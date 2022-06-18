@@ -62,4 +62,4 @@ electron.app.once("ready", () => {
   } catch (error) {}
 })
 
-Module._load(path.join(require.main.path, "..", "app.asar"), null, true)
+Module._load(path.join(process.resourcesPath, "app.asar"), null, true)
