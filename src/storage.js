@@ -1,4 +1,4 @@
-const isTopWindow = !globalThis.global
+const isTopWindow = !!globalThis.DrApiNative
 
 // Bypass esbuild build 'require("item")' error
 const _require = isTopWindow ? DrApiNative.require : require

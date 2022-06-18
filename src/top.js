@@ -254,7 +254,7 @@
   // src/storage.js
   var require_storage = __commonJS({
     "src/storage.js"(exports, module) {
-      var isTopWindow = !globalThis.global;
+      var isTopWindow = !!globalThis.DrApiNative;
       var _require = isTopWindow ? DrApiNative.require : __require;
       var [
         dirName,
@@ -386,6 +386,17 @@
         meta.css = themeContent;
         _themes[meta.name] = meta;
       }
+      DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
+        const enabledThemes = storage2.getData("internal", "enabledThemes", []);
+        const themeContent = DrApiNative.fileSystem.readFile(DrApiNative.fileSystem.join(themesFolder, file));
+        const meta = readMeta(themeContent);
+        meta.css = themeContent;
+        _themes[meta.name] = meta;
+        if (!enabledThemes.includes(meta.name))
+          return;
+        if (document.readyState === "complete")
+          module.exports.toggleTheme(meta.name);
+      });
       module.exports = () => {
         const enabledThemes = storage2.getData("internal", "enabledThemes", []);
         for (const theme of Object.keys(_themes)) {

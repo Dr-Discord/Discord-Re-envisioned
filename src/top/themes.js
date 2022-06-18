@@ -30,6 +30,18 @@ for (const theme of themes) {
   _themes[meta.name] = meta
 }
 
+DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
+  const enabledThemes = storage.getData("internal", "enabledThemes", [])
+
+  const themeContent = DrApiNative.fileSystem.readFile(DrApiNative.fileSystem.join(themesFolder, file))
+  const meta = readMeta(themeContent)
+  meta.css = themeContent
+  _themes[meta.name] = meta
+
+  if (!enabledThemes.includes(meta.name)) return
+  if (document.readyState === "complete") module.exports.toggleTheme(meta.name)
+})
+
 module.exports = () => {
   const enabledThemes = storage.getData("internal", "enabledThemes", [])
   
