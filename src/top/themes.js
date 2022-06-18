@@ -7,7 +7,7 @@ if (!DrApiNative.fileSystem.exists(themesFolder)) DrApiNative.fileSystem.mkdir(t
 
 const readDir = DrApiNative.runInNative("require(\"fs\").readdirSync")
 
-const themes = readDir(themesFolder).filter(theme => theme.endsWith(".css"))
+const themes = readDir(themesFolder).filter(theme => theme.endsWith(".theme.css"))
 
 function readMeta(contents) {
   const meta = {}
@@ -31,6 +31,8 @@ for (const theme of themes) {
 }
 
 DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
+  if (file.endsWith(".theme.css")) return
+
   const enabledThemes = storage.getData("internal", "enabledThemes", [])
 
   const themeContent = DrApiNative.fileSystem.readFile(DrApiNative.fileSystem.join(themesFolder, file))
