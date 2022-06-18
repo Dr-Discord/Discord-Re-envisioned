@@ -34,7 +34,7 @@
                   for (const ite of waiting)
                     ite(module2, id);
                   webpackModules[id] = _.exports;
-                  if (_.exports) {
+                  if (_.exports && !_.exports.css) {
                     const m = Object.entries(_.exports);
                     m.map(([id2, selector]) => {
                       if (typeof selector !== "string")
@@ -1066,7 +1066,7 @@
               React.createElement("div", {
                 className: "dr-toast-background",
                 style: {
-                  backdropFilter: `blur(${blur}px)`,
+                  filter: `blur(${blur}px)`,
                   opacity: opacity / 100
                 }
               }),

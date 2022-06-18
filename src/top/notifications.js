@@ -116,7 +116,7 @@ module.exports = async (React) => {
         React.createElement("div", {
           className: "dr-toast-background",
           style: {
-            backdropFilter: `blur(${blur}px)`,
+            filter: `blur(${blur}px)`,
             opacity: opacity / 100
           }
         }),

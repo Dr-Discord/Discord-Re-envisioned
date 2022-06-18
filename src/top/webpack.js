@@ -23,7 +23,7 @@ module.exports = new class rawWebpack {
 
             webpackModules[id] = _.exports
             
-            if (_.exports) {
+            if (_.exports && !_.exports.css) {
               const m = Object.entries(_.exports)
               m.map(([id, selector]) => {
                 if (typeof selector !== "string") return 
