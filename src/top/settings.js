@@ -33,6 +33,13 @@ module.exports = async (React) => {
   const { default: Menu, MenuItem, MenuSeparator } = webpack.getModuleByDisplayName("Menu")
   const Popout = webpack.getModuleByDisplayName("Popout", true)
   const Filter = webpack.getModuleByDisplayName("Filter", true)
+  const Trash = webpack.getModuleByDisplayName("Trash", true)
+  const Globe = webpack.getModuleByDisplayName("Globe", true)
+  const Link = webpack.getModuleByDisplayName("Link", true)
+  const InlineCode = webpack.getModuleByDisplayName("InlineCode", true)
+  const WalletIcon = webpack.getModuleByDisplayName("WalletIcon", true)
+  const Ticket = webpack.getModuleByDisplayName("Ticket", true)
+  const { openContextMenu, closeContextMenu } = webpack.getModuleByProps("openContextMenuLazy")
 
   const { header, topDivider, body, expandIcon } = webpack.getModuleByProps("header", "topDivider")
   const { iconWrapper, wrapper, secondaryHeader } = webpack.getModuleByProps("detailsWrapper", "icon", "iconWrapper")
@@ -321,9 +328,7 @@ module.exports = async (React) => {
         width: 24,
         height: 24,
         className: "dr-addon-avatar",
-        onClick() {
-          openUserProfileModal({ userId: userId })
-        },
+        onClick: () => openUserProfileModal({ userId: userId }),
       }) : false,
       React.createElement(LegacyHeader, {
         children: user?.name ?? author,
@@ -350,6 +355,7 @@ module.exports = async (React) => {
       ...Card.defaultProps,
       editable: true,
       className: card,
+      onContextMenu: (event) => openContextMenu(event, event => React.createElement(AddonContextMenu, { event, addon })),
       children: React.createElement("div", {
         className: header,
         style: { cursor: "default" },
@@ -365,6 +371,8 @@ module.exports = async (React) => {
                     children: [
                       React.createElement(LegacyHeader, {
                         children: addon.name,
+                        style: addon.authorLink ? { cursor: "pointer" } : undefined,
+                        onClick: () => addon.authorLink && shell.openExternal(addon.authorLink),
                         className: secondaryHeader,
                         size: size20,
                         tag: "h3"
@@ -403,16 +411,74 @@ module.exports = async (React) => {
               })
             ]
           }),
-          React.createElement("div", {
+          addon.description ? React.createElement("div", {
             style: { color: "var(--text-normal)" }
           }, (() => {
             const { content } = renderMessageMarkup({ content: " *s* " + addon.description })
             content.shift()
             content.shift()
             return content
-          })())
+          })()) : false
         ]
       })
+    })
+  }
+
+  function AddonContextMenu({ event, addon }) {
+    const links = [
+      addon.website ? React.createElement(MenuItem, {
+        id: "website-addon",
+        label: "Website",
+        icon: () => React.createElement(Globe, { className: iconMenu }),
+        action: () => shell.openExternal(addon.website)
+      }) : false,
+      addon.invite ? React.createElement(MenuItem, {
+        id: "invite-addon",
+        label: "Discord Invite",
+        icon: () => React.createElement(Link, { className: iconMenu }),
+        action: () => shell.openExternal(`https://discord.gg/${addon.invite.split("/").pop()}`)
+      }) : false,
+      addon.source ? React.createElement(MenuItem, {
+        id: "source-addon",
+        label: "Source",
+        icon: () => React.createElement(InlineCode, { className: iconMenu }),
+        action: () => shell.openExternal(addon.source)
+      }) : false,
+      addon.donate ? React.createElement(MenuItem, {
+        id: "donate-addon",
+        label: "Donate",
+        icon: () => React.createElement(WalletIcon, { className: iconMenu }),
+        action: () => shell.openExternal(addon.donate)
+      }) : false,
+      addon.patreon ? React.createElement(MenuItem, {
+        id: "patreon-addon",
+        label: "Patreon",
+        icon: () => React.createElement(Ticket, { className: iconMenu }),
+        action: () => shell.openExternal(addon.patreon)
+      }) : false
+    ]
+
+    return React.createElement(Menu, {
+      ...event,
+      onClose: closeContextMenu,
+      navId: "addon-context-menu",
+      children: [
+        links.filter(l => l).length ? [
+          links,
+          React.createElement(MenuSeparator)
+        ] : false,
+        React.createElement(MenuItem, {
+          id: "uninstall-addon",
+          label: "Uninstall Theme",
+          color: "colorDanger",
+          icon: () => React.createElement(Trash, { className: iconMenu }),
+          action: () => DrApi.modals.confirmModal(`Uninstall ${addon.name}`, `Are you sure you want to uninstall '${addon.name}'?`, {
+            confirmText: "Uninstall",
+            onConfirm: () => DrApiNative.fileSystem.rm(addon.filePath),
+            danger: true
+          })
+        })
+      ]
     })
   }
 
