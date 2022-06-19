@@ -390,9 +390,11 @@
         if (file.endsWith(".theme.css"))
           return;
         const enabledThemes = storage2.getData("internal", "enabledThemes", []);
-        const themeContent = DrApiNative.fileSystem.readFile(DrApiNative.fileSystem.join(themesFolder, file));
+        const filePath = DrApiNative.fileSystem.join(themesFolder, file);
+        const themeContent = DrApiNative.fileSystem.readFile(filePath);
         const meta = readMeta(themeContent);
         meta.css = themeContent;
+        meta.filePath = filePath;
         _themes[meta.name] = meta;
         if (!enabledThemes.includes(meta.name))
           return;
@@ -447,9 +449,15 @@
         const { Messages } = webpack2.getAllModulesByProps("Messages")[1];
         const Switch = webpack2.getModuleByDisplayName("Switch", true);
         const SearchBar = webpack2.getModuleByDisplayName("SearchBar", true);
+        const Folder = webpack2.getModuleByDisplayName("Folder", true);
+        const OverflowMenu = webpack2.getModuleByDisplayName("OverflowMenu", true);
+        const { Icon } = DrApi.webpack.getModuleByProps("Icon", "default");
+        const { default: Menu, MenuItem, MenuSeparator } = webpack2.getModuleByDisplayName("Menu");
+        const Popout = webpack2.getModuleByDisplayName("Popout", true);
+        const Filter = webpack2.getModuleByDisplayName("Filter", true);
         const { header, topDivider, body, expandIcon } = webpack2.getModuleByProps("header", "topDivider");
         const { iconWrapper, wrapper, secondaryHeader } = webpack2.getModuleByProps("detailsWrapper", "icon", "iconWrapper");
-        const { justifyCenter, alignCenter, justifyBetween, horizontal } = webpack2.getModuleByProps("justifyCenter", "alignCenter");
+        const { justifyCenter, alignCenter, justifyBetween, horizontal, justifyEnd } = webpack2.getModuleByProps("justifyCenter", "alignCenter");
         const { card } = webpack2.getModuleByProps("card", "pulse", "topDivider");
         styles2("DrApi-settings", `.dr-header:not(:last-child) .dr-catorgory-icon {
     color: var(--header-primary);
@@ -819,38 +827,93 @@
             })
           });
         }
+        function AddonConfiguration(event) {
+          const [sortByWhat, setSortByWhat] = storage2.useStorage("internal", "addonSortBy", "name");
+          return React.createElement(Menu, {
+            ...event,
+            onClose: event.closePopout,
+            navId: "addon-configuration",
+            children: [
+              React.createElement(MenuItem, {
+                id: "sort-by",
+                label: `Sorting by ${sortByWhat[0].toUpperCase() + sortByWhat.substring(1)}`,
+                dontCloseOnActionIfHoldingShiftKey: true,
+                icon: () => React.createElement(Filter, { className: "icon-E4cW1l dr-icon" }),
+                action: () => setSortByWhat(sortByWhat === "name" ? "author" : "name")
+              }),
+              React.createElement(MenuSeparator),
+              React.createElement(MenuItem, {
+                id: "open-theme-folder",
+                label: "Open Theme Folder",
+                icon: () => React.createElement(Folder, { className: "icon-E4cW1l dr-icon" }),
+                action: () => () => DrApiNative.runInNative('require("electron").shell').openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes"))
+              })
+            ]
+          });
+        }
+        const sortBy = (key) => (a, b) => {
+          if (a[key] < b[key])
+            return -1;
+          if (a[key] > b[key])
+            return 1;
+          return 0;
+        };
         function Themes() {
+          const [sortByWhat] = storage2.useStorage("internal", "addonSortBy", "name");
           const [query, setQuery] = React.useState("");
           const [themes2, setThemes] = React.useState(getThemes());
+          const [isConfigOpen, setConfigOpen] = React.useState(false);
           return React.createElement(FormSection, {
-            title: "Themes",
+            title: React.createElement(Flex, {
+              justify: justifyBetween,
+              children: [
+                "Themes",
+                React.createElement(Flex, {
+                  id: "dr-addon-header",
+                  justify: justifyEnd,
+                  children: [
+                    React.createElement(SearchBar, {
+                      placeholder: "Search Themes",
+                      query,
+                      isLoading: false,
+                      disabled: false,
+                      autoFocus: true,
+                      size: SearchBar.Sizes.SMALL,
+                      onQueryChange: (val) => {
+                        setQuery(val);
+                        const filtered = Object.entries(getThemes()).filter(([theme, { author }]) => theme.toLowerCase().includes(val.toLowerCase()) || author.toLowerCase().includes(val.toLowerCase()));
+                        setThemes(Object.fromEntries(filtered));
+                      },
+                      onClear: () => {
+                        setQuery("");
+                        setThemes(getThemes());
+                      }
+                    }),
+                    React.createElement(Icon, {
+                      icon: () => React.createElement(Folder, { className: "icon-2xnN2Y dr-icon" }),
+                      onClick: () => DrApiNative.runInNative('require("electron").shell').openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes")),
+                      tooltip: "Open Theme Folder"
+                    }),
+                    React.createElement(Popout, {
+                      shouldShow: isConfigOpen,
+                      position: "left",
+                      onRequestClose: () => setConfigOpen(false),
+                      renderPopout: (event) => React.createElement(AddonConfiguration, event),
+                      children: () => React.createElement(Icon, {
+                        icon: () => React.createElement(OverflowMenu, { className: "icon-2xnN2Y dr-icon" }),
+                        onClick: () => setConfigOpen(!isConfigOpen),
+                        tooltip: "Configuration"
+                      })
+                    })
+                  ]
+                })
+              ]
+            }),
             tag: FormSection.Tags.H1,
             children: [
               React.createElement("div", {
-                id: "dr-addon-header",
-                children: [
-                  React.createElement(SearchBar, {
-                    placeholder: "Search Themes",
-                    query,
-                    isLoading: false,
-                    disabled: false,
-                    autoFocus: true,
-                    size: SearchBar.Sizes.SMALL,
-                    onQueryChange: (val) => {
-                      setQuery(val);
-                      const filtered = Object.entries(getThemes()).filter(([theme]) => theme.toLowerCase().includes(val.toLowerCase()));
-                      setThemes(Object.fromEntries(filtered));
-                    },
-                    onClear: () => {
-                      setQuery("");
-                      setThemes(getThemes());
-                    }
-                  })
-                ]
-              }),
-              React.createElement("div", {
                 id: "dr-addon-list",
-                children: Object.values(themes2).map((theme) => React.createElement(AddonCard, theme))
+                children: Object.values(themes2).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
               })
             ]
           });
@@ -864,12 +927,12 @@
           {
             element: () => React.createElement(Settings),
             label: "Settings",
-            section: "Discord Re-envisioned Themes"
+            section: "Discord Re-envisioned"
           },
           {
             element: () => React.createElement(Themes),
             label: "Themes",
-            section: "Discord Re-envisioned"
+            section: "Discord Re-envisioned Themes"
           }
         ];
         patcher.after("DrApi", sectionsModule.default, "render", (that, args, res) => {
@@ -1156,6 +1219,8 @@
           });
         }
         Patcher2.after("DrApi", Shakeable.prototype, "render", (that, args, res) => {
+          if (res.props.children.find((child) => child.type === Toasts))
+            return;
           res.props.children.push(React.createElement(Toasts));
         });
       };

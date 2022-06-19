@@ -207,6 +207,7 @@ module.exports = async (React) => {
   }
 
   Patcher.after("DrApi", Shakeable.prototype, "render", (that, args, res) => {
+    if (res.props.children.find(child => child.type === Toasts)) return
     res.props.children.push(React.createElement(Toasts))
   })
 }

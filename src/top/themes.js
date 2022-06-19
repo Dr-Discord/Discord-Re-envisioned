@@ -35,9 +35,12 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type
 
   const enabledThemes = storage.getData("internal", "enabledThemes", [])
 
-  const themeContent = DrApiNative.fileSystem.readFile(DrApiNative.fileSystem.join(themesFolder, file))
+  const filePath = DrApiNative.fileSystem.join(themesFolder, file)
+
+  const themeContent = DrApiNative.fileSystem.readFile(filePath)
   const meta = readMeta(themeContent)
   meta.css = themeContent
+  meta.filePath = filePath
   _themes[meta.name] = meta
 
   if (!enabledThemes.includes(meta.name)) return
