@@ -4,6 +4,11 @@ const storage = require("../storage")
 const styles = require("./styles")
 const { getThemes, toggleTheme } = require("./themes")
 
+const [clipboard, shell] = DrApiNative.runInNative(`(() => {
+  const ele = require("electron")
+  return [ele.clipboard, ele.shell]
+})()`)
+
 module.exports = async (React) => {
   const sectionsModule = await webpack.getModuleByPropsAsync("getUserSettingsSections")
   const NotificationSettings = webpack.getModuleByDisplayName("NotificationSettings", true)
@@ -33,6 +38,10 @@ module.exports = async (React) => {
   const { iconWrapper, wrapper, secondaryHeader } = webpack.getModuleByProps("detailsWrapper", "icon", "iconWrapper")
   const { justifyCenter, alignCenter, justifyBetween, horizontal, justifyEnd} = webpack.getModuleByProps("justifyCenter", "alignCenter")
   const { card } = webpack.getModuleByProps("card", "pulse", "topDivider")
+  const { size16, size20 } = webpack.getModuleByProps("size20", "size16")
+  const { icon:iconToolbar } = DrApi.webpack.getModuleByProps("icon", "transparent", "iconWrapper")
+  const { icon:iconMenu } = DrApi.webpack.getModuleByProps("colorPremium", "icon")
+  const { line } = webpack.getModuleByProps("line", "versionHash")
 
   styles("DrApi-settings", `.dr-header:not(:last-child) .dr-catorgory-icon {
     color: var(--header-primary);
@@ -117,7 +126,7 @@ module.exports = async (React) => {
                         React.createElement(LegacyHeader, {
                           children: title,
                           className: secondaryHeader,
-                          size: "size16-CysEuG dr-size16",
+                          size: size16,
                           tag: "h3"
                         }),
                         subTitle ? React.createElement(Text, {
@@ -319,7 +328,7 @@ module.exports = async (React) => {
       React.createElement(LegacyHeader, {
         children: user?.name ?? author,
         className: secondaryHeader,
-        size: "size16-CysEuG dr-size16",
+        size: size16,
         tag: "h3"
       }),
       (user && user.id === userId) ? React.createElement(Text, {
@@ -357,7 +366,7 @@ module.exports = async (React) => {
                       React.createElement(LegacyHeader, {
                         children: addon.name,
                         className: secondaryHeader,
-                        size: "size20-2yAqwX dr-size20",
+                        size: size20,
                         tag: "h3"
                       }),
                       React.createElement(Text, {
@@ -419,15 +428,15 @@ module.exports = async (React) => {
           id: "sort-by",
           label: `Sorting by ${sortByWhat[0].toUpperCase() + sortByWhat.substring(1)}`,
           dontCloseOnActionIfHoldingShiftKey: true,
-          icon: () => React.createElement(Filter, { className: "icon-E4cW1l dr-icon" }),
+          icon: () => React.createElement(Filter, { className: iconMenu }),
           action: () => setSortByWhat(sortByWhat === "name" ? "author" : "name")
         }),
         React.createElement(MenuSeparator),
         React.createElement(MenuItem, {
           id: "open-theme-folder",
           label: "Open Theme Folder",
-          icon: () => React.createElement(Folder, { className: "icon-E4cW1l dr-icon" }),
-          action: () => () => DrApiNative.runInNative("require(\"electron\").shell").openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes"))
+          icon: () => React.createElement(Folder, { className: iconMenu }),
+          action: () => () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes"))
         }),
       ]
     })
@@ -440,6 +449,8 @@ module.exports = async (React) => {
   }
 
   function Themes() {
+    storage.useStorage("internal", "enabledThemes", [])
+
     const [sortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
     const [query, setQuery] = React.useState("")
     const [themes, setThemes] = React.useState(getThemes())
@@ -473,8 +484,8 @@ module.exports = async (React) => {
                 }
               }),
               React.createElement(Icon, {
-                icon: () => React.createElement(Folder, { className: "icon-2xnN2Y dr-icon" }),
-                onClick: () => DrApiNative.runInNative("require(\"electron\").shell").openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes")),
+                icon: () => React.createElement(Folder, { className: iconToolbar }),
+                onClick: () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes")),
                 tooltip: "Open Theme Folder"
               }),
               React.createElement(Popout, {
@@ -483,7 +494,7 @@ module.exports = async (React) => {
                 onRequestClose: () => setConfigOpen(false),
                 renderPopout: (event) => React.createElement(AddonConfiguration, event),
                 children: () => React.createElement(Icon, {
-                  icon: () => React.createElement(OverflowMenu, { className: "icon-2xnN2Y dr-icon" }),
+                  icon: () => React.createElement(OverflowMenu, { className: iconToolbar }),
                   onClick: () => setConfigOpen(!isConfigOpen),
                   tooltip: "Configuration"
                 })
@@ -530,60 +541,6 @@ module.exports = async (React) => {
     sections.splice(index, 0, ...settings)
   })
 
-  const { line } = webpack.getModuleByProps("line", "versionHash")
-  
-  const { openModal } = webpack.getModuleByProps("openModalLazy", "openModal")
-  const { ModalRoot, ModalHeader, ModalContent, ModalFooter, ModalCloseButton } = webpack.getModuleByProps("ModalRoot", "ModalHeader")
-  const { Heading } = DrApi.webpack.getModuleByProps("Heading")
-
-  function changeLog() {
-    openModal(props => React.createElement(ModalRoot, {
-      ...props,
-      className: "modal-3Hrb0S dr-modal",
-      children: [
-        React.createElement(ModalHeader, {
-          align: justifyBetween,
-          separator: false,
-          children: [
-            React.createElement(Flex.Child, {
-              wrap: false,
-              children: [
-                React.createElement(Heading, {
-                  children: "What's New",
-                  level: 2,
-                  variant: "heading-lg/medium"
-                }),
-                React.createElement(Text, {
-                  variant: "text-xs/normal",
-                  children: [
-                    "Discord Re-envisioned",
-                    " (",
-                    React.createElement("span", {
-                      children: "ALPHA",
-                      style: { color: "var(--status-danger)" }
-                    }),
-                    ")"
-                  ]
-                })
-              ]
-            }),
-            React.createElement(Flex.Child, {
-              grow: 0,
-              children: React.createElement(ModalCloseButton, { onClick: props.onClose })
-            })
-          ]
-        }),
-        React.createElement(ModalContent, {
-          className: "container-3PVapX dr-container content-FDHp32 dr-content",
-          children: "Text"
-        }),
-        React.createElement(ModalFooter, {
-          direction: horizontal
-        })
-      ]
-    }))
-  }
-
   patcher.after("DrApi", webpack.getModuleByDisplayName("ClientDebugInfo"), "default", (that, args, res) => {
     res.props.children.push(React.createElement(Text, {
       className: line,
@@ -594,7 +551,7 @@ module.exports = async (React) => {
         "Discord Re-envisioned",
         " (",
         React.createElement("span", {
-          onClick: () => changeLog(),
+          onClick: () => {},
           children: "ALPHA",
           style: { color: "var(--status-danger)", cursor: "pointer" }
         }),

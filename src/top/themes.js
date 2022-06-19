@@ -24,24 +24,45 @@ function readMeta(contents) {
 const _themes = {}
 
 for (const theme of themes) {
-  const themeContent = DrApiNative.fileSystem.readFile(DrApiNative.fileSystem.join(themesFolder, theme))
-  const meta = readMeta(themeContent)
-  meta.css = themeContent
-  _themes[meta.name] = meta
-}
-
-DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
-  if (file.endsWith(".theme.css")) return
-
-  const enabledThemes = storage.getData("internal", "enabledThemes", [])
-
-  const filePath = DrApiNative.fileSystem.join(themesFolder, file)
+  const filePath = DrApiNative.fileSystem.join(themesFolder, theme)
 
   const themeContent = DrApiNative.fileSystem.readFile(filePath)
   const meta = readMeta(themeContent)
   meta.css = themeContent
   meta.filePath = filePath
+
   _themes[meta.name] = meta
+}
+
+DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
+  if (!file.endsWith(".theme.css")) return
+
+  const enabledThemes = storage.getData("internal", "enabledThemes", [])
+
+  const filePath = DrApiNative.fileSystem.join(themesFolder, file)
+
+  if (!DrApiNative.fileSystem.exists(filePath)) {
+    const found = Object.values(_themes).find(theme => theme.filePath === filePath)
+    delete _themes[found.name]
+    
+    const index = enabledThemes.indexOf(found.name)
+    if (index !== -1) {
+      enabledThemes.splice(index, 1)
+      document.getElementById(found.name).remove()
+    }
+
+    return storage.setData("internal", "enabledThemes", [...enabledThemes])
+  }
+
+  const themeContent = DrApiNative.fileSystem.readFile(filePath)
+
+  const meta = readMeta(themeContent)
+
+  meta.css = themeContent
+  meta.filePath = filePath
+  _themes[meta.name] = meta
+
+  storage.setData("internal", "enabledThemes", enabledThemes)
 
   if (!enabledThemes.includes(meta.name)) return
   if (document.readyState === "complete") module.exports.toggleTheme(meta.name)
