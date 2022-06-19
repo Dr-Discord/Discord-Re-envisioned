@@ -61,5 +61,5 @@ const Native = {
 contextBridge.exposeInMainWorld("DrApiNative", Native)
 
 const node = document.createElement("script")
-node.innerHTML = fs.readFileSync(path.join(__dirname, "top.js"), "utf-8")
+node.innerHTML = fs.readFileSync(path.join(__dirname, "main.js"), "utf-8")
 document.append(node)

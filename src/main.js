@@ -11,9 +11,9 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
 
-  // src/top/webpack.js
+  // src/main/webpack.js
   var require_webpack = __commonJS({
-    "src/top/webpack.js"(exports, module) {
+    "src/main/webpack.js"(exports, module) {
       module.exports = new class rawWebpack {
         constructor() {
           let waiting = [];
@@ -186,9 +186,9 @@
     }
   });
 
-  // src/top/patcher.js
+  // src/main/patcher.js
   var require_patcher = __commonJS({
-    "src/top/patcher.js"(exports, module) {
+    "src/main/patcher.js"(exports, module) {
       module.exports = new class rawPatcher {
         Symbol = Symbol("DrApi");
         hook(module2, fn) {
@@ -338,9 +338,9 @@
     }
   });
 
-  // src/top/styles.js
+  // src/main/styles.js
   var require_styles = __commonJS({
-    "src/top/styles.js"(exports, module) {
+    "src/main/styles.js"(exports, module) {
       var styles2 = document.createElement("dr-styles");
       module.exports = function(id, css) {
         let style = document.getElementById(id);
@@ -357,9 +357,9 @@
     }
   });
 
-  // src/top/themes.js
+  // src/main/themes.js
   var require_themes = __commonJS({
-    "src/top/themes.js"(exports, module) {
+    "src/main/themes.js"(exports, module) {
       var storage2 = require_storage();
       var { styles: styles2 } = require_styles();
       var themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes");
@@ -436,9 +436,9 @@
     }
   });
 
-  // src/top/settings.js
+  // src/main/settings.js
   var require_settings = __commonJS({
-    "src/top/settings.js"(exports, module) {
+    "src/main/settings.js"(exports, module) {
       var patcher = require_patcher();
       var webpack2 = require_webpack();
       var storage2 = require_storage();
@@ -1053,9 +1053,9 @@
     }
   });
 
-  // src/top/notifications.js
+  // src/main/notifications.js
   var require_notifications = __commonJS({
-    "src/top/notifications.js"(exports, module) {
+    "src/main/notifications.js"(exports, module) {
       var webpack2 = require_webpack();
       var Patcher2 = require_patcher();
       var storage2 = require_storage();
@@ -1263,9 +1263,9 @@
     }
   });
 
-  // src/top/modals.js
+  // src/main/modals.js
   var require_modals = __commonJS({
-    "src/top/modals.js"(exports, module) {
+    "src/main/modals.js"(exports, module) {
       var patcher = require_patcher();
       var webpack2 = require_webpack();
       module.exports = async (React) => {
@@ -1333,7 +1333,7 @@
     }
   });
 
-  // src/top/index.js
+  // src/main/index.js
   var originalConsole = globalThis.console;
   for (const key in originalConsole) {
     const e = originalConsole[key];
