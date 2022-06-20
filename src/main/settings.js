@@ -598,11 +598,7 @@ module.exports = async (React) => {
     return 0
   }
 
-  function filterThemes(val, [theme, { author }]) {
-    const res = val.split("&&").map(v => theme.toLowerCase().includes(v.toLowerCase()) || author.toLowerCase().includes(v.toLowerCase()))
-
-    return res.filter(l => l).length
-  }
+  const filterThemes = (val, [theme, { author }]) => val.map(v => theme.toLowerCase().includes(v.toLowerCase()) || author.toLowerCase().includes(v.toLowerCase())).filter(l => l).length
 
   function Themes() {
     storage.useStorage("internal", "enabledThemes", [])
@@ -611,6 +607,7 @@ module.exports = async (React) => {
     const [sortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
     const [filter] = storage.useStorage("internal", "addonFilterBy", 0)
     const [query, setQuery] = React.useState("")
+    const [tags, setTags] = React.useState([])
     const [themes, setThemes] = React.useState(getThemes())
     const [splashThemes, setSplashThemes] = React.useState(getThemes(true))
     const [isConfigOpen, setConfigOpen] = React.useState(false)
@@ -630,17 +627,42 @@ module.exports = async (React) => {
                 placeholder: "Search Themes",
                 className: search,
                 query,
+                tags,
                 isLoading: false,
                 disabled: false,
                 autoFocus: true,
                 size: SearchBar.Sizes.SMALL,
-                onQueryChange: (val) => {
-                  setQuery(val)
-  
-                  const filtered = Object.entries(getThemes()).filter(filterThemes.bind(null, val))
+                onRemoveTag: (tag) => {
+                  tags.splice(tag, 1)
+                  setTags([...tags])
+
+                  const searchValue = tags.length ? tags : [query]
+
+                  const filtered = Object.entries(getThemes()).filter(filterThemes.bind(null, searchValue))
                   setThemes(Object.fromEntries(filtered))
 
-                  const _filtered = Object.entries(getThemes(true)).filter(filterThemes.bind(null, val))
+                  const _filtered = Object.entries(getThemes(true)).filter(filterThemes.bind(null, searchValue))
+                  setSplashThemes(Object.fromEntries(_filtered))
+                },
+                onKeyDown: (event) => {
+                  if (event.key !== "Tab") return
+                  event.stopPropagation()
+                  event.preventDefault()
+
+                  if (!query) return
+                  
+                  setTags(tags.concat(query))
+                  setQuery("")
+                },
+                onQueryChange: (val) => {
+                  setQuery(val)
+
+                  const searchValue = tags.concat(val)
+
+                  const filtered = Object.entries(getThemes()).filter(filterThemes.bind(null, searchValue))
+                  setThemes(Object.fromEntries(filtered))
+
+                  const _filtered = Object.entries(getThemes(true)).filter(filterThemes.bind(null, searchValue))
                   setSplashThemes(Object.fromEntries(_filtered))
                 },
                 onClear: () => {
