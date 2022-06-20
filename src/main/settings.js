@@ -404,7 +404,7 @@ module.exports = async (React) => {
         className: secondaryHeader,
         size: size16,
         style: authorLink ? { cursor: "pointer" } : undefined,
-        onClick: authorLink ? shell.openExternal(authorLink) : undefined,
+        onClick: authorLink ? () => shell.openExternal(authorLink) : undefined,
         tag: "h3"
       }),
       user ? React.createElement(Text, {
@@ -630,6 +630,11 @@ module.exports = async (React) => {
             id: "dr-addon-header",
             justify: justifyEnd,
             children: [
+              React.createElement(Icon, {
+                icon: () => React.createElement(Folder, { className: iconToolbar }),
+                onClick: () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes")),
+                tooltip: "Open Theme Folder"
+              }),
               React.createElement(SearchBar, {
                 placeholder: "Search Themes",
                 className: search,
@@ -677,11 +682,6 @@ module.exports = async (React) => {
                   setThemes(getThemes())
                   setSplashThemes(getThemes(true))
                 }
-              }),
-              React.createElement(Icon, {
-                icon: () => React.createElement(Folder, { className: iconToolbar }),
-                onClick: () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes")),
-                tooltip: "Open Theme Folder"
               }),
               React.createElement(Popout, {
                 shouldShow: isConfigOpen,
