@@ -547,6 +547,7 @@
         const { icon: iconToolbar } = DrApi.webpack.getModuleByProps("icon", "transparent", "iconWrapper");
         const { icon: iconMenu } = DrApi.webpack.getModuleByProps("colorPremium", "icon");
         const { line } = webpack2.getModuleByProps("line", "versionHash");
+        const { search } = DrApi.webpack.getModuleByProps("search", "toolbar");
         styles2("DrApi-settings", `.dr-header:not(:last-child) .dr-catorgory-icon {
     color: var(--header-primary);
   } .dr-catorgory-icon {
@@ -1047,6 +1048,7 @@
                   children: [
                     React.createElement(SearchBar, {
                       placeholder: "Search Themes",
+                      className: search,
                       query,
                       isLoading: false,
                       disabled: false,
@@ -1076,6 +1078,7 @@
                       onRequestClose: () => setConfigOpen(false),
                       renderPopout: (event) => React.createElement(AddonConfiguration, event),
                       children: () => React.createElement(Icon, {
+                        selected: isConfigOpen,
                         icon: () => React.createElement(OverflowMenu, { className: iconToolbar }),
                         onClick: () => setConfigOpen(!isConfigOpen),
                         tooltip: "Configuration"
