@@ -1,5 +1,5 @@
 const storage = require("../storage")
-const { styles } = require("./styles")
+const { themes:styles } = require("./styles")
 
 const themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes")
 
@@ -7,7 +7,9 @@ if (!DrApiNative.fileSystem.exists(themesFolder)) DrApiNative.fileSystem.mkdir(t
 
 const readDir = DrApiNative.runInNative("require(\"fs\").readdirSync")
 
-const themes = readDir(themesFolder).filter(theme => theme.endsWith(".theme.css"))
+const dir = readDir(themesFolder)
+const themes = dir.filter(theme => theme.endsWith(".theme.css"))
+const splashThemes = dir.filter(theme => theme.endsWith(".splash.css"))
 
 function readMeta(contents) {
   const meta = {}
@@ -22,7 +24,6 @@ function readMeta(contents) {
 }
 
 const _themes = {}
-
 for (const theme of themes) {
   const filePath = DrApiNative.fileSystem.join(themesFolder, theme)
 
@@ -34,9 +35,19 @@ for (const theme of themes) {
   _themes[meta.name] = meta
 }
 
-DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
-  if (!file.endsWith(".theme.css")) return
+const _splashThemes = {}
+for (const theme of splashThemes) {
+  const filePath = DrApiNative.fileSystem.join(themesFolder, theme)
 
+  const themeContent = DrApiNative.fileSystem.readFile(filePath)
+  const meta = readMeta(themeContent)
+  meta.css = themeContent
+  meta.filePath = filePath
+
+  _splashThemes[meta.name] = meta
+}
+
+function watchTheme(file) {
   const enabledThemes = storage.getData("internal", "enabledThemes", [])
 
   const filePath = DrApiNative.fileSystem.join(themesFolder, file)
@@ -48,7 +59,7 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type
     const index = enabledThemes.indexOf(found.name)
     if (index !== -1) {
       enabledThemes.splice(index, 1)
-      document.getElementById(found.name).remove()
+      document.querySelector(`[dr-theme=${JSON.stringify(id)}]`).remove()
     }
 
     return storage.setData("internal", "enabledThemes", [...enabledThemes])
@@ -66,6 +77,37 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type
 
   if (!enabledThemes.includes(meta.name)) return
   if (document.readyState === "complete") module.exports.toggleTheme(meta.name)
+}
+
+function watchSplash(file) {
+  const enabledThemes = storage.getData("internal", "enabledSplashThemes", [])
+
+  const filePath = DrApiNative.fileSystem.join(themesFolder, file)
+
+  if (!DrApiNative.fileSystem.exists(filePath)) {
+    const found = Object.values(_splashThemes).find(theme => theme.filePath === filePath)
+    delete _splashThemes[found.name]
+    
+    const index = enabledThemes.indexOf(found.name)
+    if (index !== -1) enabledThemes.splice(index, 1)
+
+    return storage.setData("internal", "enabledSplashThemes", [...enabledThemes])
+  }
+
+  const themeContent = DrApiNative.fileSystem.readFile(filePath)
+
+  const meta = readMeta(themeContent)
+
+  meta.css = themeContent
+  meta.filePath = filePath
+  _splashThemes[meta.name] = meta
+
+  storage.setData("internal", "enabledSplashThemes", enabledThemes)
+}
+
+DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
+  if (file.endsWith(".theme.css")) return watchTheme(file)
+  if (file.endsWith(".splash.css")) return watchSplash(file)
 })
 
 module.exports = () => {
@@ -80,13 +122,13 @@ module.exports = () => {
 module.exports.toggleTheme = (id) => {
   const theme = _themes[id]
 
-  const isOn = document.getElementById(id)
+  const isOn = document.querySelector(`[dr-theme=${JSON.stringify(id)}]`)
   if (isOn) return isOn.remove()
 
   const style = document.createElement("style")
-  style.id = theme.name
+  style.setAttribute("dr-theme", theme.name)
   style.innerHTML = theme.css
   styles.appendChild(style)
 }
 
-module.exports.getThemes = () => _themes
+module.exports.getThemes = (splash = false) => splash ? _splashThemes : _themes

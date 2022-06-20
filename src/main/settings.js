@@ -4,10 +4,9 @@ const storage = require("../storage")
 const styles = require("./styles")
 const { getThemes, toggleTheme } = require("./themes")
 
-const [clipboard, shell] = DrApiNative.runInNative(`(() => {
-  const ele = require("electron")
-  return [ele.clipboard, ele.shell]
-})()`)
+window.getThemes = getThemes
+
+const shell = DrApiNative.runInNative(`require("electron").shell`)
 
 module.exports = async (React) => {
   const sectionsModule = await webpack.getModuleByPropsAsync("getUserSettingsSections")
@@ -39,11 +38,13 @@ module.exports = async (React) => {
   const InlineCode = webpack.getModuleByDisplayName("InlineCode", true)
   const WalletIcon = webpack.getModuleByDisplayName("WalletIcon", true)
   const Ticket = webpack.getModuleByDisplayName("Ticket", true)
+  const DoubleStarIcon = webpack.getModuleByDisplayName("DoubleStarIcon", true)
+  const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
   const { openContextMenu, closeContextMenu } = webpack.getModuleByProps("openContextMenuLazy")
 
   const { header, topDivider, body, expandIcon } = webpack.getModuleByProps("header", "topDivider")
   const { iconWrapper, wrapper, secondaryHeader } = webpack.getModuleByProps("detailsWrapper", "icon", "iconWrapper")
-  const { justifyCenter, alignCenter, justifyBetween, horizontal, justifyEnd} = webpack.getModuleByProps("justifyCenter", "alignCenter")
+  const { justifyCenter, alignCenter, justifyBetween, justifyEnd} = webpack.getModuleByProps("justifyCenter", "alignCenter")
   const { card } = webpack.getModuleByProps("card", "pulse", "topDivider")
   const { size16, size20 } = webpack.getModuleByProps("size20", "size16")
   const { icon:iconToolbar } = DrApi.webpack.getModuleByProps("icon", "transparent", "iconWrapper")
@@ -312,16 +313,15 @@ module.exports = async (React) => {
   const renderMessageMarkup = webpack.getModuleByProps("renderMessageMarkupToAST").default
   const [{ getUser: fetchUser }, { getUser }] = webpack.getAllModulesByProps("getUser")
 
-  function Avatar({ author, userId }) {
+  function Avatar({ author, userId, authorLink }) {
     const [user, setUser] = React.useState(getUser(userId))
 
     React.useEffect(() => {
       void async function() {
-        if (user) setUser(getUser(userId))
-        else if (typeof userId === "string") setUser(await fetchUser(userId))
+        if (typeof userId === "string") setUser(await fetchUser(userId))
       }()
     })
-
+    
     return [
       (user && user.id === userId) ? React.createElement("img", {
         src: user.getAvatarURL(false, undefined, true),
@@ -334,6 +334,8 @@ module.exports = async (React) => {
         children: user?.name ?? author,
         className: secondaryHeader,
         size: size16,
+        style: authorLink ? { cursor: "pointer" } : undefined,
+        onClick: authorLink ? shell.openExternal(authorLink) : undefined,
         tag: "h3"
       }),
       (user && user.id === userId) ? React.createElement(Text, {
@@ -349,12 +351,13 @@ module.exports = async (React) => {
   }
 
   function AddonCard(addon) {
-    const [enabledThemes, setEnabledThmes] = storage.useStorage("internal", "enabledThemes", [])
-
+    const [enabledAddons, setEnabledAddons] = storage.useStorage("internal", addon.filePath.endsWith(".theme.css") ? "enabledThemes" : addon.filePath.endsWith(".splash.css") ? "enabledSplashThemes" : "UNKNOWN", [])
+    
     return React.createElement(Card, {
       ...Card.defaultProps,
       editable: true,
       className: card,
+      key: `dr-addon-${addon.name}${addon.filePath.endsWith(".splash.css") ? "-splash" : ""}`,
       onContextMenu: (event) => openContextMenu(event, event => React.createElement(AddonContextMenu, { event, addon })),
       children: React.createElement("div", {
         className: header,
@@ -369,10 +372,12 @@ module.exports = async (React) => {
                   React.createElement(Flex, {
                     style: { marginBottom: 4 },
                     children: [
+                      addon.filePath.endsWith(".splash.css") ? React.createElement(Tooltip, {
+                        text: "Splash Theme",
+                        children: (props) => React.createElement(DoubleStarIcon, { className: iconToolbar, style: { marginRight: 8 }, ...props })
+                      }) : false,
                       React.createElement(LegacyHeader, {
                         children: addon.name,
-                        style: addon.authorLink ? { cursor: "pointer" } : undefined,
-                        onClick: () => addon.authorLink && shell.openExternal(addon.authorLink),
                         className: secondaryHeader,
                         size: size20,
                         tag: "h3"
@@ -380,9 +385,9 @@ module.exports = async (React) => {
                       React.createElement(Text, {
                         style: {
                           paddingTop: 5,
-                          marginLeft: 10
+                          marginLeft: 4
                         },
-                        children: ["v", addon.version],
+                        children: ["v", addon.version ?? "???"],
                         color: "header-secondary",
                         variant: "text-sm/normal"
                       })
@@ -390,23 +395,23 @@ module.exports = async (React) => {
                   }),
                   React.createElement(Flex, {
                     style: { marginBottom: 6 },
-                    children: React.createElement(Avatar, { userId: addon.authorId, author: addon.author })
+                    children: React.createElement(Avatar, { userId: addon.authorId, author: addon.author, authorLink: addon.authorLink })
                   })
                 ]
               }),
               React.createElement(Switch, {
-                checked: enabledThemes.includes(addon.name),
+                checked: enabledAddons.includes(addon.name),
                 onChange: (val) => {
-                  if (val) enabledThemes.push(addon.name)
+                  if (val) enabledAddons.push(addon.name)
                   else {
-                    const i = enabledThemes.indexOf(addon.name)
+                    const i = enabledAddons.indexOf(addon.name)
                     if (i === -1) return
-                    enabledThemes.splice(i, 1)
+                    enabledAddons.splice(i, 1)
                   }
 
-                  setEnabledThmes([...enabledThemes])
+                  setEnabledAddons([...enabledAddons])
 
-                  toggleTheme(addon.name)
+                  if (addon.filePath.endsWith(".theme.css")) toggleTheme(addon.name)
                 }
               })
             ]
@@ -503,7 +508,7 @@ module.exports = async (React) => {
           label: "Open Theme Folder",
           icon: () => React.createElement(Folder, { className: iconMenu }),
           action: () => () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes"))
-        }),
+        })
       ]
     })
   }
@@ -516,10 +521,12 @@ module.exports = async (React) => {
 
   function Themes() {
     storage.useStorage("internal", "enabledThemes", [])
+    storage.useStorage("internal", "enabledSplashThemes", [])
 
     const [sortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
     const [query, setQuery] = React.useState("")
     const [themes, setThemes] = React.useState(getThemes())
+    const [splashThemes, setSplashThemes] = React.useState(getThemes(true))
     const [isConfigOpen, setConfigOpen] = React.useState(false)
 
     return React.createElement(FormSection, {
@@ -543,10 +550,14 @@ module.exports = async (React) => {
   
                   const filtered = Object.entries(getThemes()).filter(([theme, { author }]) => theme.toLowerCase().includes(val.toLowerCase()) || author.toLowerCase().includes(val.toLowerCase()))
                   setThemes(Object.fromEntries(filtered))
+
+                  const _filtered = Object.entries(getThemes(true)).filter(([theme, { author }]) => theme.toLowerCase().includes(val.toLowerCase()) || author.toLowerCase().includes(val.toLowerCase()))
+                  setSplashThemes(Object.fromEntries(_filtered))
                 },
                 onClear: () => {
                   setQuery("")
                   setThemes(getThemes())
+                  setSplashThemes(getThemes(true))
                 }
               }),
               React.createElement(Icon, {
@@ -574,6 +585,10 @@ module.exports = async (React) => {
         React.createElement("div", {
           id: "dr-addon-list",
           children: Object.values(themes).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
+        }),
+        React.createElement("div", {
+          id: "dr-splash-addon-list",
+          children: Object.values(splashThemes).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
         })
       ]
     })

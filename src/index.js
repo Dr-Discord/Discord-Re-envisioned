@@ -14,11 +14,10 @@ class BrowserWindow extends electron.BrowserWindow {
 
     let originalPreload = opts.webPreferences.preload
 
-    if (opts.webPreferences.nativeWindowOpen) {
+    if (opts.title && opts.webPreferences?.nativeWindowOpen) {
       opts.webPreferences.preload = path.join(__dirname, "preload.js")
-    }
-    if (opts.title) {
-      opts.webPreferences.preload = path.join(__dirname, "preload.js")
+    } else {
+      opts.webPreferences.preload = path.join(__dirname, "splashPreload.js")
     }
 
     if (process.platform === "darwin" && !newMacOS) opts.titleBarStyle = "default"

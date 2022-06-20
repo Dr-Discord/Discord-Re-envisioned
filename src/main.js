@@ -27,24 +27,24 @@
           function makeHandler(original) {
             function handler(chunk) {
               const [, modules] = chunk;
-              for (const id in modules) {
-                const old2 = modules[id];
-                modules[id] = function(_, module2) {
+              for (const id2 in modules) {
+                const old2 = modules[id2];
+                modules[id2] = function(_, module2) {
                   const res = old2.apply(this, arguments);
                   for (const ite of waiting)
-                    ite(module2, id);
-                  webpackModules[id] = _.exports;
+                    ite(module2, id2);
+                  webpackModules[id2] = _.exports;
                   if (_.exports && !_.exports.css) {
                     const m = Object.entries(_.exports);
-                    m.map(([id2, selector]) => {
+                    m.map(([id3, selector]) => {
                       if (typeof selector !== "string")
                         return;
-                      if (!selector.includes(`${id2}-`))
+                      if (!selector.includes(`${id3}-`))
                         return;
                       let newSelector = [];
                       for (const s of selector.split(" "))
                         newSelector.push(`${s} dr-${s.split("-")[0]}`);
-                      _.exports[id2] = newSelector.join(" ");
+                      _.exports[id3] = newSelector.join(" ");
                     });
                   }
                   return res;
@@ -70,9 +70,9 @@
           this.errors = [];
         }
         getModule(filter) {
-          for (const id in this.webpackModules) {
+          for (const id2 in this.webpackModules) {
             try {
-              const module2 = this.webpackModules[id];
+              const module2 = this.webpackModules[id2];
               if (!module2)
                 continue;
               if (filter(module2))
@@ -82,8 +82,8 @@
             }
           }
         }
-        getModuleById(id) {
-          return this.webpackModules[id];
+        getModuleById(id2) {
+          return this.webpackModules[id2];
         }
         getModuleByProps(...props) {
           let _module;
@@ -105,9 +105,9 @@
         }
         getAllModules(filter) {
           let modules = [];
-          for (const id in this.webpackModules) {
+          for (const id2 in this.webpackModules) {
             try {
-              const module2 = this.webpackModules[id];
+              const module2 = this.webpackModules[id2];
               if (!module2)
                 continue;
               if (filter(module2))
@@ -142,11 +142,11 @@
             const cached = _this.getModule(filter);
             if (cached)
               return resolve(cached);
-            function waiter(module2, id) {
+            function waiter(module2, id2) {
               try {
                 if (!module2)
                   return;
-                if (filter(module2, id)) {
+                if (filter(module2, id2)) {
                   const i = _this.waiting.indexOf(waiter);
                   _this.waiting.splice(i, 1);
                   return resolve(module2);
@@ -162,7 +162,7 @@
           const cached = this.webpackModules[moduleId];
           if (cached)
             return Promise.resolve(cached);
-          return this.getModuleAsync((_, id) => Number(id) === Number(moduleId));
+          return this.getModuleAsync((_, id2) => Number(id2) === Number(moduleId));
         }
         getModuleByPropsAsync(...props) {
           return new Promise((resolve) => {
@@ -229,21 +229,21 @@
           }
           return hook;
         }
-        before(id, mod, fn, callback) {
+        before(id2, mod, fn, callback) {
           const hook = this.hook(mod, fn);
-          const obj = { callback, id };
+          const obj = { callback, id: id2 };
           hook.before.add(obj);
           return () => hook.after.delete(obj);
         }
-        instead(id, mod, fn, callback) {
+        instead(id2, mod, fn, callback) {
           const hook = this.hook(mod, fn);
-          const obj = { callback, id };
+          const obj = { callback, id: id2 };
           hook.instead.add(obj);
           return () => hook.after.delete(obj);
         }
-        after(id, mod, fn, callback) {
+        after(id2, mod, fn, callback) {
           const hook = this.hook(mod, fn);
-          const obj = { callback, id };
+          const obj = { callback, id: id2 };
           hook.after.add(obj);
           return () => hook.after.delete(obj);
         }
@@ -342,18 +342,29 @@
   var require_styles = __commonJS({
     "src/main/styles.js"(exports, module) {
       var styles2 = document.createElement("dr-styles");
-      module.exports = function(id, css) {
-        let style = document.getElementById(id);
+      var internal = document.createElement("dr-internal");
+      var themes2 = document.createElement("dr-themes");
+      var plugins = document.createElement("dr-plugins");
+      styles2.append(internal, plugins, themes2);
+      module.exports = function(id2, css) {
+        const isInternal = id2.startsWith("DrApi");
+        let style = document.querySelector(`[dr-${isInternal ? "internal" : "plugin"}=${JSON.stringify(id2)}]`);
         if (!style) {
           style = document.createElement("style");
-          style.id = id;
-          styles2.appendChild(style);
+          style.setAttribute(`dr-${internal ? "internal" : "plugin"}`, id2);
+          if (isInternal)
+            internal.append(style);
+          else
+            plugins.append(style);
         }
         style.innerHTML = css;
         return () => style.remove();
       };
       module.exports.documentReady = () => document.head.append(styles2);
       module.exports.styles = styles2;
+      module.exports.internal = internal;
+      module.exports.plugins = plugins;
+      module.exports.themes = themes2;
     }
   });
 
@@ -361,12 +372,14 @@
   var require_themes = __commonJS({
     "src/main/themes.js"(exports, module) {
       var storage2 = require_storage();
-      var { styles: styles2 } = require_styles();
+      var { themes: styles2 } = require_styles();
       var themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes");
       if (!DrApiNative.fileSystem.exists(themesFolder))
         DrApiNative.fileSystem.mkdir(themesFolder);
       var readDir = DrApiNative.runInNative('require("fs").readdirSync');
-      var themes2 = readDir(themesFolder).filter((theme) => theme.endsWith(".theme.css"));
+      var dir = readDir(themesFolder);
+      var themes2 = dir.filter((theme) => theme.endsWith(".theme.css"));
+      var splashThemes = dir.filter((theme) => theme.endsWith(".splash.css"));
       function readMeta(contents) {
         const meta = {};
         const jsdoc = contents.match(/\/\*\*([\s\S]*?)\*\//);
@@ -388,9 +401,16 @@
         meta.filePath = filePath;
         _themes[meta.name] = meta;
       }
-      DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
-        if (!file.endsWith(".theme.css"))
-          return;
+      var _splashThemes = {};
+      for (const theme of splashThemes) {
+        const filePath = DrApiNative.fileSystem.join(themesFolder, theme);
+        const themeContent = DrApiNative.fileSystem.readFile(filePath);
+        const meta = readMeta(themeContent);
+        meta.css = themeContent;
+        meta.filePath = filePath;
+        _splashThemes[meta.name] = meta;
+      }
+      function watchTheme(file) {
         const enabledThemes = storage2.getData("internal", "enabledThemes", []);
         const filePath = DrApiNative.fileSystem.join(themesFolder, file);
         if (!DrApiNative.fileSystem.exists(filePath)) {
@@ -399,7 +419,7 @@
           const index = enabledThemes.indexOf(found.name);
           if (index !== -1) {
             enabledThemes.splice(index, 1);
-            document.getElementById(found.name).remove();
+            document.querySelector(`[dr-theme=${JSON.stringify(id)}]`).remove();
           }
           return storage2.setData("internal", "enabledThemes", [...enabledThemes]);
         }
@@ -413,6 +433,30 @@
           return;
         if (document.readyState === "complete")
           module.exports.toggleTheme(meta.name);
+      }
+      function watchSplash(file) {
+        const enabledThemes = storage2.getData("internal", "enabledSplashThemes", []);
+        const filePath = DrApiNative.fileSystem.join(themesFolder, file);
+        if (!DrApiNative.fileSystem.exists(filePath)) {
+          const found = Object.values(_splashThemes).find((theme) => theme.filePath === filePath);
+          delete _splashThemes[found.name];
+          const index = enabledThemes.indexOf(found.name);
+          if (index !== -1)
+            enabledThemes.splice(index, 1);
+          return storage2.setData("internal", "enabledSplashThemes", [...enabledThemes]);
+        }
+        const themeContent = DrApiNative.fileSystem.readFile(filePath);
+        const meta = readMeta(themeContent);
+        meta.css = themeContent;
+        meta.filePath = filePath;
+        _splashThemes[meta.name] = meta;
+        storage2.setData("internal", "enabledSplashThemes", enabledThemes);
+      }
+      DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
+        if (file.endsWith(".theme.css"))
+          return watchTheme(file);
+        if (file.endsWith(".splash.css"))
+          return watchSplash(file);
       });
       module.exports = () => {
         const enabledThemes = storage2.getData("internal", "enabledThemes", []);
@@ -422,17 +466,17 @@
           module.exports.toggleTheme(theme);
         }
       };
-      module.exports.toggleTheme = (id) => {
-        const theme = _themes[id];
-        const isOn = document.getElementById(id);
+      module.exports.toggleTheme = (id2) => {
+        const theme = _themes[id2];
+        const isOn = document.querySelector(`[dr-theme=${JSON.stringify(id2)}]`);
         if (isOn)
           return isOn.remove();
         const style = document.createElement("style");
-        style.id = theme.name;
+        style.setAttribute("dr-theme", theme.name);
         style.innerHTML = theme.css;
         styles2.appendChild(style);
       };
-      module.exports.getThemes = () => _themes;
+      module.exports.getThemes = (splash = false) => splash ? _splashThemes : _themes;
     }
   });
 
@@ -444,10 +488,8 @@
       var storage2 = require_storage();
       var styles2 = require_styles();
       var { getThemes, toggleTheme } = require_themes();
-      var [clipboard, shell] = DrApiNative.runInNative(`(() => {
-  const ele = require("electron")
-  return [ele.clipboard, ele.shell]
-})()`);
+      window.getThemes = getThemes;
+      var shell = DrApiNative.runInNative(`require("electron").shell`);
       module.exports = async (React) => {
         const sectionsModule = await webpack2.getModuleByPropsAsync("getUserSettingsSections");
         const NotificationSettings = webpack2.getModuleByDisplayName("NotificationSettings", true);
@@ -478,10 +520,12 @@
         const InlineCode = webpack2.getModuleByDisplayName("InlineCode", true);
         const WalletIcon = webpack2.getModuleByDisplayName("WalletIcon", true);
         const Ticket = webpack2.getModuleByDisplayName("Ticket", true);
+        const DoubleStarIcon = webpack2.getModuleByDisplayName("DoubleStarIcon", true);
+        const Tooltip = webpack2.getModuleByDisplayName("Tooltip", true);
         const { openContextMenu, closeContextMenu } = webpack2.getModuleByProps("openContextMenuLazy");
         const { header, topDivider, body, expandIcon } = webpack2.getModuleByProps("header", "topDivider");
         const { iconWrapper, wrapper, secondaryHeader } = webpack2.getModuleByProps("detailsWrapper", "icon", "iconWrapper");
-        const { justifyCenter, alignCenter, justifyBetween, horizontal, justifyEnd } = webpack2.getModuleByProps("justifyCenter", "alignCenter");
+        const { justifyCenter, alignCenter, justifyBetween, justifyEnd } = webpack2.getModuleByProps("justifyCenter", "alignCenter");
         const { card } = webpack2.getModuleByProps("card", "pulse", "topDivider");
         const { size16, size20 } = webpack2.getModuleByProps("size20", "size16");
         const { icon: iconToolbar } = DrApi.webpack.getModuleByProps("icon", "transparent", "iconWrapper");
@@ -520,7 +564,7 @@
           content,
           title,
           subTitle,
-          id,
+          id: id2,
           open = false
         }) {
           const [isOpen, setOpen] = React.useState(open);
@@ -540,7 +584,7 @@
                   className: header,
                   onClick: () => {
                     setOpen(!isOpen);
-                    if (id === "notifications")
+                    if (id2 === "notifications")
                       if (isOpen)
                         DrApi.toast.delete(demoToastObj.id);
                       else
@@ -747,13 +791,11 @@
         const { openUserProfileModal } = webpack2.getModuleByProps("openUserProfileModal");
         const renderMessageMarkup = webpack2.getModuleByProps("renderMessageMarkupToAST").default;
         const [{ getUser: fetchUser }, { getUser }] = webpack2.getAllModulesByProps("getUser");
-        function Avatar({ author, userId }) {
+        function Avatar({ author, userId, authorLink }) {
           const [user, setUser] = React.useState(getUser(userId));
           React.useEffect(() => {
             void async function() {
-              if (user)
-                setUser(getUser(userId));
-              else if (typeof userId === "string")
+              if (typeof userId === "string")
                 setUser(await fetchUser(userId));
             }();
           });
@@ -769,6 +811,8 @@
               children: user?.name ?? author,
               className: secondaryHeader,
               size: size16,
+              style: authorLink ? { cursor: "pointer" } : void 0,
+              onClick: authorLink ? shell.openExternal(authorLink) : void 0,
               tag: "h3"
             }),
             user && user.id === userId ? React.createElement(Text, {
@@ -783,11 +827,12 @@
           ];
         }
         function AddonCard(addon) {
-          const [enabledThemes, setEnabledThmes] = storage2.useStorage("internal", "enabledThemes", []);
+          const [enabledAddons, setEnabledAddons] = storage2.useStorage("internal", addon.filePath.endsWith(".theme.css") ? "enabledThemes" : addon.filePath.endsWith(".splash.css") ? "enabledSplashThemes" : "UNKNOWN", []);
           return React.createElement(Card, {
             ...Card.defaultProps,
             editable: true,
             className: card,
+            key: `dr-addon-${addon.name}${addon.filePath.endsWith(".splash.css") ? "-splash" : ""}`,
             onContextMenu: (event) => openContextMenu(event, (event2) => React.createElement(AddonContextMenu, { event: event2, addon })),
             children: React.createElement("div", {
               className: header,
@@ -802,10 +847,12 @@
                         React.createElement(Flex, {
                           style: { marginBottom: 4 },
                           children: [
+                            addon.filePath.endsWith(".splash.css") ? React.createElement(Tooltip, {
+                              text: "Splash Theme",
+                              children: (props) => React.createElement(DoubleStarIcon, { className: iconToolbar, style: { marginRight: 8 }, ...props })
+                            }) : false,
                             React.createElement(LegacyHeader, {
                               children: addon.name,
-                              style: addon.authorLink ? { cursor: "pointer" } : void 0,
-                              onClick: () => addon.authorLink && shell.openExternal(addon.authorLink),
                               className: secondaryHeader,
                               size: size20,
                               tag: "h3"
@@ -813,9 +860,9 @@
                             React.createElement(Text, {
                               style: {
                                 paddingTop: 5,
-                                marginLeft: 10
+                                marginLeft: 4
                               },
-                              children: ["v", addon.version],
+                              children: ["v", addon.version ?? "???"],
                               color: "header-secondary",
                               variant: "text-sm/normal"
                             })
@@ -823,23 +870,24 @@
                         }),
                         React.createElement(Flex, {
                           style: { marginBottom: 6 },
-                          children: React.createElement(Avatar, { userId: addon.authorId, author: addon.author })
+                          children: React.createElement(Avatar, { userId: addon.authorId, author: addon.author, authorLink: addon.authorLink })
                         })
                       ]
                     }),
                     React.createElement(Switch, {
-                      checked: enabledThemes.includes(addon.name),
+                      checked: enabledAddons.includes(addon.name),
                       onChange: (val) => {
                         if (val)
-                          enabledThemes.push(addon.name);
+                          enabledAddons.push(addon.name);
                         else {
-                          const i = enabledThemes.indexOf(addon.name);
+                          const i = enabledAddons.indexOf(addon.name);
                           if (i === -1)
                             return;
-                          enabledThemes.splice(i, 1);
+                          enabledAddons.splice(i, 1);
                         }
-                        setEnabledThmes([...enabledThemes]);
-                        toggleTheme(addon.name);
+                        setEnabledAddons([...enabledAddons]);
+                        if (addon.filePath.endsWith(".theme.css"))
+                          toggleTheme(addon.name);
                       }
                     })
                   ]
@@ -945,9 +993,11 @@
         };
         function Themes() {
           storage2.useStorage("internal", "enabledThemes", []);
+          storage2.useStorage("internal", "enabledSplashThemes", []);
           const [sortByWhat] = storage2.useStorage("internal", "addonSortBy", "name");
           const [query, setQuery] = React.useState("");
           const [themes2, setThemes] = React.useState(getThemes());
+          const [splashThemes, setSplashThemes] = React.useState(getThemes(true));
           const [isConfigOpen, setConfigOpen] = React.useState(false);
           return React.createElement(FormSection, {
             title: React.createElement(Flex, {
@@ -969,10 +1019,13 @@
                         setQuery(val);
                         const filtered = Object.entries(getThemes()).filter(([theme, { author }]) => theme.toLowerCase().includes(val.toLowerCase()) || author.toLowerCase().includes(val.toLowerCase()));
                         setThemes(Object.fromEntries(filtered));
+                        const _filtered = Object.entries(getThemes(true)).filter(([theme, { author }]) => theme.toLowerCase().includes(val.toLowerCase()) || author.toLowerCase().includes(val.toLowerCase()));
+                        setSplashThemes(Object.fromEntries(_filtered));
                       },
                       onClear: () => {
                         setQuery("");
                         setThemes(getThemes());
+                        setSplashThemes(getThemes(true));
                       }
                     }),
                     React.createElement(Icon, {
@@ -1000,6 +1053,10 @@
               React.createElement("div", {
                 id: "dr-addon-list",
                 children: Object.values(themes2).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
+              }),
+              React.createElement("div", {
+                id: "dr-splash-addon-list",
+                children: Object.values(splashThemes).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
               })
             ]
           });
@@ -1141,7 +1198,7 @@
             return content2;
           })() : con);
         }
-        function Toast({ title, content, icon, buttons = [], hideToast, id, type = "" }) {
+        function Toast({ title, content, icon, buttons = [], hideToast, id: id2, type = "" }) {
           const [blur] = storage2.useStorage("internal", "notificationBlur", 0);
           const [opacity] = storage2.useStorage("internal", "notificationOpacity", 80);
           buttons = buttons.map((button) => {
@@ -1161,7 +1218,7 @@
           });
           return React.createElement("div", {
             className: "dr-toast",
-            id,
+            id: id2,
             type: type.toLowerCase(),
             children: [
               React.createElement("div", {
@@ -1219,8 +1276,8 @@
           const [toasts, setToasts] = React.useState([]);
           React.useEffect(() => {
             DrApi.toast = {
-              delete(id) {
-                const toast = toasts.find((t) => t.id === id);
+              delete(id2) {
+                const toast = toasts.find((t) => t.id === id2);
                 const index = toasts.indexOf(toast);
                 if (index === -1)
                   return;
@@ -1294,16 +1351,16 @@
           })() : con);
         }
         window.DrApi.modals = {
-          open(content, id) {
-            id ??= `DrApi-Modal-${_id}`;
+          open(content, id2) {
+            id2 ??= `DrApi-Modal-${_id}`;
             _id++;
             openModal(typeof content === "function" ? content : () => content, {
-              modalKey: id
+              modalKey: id2
             });
-            return () => this.close(id);
+            return () => this.close(id2);
           },
-          close(id) {
-            closeModal(id);
+          close(id2) {
+            closeModal(id2);
           },
           alert(title, content, opts = {}) {
             const { confirmText = Messages.OKAY, onConfirm } = opts;
