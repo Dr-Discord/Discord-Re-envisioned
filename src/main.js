@@ -1085,6 +1085,10 @@
             return 1;
           return 0;
         };
+        function filterThemes(val, [theme, { author }]) {
+          const res = val.split("&&").map((v) => theme.toLowerCase().includes(v.toLowerCase()) || author.toLowerCase().includes(v.toLowerCase()));
+          return res.filter((l) => l).length;
+        }
         function Themes() {
           storage2.useStorage("internal", "enabledThemes", []);
           storage2.useStorage("internal", "enabledSplashThemes", []);
@@ -1114,9 +1118,9 @@
                       size: SearchBar.Sizes.SMALL,
                       onQueryChange: (val) => {
                         setQuery(val);
-                        const filtered = Object.entries(getThemes()).filter(([theme, { author }]) => theme.toLowerCase().includes(val.toLowerCase()) || author.toLowerCase().includes(val.toLowerCase()));
+                        const filtered = Object.entries(getThemes()).filter(filterThemes.bind(null, val));
                         setThemes(Object.fromEntries(filtered));
-                        const _filtered = Object.entries(getThemes(true)).filter(([theme, { author }]) => theme.toLowerCase().includes(val.toLowerCase()) || author.toLowerCase().includes(val.toLowerCase()));
+                        const _filtered = Object.entries(getThemes(true)).filter(filterThemes.bind(null, val));
                         setSplashThemes(Object.fromEntries(_filtered));
                       },
                       onClear: () => {
