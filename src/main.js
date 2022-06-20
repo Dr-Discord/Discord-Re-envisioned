@@ -540,6 +540,7 @@
         const SortIcon = webpack2.getModuleByDisplayName("SortIcon", true);
         const OsMac = webpack2.getModuleByDisplayName("OsMac", true);
         const Retry = webpack2.getModuleByDisplayName("Retry", true);
+        const Gear = webpack2.getModuleByDisplayName("Gear", true);
         const Tooltip = webpack2.getModuleByDisplayName("Tooltip", true);
         const { openContextMenu, closeContextMenu } = webpack2.getModuleByProps("openContextMenuLazy");
         const { header, topDivider, body, expandIcon } = webpack2.getModuleByProps("header", "topDivider");
@@ -569,7 +570,7 @@
   } .dr-addon-avatar + h3 {
     padding-top: 5px;
   } .dr-addon-avatar + h3 + div {
-    padding-top: 6px;
+    padding-top: 6px !important
   }`);
         const demoToastObj = {
           id: "toastDemo",
@@ -1101,7 +1102,12 @@
             title: React.createElement(Flex, {
               justify: justifyBetween,
               children: [
-                "Themes",
+                React.createElement(Flex, {
+                  children: [
+                    React.createElement(Creative, { style: { marginRight: 8 } }),
+                    "Themes"
+                  ]
+                }),
                 React.createElement(Flex, {
                   id: "dr-addon-header",
                   justify: justifyEnd,
@@ -1186,13 +1192,22 @@
           },
           {
             element: () => React.createElement(Settings),
+            icon: React.createElement(Gear, { width: 20, height: 20 }),
             label: "Settings",
             section: "Discord Re-envisioned"
           },
           {
             element: () => React.createElement(Themes),
+            icon: React.createElement(Creative, { width: 20, height: 20 }),
             label: "Themes",
             section: "Discord Re-envisioned Themes"
+          },
+          {
+            onClick: () => {
+            },
+            icon: React.createElement(DoubleStarIcon, { width: 20, height: 20 }),
+            label: "Custom CSS",
+            section: "Discord Re-envisioned Custom CSS"
           }
         ];
         patcher.after("DrApi", sectionsModule.default, "render", (that, args, res) => {

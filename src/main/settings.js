@@ -44,6 +44,7 @@ module.exports = async (React) => {
   const SortIcon = webpack.getModuleByDisplayName("SortIcon", true)
   const OsMac = webpack.getModuleByDisplayName("OsMac", true)
   const Retry = webpack.getModuleByDisplayName("Retry", true)
+  const Gear = webpack.getModuleByDisplayName("Gear", true)
   const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
   const { openContextMenu, closeContextMenu } = webpack.getModuleByProps("openContextMenuLazy")
 
@@ -75,7 +76,7 @@ module.exports = async (React) => {
   } .dr-addon-avatar + h3 {
     padding-top: 5px;
   } .dr-addon-avatar + h3 + div {
-    padding-top: 6px;
+    padding-top: 6px !important
   }`)
 
   const demoToastObj = {
@@ -618,7 +619,12 @@ module.exports = async (React) => {
       title: React.createElement(Flex, {
         justify: justifyBetween,
         children: [
-          "Themes",
+          React.createElement(Flex, {
+            children: [
+              React.createElement(Creative, { style: { marginRight: 8 } }),
+              "Themes"
+            ]
+          }),
           React.createElement(Flex, {
             id: "dr-addon-header",
             justify: justifyEnd,
@@ -710,13 +716,21 @@ module.exports = async (React) => {
     },
     {
       element: () => React.createElement(Settings),
+      icon: React.createElement(Gear, { width: 20, height: 20 }),
       label: "Settings",
       section: "Discord Re-envisioned"
     },
     {
       element: () => React.createElement(Themes),
+      icon: React.createElement(Creative, { width: 20, height: 20 }),
       label: "Themes",
       section: "Discord Re-envisioned Themes"
+    },
+    {
+      onClick: () => {},
+      icon: React.createElement(DoubleStarIcon, { width: 20, height: 20 }),
+      label: "Custom CSS",
+      section: "Discord Re-envisioned Custom CSS"
     }
   ]
 
