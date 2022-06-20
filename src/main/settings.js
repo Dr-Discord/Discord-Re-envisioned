@@ -39,6 +39,8 @@ module.exports = async (React) => {
   const WalletIcon = webpack.getModuleByDisplayName("WalletIcon", true)
   const Ticket = webpack.getModuleByDisplayName("Ticket", true)
   const DoubleStarIcon = webpack.getModuleByDisplayName("DoubleStarIcon", true)
+  const Creative = webpack.getModuleByDisplayName("Creative", true)
+  const Alert = webpack.getModuleByDisplayName("Alert", true)
   const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
   const { openContextMenu, closeContextMenu } = webpack.getModuleByProps("openContextMenuLazy")
 
@@ -64,9 +66,12 @@ module.exports = async (React) => {
   } .dr-addon-avatar {
     border-radius: 50%; 
     cursor: pointer;
+    margin-top: 3px;
     margin-right: 8px
   } .dr-addon-avatar + h3 {
-    padding-top: 2px;
+    padding-top: 5px;
+  } .dr-addon-avatar + h3 + div {
+    padding-top: 6px;
   }`)
 
   const demoToastObj = {
@@ -352,7 +357,7 @@ module.exports = async (React) => {
 
   function AddonCard(addon) {
     const [enabledAddons, setEnabledAddons] = storage.useStorage("internal", addon.filePath.endsWith(".theme.css") ? "enabledThemes" : addon.filePath.endsWith(".splash.css") ? "enabledSplashThemes" : "UNKNOWN", [])
-    
+
     return React.createElement(Card, {
       ...Card.defaultProps,
       editable: true,
@@ -372,10 +377,10 @@ module.exports = async (React) => {
                   React.createElement(Flex, {
                     style: { marginBottom: 4 },
                     children: [
-                      addon.filePath.endsWith(".splash.css") ? React.createElement(Tooltip, {
-                        text: "Splash Theme",
-                        children: (props) => React.createElement(DoubleStarIcon, { className: iconToolbar, style: { marginRight: 8 }, ...props })
-                      }) : false,
+                      React.createElement(Tooltip, {
+                        text: addon.filePath.endsWith(".theme.css") ? "Theme" : addon.filePath.endsWith(".splash.css") ? "Splash Theme" : "UNKNOWN",
+                        children: (props) => React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : Alert, { className: iconToolbar, style: { marginRight: 8 }, ...props })
+                      }),
                       React.createElement(LegacyHeader, {
                         children: addon.name,
                         className: secondaryHeader,

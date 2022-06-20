@@ -535,6 +535,8 @@
         const WalletIcon = webpack2.getModuleByDisplayName("WalletIcon", true);
         const Ticket = webpack2.getModuleByDisplayName("Ticket", true);
         const DoubleStarIcon = webpack2.getModuleByDisplayName("DoubleStarIcon", true);
+        const Creative = webpack2.getModuleByDisplayName("Creative", true);
+        const Alert = webpack2.getModuleByDisplayName("Alert", true);
         const Tooltip = webpack2.getModuleByDisplayName("Tooltip", true);
         const { openContextMenu, closeContextMenu } = webpack2.getModuleByProps("openContextMenuLazy");
         const { header, topDivider, body, expandIcon } = webpack2.getModuleByProps("header", "topDivider");
@@ -558,9 +560,12 @@
   } .dr-addon-avatar {
     border-radius: 50%; 
     cursor: pointer;
+    margin-top: 3px;
     margin-right: 8px
   } .dr-addon-avatar + h3 {
-    padding-top: 2px;
+    padding-top: 5px;
+  } .dr-addon-avatar + h3 + div {
+    padding-top: 6px;
   }`);
         const demoToastObj = {
           id: "toastDemo",
@@ -861,10 +866,10 @@
                         React.createElement(Flex, {
                           style: { marginBottom: 4 },
                           children: [
-                            addon.filePath.endsWith(".splash.css") ? React.createElement(Tooltip, {
-                              text: "Splash Theme",
-                              children: (props) => React.createElement(DoubleStarIcon, { className: iconToolbar, style: { marginRight: 8 }, ...props })
-                            }) : false,
+                            React.createElement(Tooltip, {
+                              text: addon.filePath.endsWith(".theme.css") ? "Theme" : addon.filePath.endsWith(".splash.css") ? "Splash Theme" : "UNKNOWN",
+                              children: (props) => React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : Alert, { className: iconToolbar, style: { marginRight: 8 }, ...props })
+                            }),
                             React.createElement(LegacyHeader, {
                               children: addon.name,
                               className: secondaryHeader,
