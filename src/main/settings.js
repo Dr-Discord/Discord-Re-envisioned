@@ -534,7 +534,7 @@ module.exports = async (React) => {
           dontCloseOnActionIfHoldingShiftKey: true,
           icon: () => React.createElement(Filter, { className: iconMenu }),
           action: () => {
-            if ((filter + 1) === 2) return setFilter(0)
+            if ((filter + 1) === 3) return setFilter(0)
             setFilter(filter + 1)
           }
         }),

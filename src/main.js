@@ -1020,7 +1020,7 @@
                 dontCloseOnActionIfHoldingShiftKey: true,
                 icon: () => React.createElement(Filter, { className: iconMenu }),
                 action: () => {
-                  if (filter + 1 === 2)
+                  if (filter + 1 === 3)
                     return setFilter(0);
                   setFilter(filter + 1);
                 }
