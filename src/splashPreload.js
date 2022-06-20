@@ -27,7 +27,7 @@ const Native = {
 }
 
 document.addEventListener("keydown", event => {
-  if (event.key === "s" && event.shiftKey && (event.metaKey || event.ctrlKey)) ipcRenderer.send("@DrApi/dontHideSplash")
+  if (event.key.toLowerCase() === "s" && event.shiftKey && (event.metaKey || event.ctrlKey)) ipcRenderer.send("@DrApi/dontHideSplash")
 })
 contextBridge.exposeInMainWorld("DrApiNative", Native)
 
