@@ -9,6 +9,8 @@ const storage = require("./storage")
 const newMacOS = storage.getData("internal", "newMacOS", true)
 const transparency = storage.getData("internal", "transparency", false)
 
+let allowSplashToClose = true
+
 class BrowserWindow extends electron.BrowserWindow {
   static original = electron.BrowserWindow
 
@@ -30,11 +32,24 @@ class BrowserWindow extends electron.BrowserWindow {
       opts.backgroundColor = "#00000000"
     }
 
-    super(opts)
+    const win = new electron.BrowserWindow(opts)
 
-    this.webContents.DrApi = {
+    win.webContents.DrApi = {
       preload: originalPreload
     }
+
+    const oldClose = win.close
+    win.close = function() {
+      if (!opts.webPreferences.preload.endsWith("splashPreload.js")) oldClose.apply(this, arguments)
+      if (allowSplashToClose) oldClose.apply(this, arguments)
+    }
+    const oldHide = win.hide
+    win.hide = function() {
+      if (!opts.webPreferences.preload.endsWith("splashPreload.js")) oldHide.apply(this, arguments)
+      if (allowSplashToClose) oldHide.apply(this, arguments)
+    }
+
+    return win
   }
 }
 
@@ -46,7 +61,8 @@ require.cache.electron.exports = { ...electron, BrowserWindow }
 
 electron.ipcMain.on("@DrApi/preload", (event) => event.returnValue = event.sender.DrApi.preload)
 electron.ipcMain.on("@DrApi/newMacOS", (event) => event.returnValue = newMacOS)
-
+electron.ipcMain.on("@DrApi/dontHideSplash", (event) => event.returnValue = allowSplashToClose = false)
+electron.ipcMain.on("@DrApi/eval", (event, code) => event.returnValue = eval(code))
 electron.ipcMain.on("@DrApi/quit", (event, restart = false) => {
   if(restart) electron.app.relaunch()
   electron.app.quit()
