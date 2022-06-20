@@ -424,9 +424,13 @@
           return storage2.setData("internal", "enabledThemes", [...enabledThemes]);
         }
         const themeContent = DrApiNative.fileSystem.readFile(filePath);
-        if (found)
-          delete _splashThemes[found.name];
         const meta = readMeta(themeContent);
+        if (found) {
+          delete _themes[found.name];
+          const index = enabledThemes.indexOf(found.name);
+          if (index !== -1)
+            enabledThemes.splice(index, 1, meta.name);
+        }
         meta.css = themeContent;
         meta.filePath = filePath;
         _themes[meta.name] = meta;
@@ -451,6 +455,12 @@
         if (found)
           delete _splashThemes[found.name];
         const meta = readMeta(themeContent);
+        if (found) {
+          delete _splashThemes[found.name];
+          const index = enabledThemes.indexOf(found.name);
+          if (index !== -1)
+            enabledThemes.splice(index, 1, meta.name);
+        }
         meta.css = themeContent;
         meta.filePath = filePath;
         _splashThemes[meta.name] = meta;
