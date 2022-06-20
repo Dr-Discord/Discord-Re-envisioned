@@ -52,8 +52,9 @@ function watchTheme(file) {
 
   const filePath = DrApiNative.fileSystem.join(themesFolder, file)
 
+  const found = Object.values(_themes).find(theme => theme.filePath === filePath)
+  
   if (!DrApiNative.fileSystem.exists(filePath)) {
-    const found = Object.values(_themes).find(theme => theme.filePath === filePath)
     delete _themes[found.name]
     
     const index = enabledThemes.indexOf(found.name)
@@ -66,6 +67,8 @@ function watchTheme(file) {
   }
 
   const themeContent = DrApiNative.fileSystem.readFile(filePath)
+
+  if (found) delete _splashThemes[found.name]
 
   const meta = readMeta(themeContent)
 
@@ -84,8 +87,9 @@ function watchSplash(file) {
 
   const filePath = DrApiNative.fileSystem.join(themesFolder, file)
 
+  const found = Object.values(_splashThemes).find(theme => theme.filePath === filePath)
+
   if (!DrApiNative.fileSystem.exists(filePath)) {
-    const found = Object.values(_splashThemes).find(theme => theme.filePath === filePath)
     delete _splashThemes[found.name]
     
     const index = enabledThemes.indexOf(found.name)
@@ -95,6 +99,8 @@ function watchSplash(file) {
   }
 
   const themeContent = DrApiNative.fileSystem.readFile(filePath)
+
+  if (found) delete _splashThemes[found.name]
 
   const meta = readMeta(themeContent)
 

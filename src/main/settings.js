@@ -584,11 +584,7 @@ module.exports = async (React) => {
       children: [
         React.createElement("div", {
           id: "dr-addon-list",
-          children: Object.values(themes).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
-        }),
-        React.createElement("div", {
-          id: "dr-splash-addon-list",
-          children: Object.values(splashThemes).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
+          children: Object.values(themes).concat(...Object.values(splashThemes)).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
         })
       ]
     })

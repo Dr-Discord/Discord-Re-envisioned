@@ -413,8 +413,8 @@
       function watchTheme(file) {
         const enabledThemes = storage2.getData("internal", "enabledThemes", []);
         const filePath = DrApiNative.fileSystem.join(themesFolder, file);
+        const found = Object.values(_themes).find((theme) => theme.filePath === filePath);
         if (!DrApiNative.fileSystem.exists(filePath)) {
-          const found = Object.values(_themes).find((theme) => theme.filePath === filePath);
           delete _themes[found.name];
           const index = enabledThemes.indexOf(found.name);
           if (index !== -1) {
@@ -424,6 +424,8 @@
           return storage2.setData("internal", "enabledThemes", [...enabledThemes]);
         }
         const themeContent = DrApiNative.fileSystem.readFile(filePath);
+        if (found)
+          delete _splashThemes[found.name];
         const meta = readMeta(themeContent);
         meta.css = themeContent;
         meta.filePath = filePath;
@@ -437,8 +439,8 @@
       function watchSplash(file) {
         const enabledThemes = storage2.getData("internal", "enabledSplashThemes", []);
         const filePath = DrApiNative.fileSystem.join(themesFolder, file);
+        const found = Object.values(_splashThemes).find((theme) => theme.filePath === filePath);
         if (!DrApiNative.fileSystem.exists(filePath)) {
-          const found = Object.values(_splashThemes).find((theme) => theme.filePath === filePath);
           delete _splashThemes[found.name];
           const index = enabledThemes.indexOf(found.name);
           if (index !== -1)
@@ -446,6 +448,8 @@
           return storage2.setData("internal", "enabledSplashThemes", [...enabledThemes]);
         }
         const themeContent = DrApiNative.fileSystem.readFile(filePath);
+        if (found)
+          delete _splashThemes[found.name];
         const meta = readMeta(themeContent);
         meta.css = themeContent;
         meta.filePath = filePath;
@@ -1052,11 +1056,7 @@
             children: [
               React.createElement("div", {
                 id: "dr-addon-list",
-                children: Object.values(themes2).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
-              }),
-              React.createElement("div", {
-                id: "dr-splash-addon-list",
-                children: Object.values(splashThemes).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
+                children: Object.values(themes2).concat(...Object.values(splashThemes)).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
               })
             ]
           });
