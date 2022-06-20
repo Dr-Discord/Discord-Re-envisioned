@@ -41,6 +41,9 @@ module.exports = async (React) => {
   const DoubleStarIcon = webpack.getModuleByDisplayName("DoubleStarIcon", true)
   const Creative = webpack.getModuleByDisplayName("Creative", true)
   const Alert = webpack.getModuleByDisplayName("Alert", true)
+  const SortIcon = webpack.getModuleByDisplayName("SortIcon", true)
+  const OsMac = webpack.getModuleByDisplayName("OsMac", true)
+  const Retry = webpack.getModuleByDisplayName("Retry", true)
   const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
   const { openContextMenu, closeContextMenu } = webpack.getModuleByProps("openContextMenuLazy")
 
@@ -296,7 +299,21 @@ module.exports = async (React) => {
         }),
         React.createElement(SwitchItem, {
           value: transparency,
-          children: "Transparency",
+          children: [
+            "Transparency",
+            React.createElement(Tooltip, {
+              text: "Reloading is needed",
+              children: (props) => React.createElement(Retry, {
+                ...props, 
+                width: 18, 
+                height: 18,
+                style: {
+                  marginLeft: 4,
+                  transform: "translateY(2px) rotate(180deg)"
+                }
+              })
+            })
+          ],
           note: "Make Discord transparent. Warning this will break window snapping.",
           onChange: (value) => {
             DrApi.modals.confirmModal("Restart Discord?", [
@@ -313,7 +330,33 @@ module.exports = async (React) => {
         }),
         React.createElement(SwitchItem, {
           value: newMacOS,
-          children: "New MacOS Titlebar Style",
+          children: [
+            React.createElement(Tooltip, {
+              text: "MacOS only",
+              children: (props) => React.createElement(OsMac, {
+                ...props, 
+                width: 18, 
+                height: 18,
+                style: {
+                  marginRight: 4,
+                  transform: "translateY(2px)"
+                }
+              })
+            }),
+            "New MacOS Titlebar Style",
+            React.createElement(Tooltip, {
+              text: "Reloading is needed",
+              children: (props) => React.createElement(Retry, {
+                ...props, 
+                width: 18, 
+                height: 18,
+                style: {
+                  marginLeft: 4,
+                  transform: "translateY(2px) rotate(180deg)"
+                }
+              })
+            })
+          ],
           note: "Use Electrons titlebar or Discords titlebar.",
           disabled: !(DrApiNative.platform === "darwin"),
           onChange: (value) => {
@@ -524,7 +567,7 @@ module.exports = async (React) => {
           id: "sort-by",
           label: `Sorting by ${sortByWhat[0].toUpperCase() + sortByWhat.substring(1)}`,
           dontCloseOnActionIfHoldingShiftKey: true,
-          icon: () => React.createElement(Filter, { className: iconMenu }),
+          icon: () => React.createElement(SortIcon, { className: iconMenu }),
           action: () => setSortByWhat(sortByWhat === "name" ? "author" : "name")
         }),
         React.createElement(MenuSeparator),
