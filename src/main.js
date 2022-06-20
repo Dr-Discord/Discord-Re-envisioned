@@ -541,6 +541,7 @@
         const OsMac = webpack2.getModuleByDisplayName("OsMac", true);
         const Retry = webpack2.getModuleByDisplayName("Retry", true);
         const Gear = webpack2.getModuleByDisplayName("Gear", true);
+        const Pencil = webpack2.getModuleByDisplayName("Pencil", true);
         const Tooltip = webpack2.getModuleByDisplayName("Tooltip", true);
         const { openContextMenu, closeContextMenu } = webpack2.getModuleByProps("openContextMenuLazy");
         const { header, topDivider, body, expandIcon } = webpack2.getModuleByProps("header", "topDivider");
@@ -1205,7 +1206,7 @@
           {
             onClick: () => {
             },
-            icon: React.createElement(DoubleStarIcon, { width: 20, height: 20 }),
+            icon: React.createElement(Pencil, { width: 20, height: 20 }),
             label: "Custom CSS",
             section: "Discord Re-envisioned Custom CSS"
           }

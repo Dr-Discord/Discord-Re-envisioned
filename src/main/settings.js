@@ -45,6 +45,7 @@ module.exports = async (React) => {
   const OsMac = webpack.getModuleByDisplayName("OsMac", true)
   const Retry = webpack.getModuleByDisplayName("Retry", true)
   const Gear = webpack.getModuleByDisplayName("Gear", true)
+  const Pencil = webpack.getModuleByDisplayName("Pencil", true)
   const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
   const { openContextMenu, closeContextMenu } = webpack.getModuleByProps("openContextMenuLazy")
 
@@ -728,7 +729,7 @@ module.exports = async (React) => {
     },
     {
       onClick: () => {},
-      icon: React.createElement(DoubleStarIcon, { width: 20, height: 20 }),
+      icon: React.createElement(Pencil, { width: 20, height: 20 }),
       label: "Custom CSS",
       section: "Discord Re-envisioned Custom CSS"
     }
