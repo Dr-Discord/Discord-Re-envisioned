@@ -819,7 +819,7 @@
             }();
           });
           return [
-            user && user.id === userId ? React.createElement("img", {
+            user ? React.createElement("img", {
               src: user.getAvatarURL(false, void 0, true),
               width: 24,
               height: 24,
@@ -834,7 +834,7 @@
               onClick: authorLink ? shell.openExternal(authorLink) : void 0,
               tag: "h3"
             }),
-            user && user.id === userId ? React.createElement(Text, {
+            user ? React.createElement(Text, {
               style: {
                 paddingTop: 4,
                 marginLeft: 4

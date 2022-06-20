@@ -328,7 +328,7 @@ module.exports = async (React) => {
     })
     
     return [
-      (user && user.id === userId) ? React.createElement("img", {
+      user ? React.createElement("img", {
         src: user.getAvatarURL(false, undefined, true),
         width: 24,
         height: 24,
@@ -343,7 +343,7 @@ module.exports = async (React) => {
         onClick: authorLink ? shell.openExternal(authorLink) : undefined,
         tag: "h3"
       }),
-      (user && user.id === userId) ? React.createElement(Text, {
+      user ? React.createElement(Text, {
         style: {
           paddingTop: 4,
           marginLeft: 4
