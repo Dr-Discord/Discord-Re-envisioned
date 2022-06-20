@@ -513,6 +513,7 @@ module.exports = async (React) => {
 
   function AddonConfiguration(event) {
     const [sortByWhat, setSortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
+    const [filter, setFilter] = storage.useStorage("internal", "addonFilterBy", 0)
 
     return React.createElement(Menu, {
       ...event,
@@ -525,6 +526,17 @@ module.exports = async (React) => {
           dontCloseOnActionIfHoldingShiftKey: true,
           icon: () => React.createElement(Filter, { className: iconMenu }),
           action: () => setSortByWhat(sortByWhat === "name" ? "author" : "name")
+        }),
+        React.createElement(MenuSeparator),
+        React.createElement(MenuItem, {
+          id: "filter-by",
+          label: filter === 0 ? "Not filtering" : `Filtering out ${filter === 1 ? "Splash Themes" : "Normal Themes"}`,
+          dontCloseOnActionIfHoldingShiftKey: true,
+          icon: () => React.createElement(Filter, { className: iconMenu }),
+          action: () => {
+            if ((filter + 1) === 2) return setFilter(0)
+            setFilter(filter + 1)
+          }
         }),
         React.createElement(MenuSeparator),
         React.createElement(MenuItem, {
@@ -548,10 +560,13 @@ module.exports = async (React) => {
     storage.useStorage("internal", "enabledSplashThemes", [])
 
     const [sortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
+    const [filter] = storage.useStorage("internal", "addonFilterBy", 0)
     const [query, setQuery] = React.useState("")
     const [themes, setThemes] = React.useState(getThemes())
     const [splashThemes, setSplashThemes] = React.useState(getThemes(true))
     const [isConfigOpen, setConfigOpen] = React.useState(false)
+
+    const _themes = filter === 0 ? Object.values(themes).concat(...Object.values(splashThemes)) : filter === 1 ? Object.values(themes) : Object.values(splashThemes)
 
     return React.createElement(FormSection, {
       title: React.createElement(Flex, {
@@ -610,7 +625,7 @@ module.exports = async (React) => {
       children: [
         React.createElement("div", {
           id: "dr-addon-list",
-          children: Object.values(themes).concat(...Object.values(splashThemes)).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
+          children: _themes.sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
         })
       ]
     })
