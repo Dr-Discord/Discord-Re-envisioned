@@ -127,19 +127,16 @@
     meta.filePath = filePath;
     _themes[meta.name] = meta;
   }
-  function documentReady() {
-    const node = document.createElement("dr-themes");
-    for (const themeName of enabledThemes) {
-      const theme = _themes[themeName];
-      const style = document.createElement("style");
-      style.setAttribute("dr-theme", theme.name);
-      style.innerHTML = theme.css;
-      node.append(style);
-    }
-    document.head.append(node);
+  var node = document.createElement("dr-themes");
+  for (const themeName of enabledThemes) {
+    const theme = _themes[themeName];
+    const style = document.createElement("style");
+    style.setAttribute("dr-theme", theme.name);
+    style.innerHTML = theme.css;
+    node.append(style);
   }
   if (document.readyState === "complete")
-    documentReady();
+    document.head.append(node);
   else
-    document.addEventListener("DOMContentLoaded", documentReady);
+    document.addEventListener("DOMContentLoaded", () => document.head.append(node));
 })();

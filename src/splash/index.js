@@ -35,17 +35,14 @@ for (const theme of themes) {
   _themes[meta.name] = meta
 }
 
-function documentReady() {
-  const node = document.createElement("dr-themes")
-  for (const themeName of enabledThemes) {
-    const theme = _themes[themeName]
-    const style = document.createElement("style")
-    style.setAttribute("dr-theme", theme.name)
-    style.innerHTML = theme.css
-    node.append(style)
-  }
-  document.head.append(node)
+const node = document.createElement("dr-themes")
+for (const themeName of enabledThemes) {
+  const theme = _themes[themeName]
+  const style = document.createElement("style")
+  style.setAttribute("dr-theme", theme.name)
+  style.innerHTML = theme.css
+  node.append(style)
 }
 
-if (document.readyState === "complete") documentReady()
-else document.addEventListener("DOMContentLoaded", documentReady)
+if (document.readyState === "complete") document.head.append(node)
+else document.addEventListener("DOMContentLoaded", () => document.head.append(node))
