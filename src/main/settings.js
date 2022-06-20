@@ -174,6 +174,7 @@ module.exports = async (React) => {
 
   function Settings() {
     const [newMacOS, setNewMacOS] = storage.useStorage("internal", "newMacOS", true)
+    const [transparency, setTransparency] = storage.useStorage("internal", "transparency", false)
     const [position, setPosition] = storage.useStorage("internal", "notificationLocation", NotificationSettings.Positions.TOP_RIGHT)
     const [positionX, setPositionX] = storage.useStorage("internal", "notificationPositionX", 20)
     const [positionY, setPositionY] = storage.useStorage("internal", "notificationPositionY", 20)
@@ -293,13 +294,30 @@ module.exports = async (React) => {
           ]
         }),
         React.createElement(SwitchItem, {
+          value: transparency,
+          children: "Transparency",
+          note: "Make Discord transparent. Warning this will break window snapping.",
+          onChange: (value) => {
+            DrApi.modals.confirmModal("Restart Discord?", [
+              "To toggle transparency you need to restart Discord."
+            ], {
+              onConfirm() {
+                DrApiNative.quit(true)
+                setTransparency(value)
+              },
+              confirmText: "Restart",
+              danger: true
+            })
+          }
+        }),
+        React.createElement(SwitchItem, {
           value: newMacOS,
           children: "New MacOS Titlebar Style",
           note: "Use Electrons titlebar or Discords titlebar.",
           disabled: !(DrApiNative.platform === "darwin"),
           onChange: (value) => {
-            DrApi.modals.confirmModal("Restart discord?", [
-              `To use ${value ? "new" : "old"} MacOS titlebar style you need to restart discord.`
+            DrApi.modals.confirmModal("Restart Discord?", [
+              `To use ${value ? "new" : "old"} MacOS titlebar style you need to restart Discord.`
             ], {
               onConfirm() {
                 DrApiNative.quit(true)

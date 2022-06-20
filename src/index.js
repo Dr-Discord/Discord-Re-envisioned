@@ -7,6 +7,7 @@ const Module = require("module")
 const storage = require("./storage")
 
 const newMacOS = storage.getData("internal", "newMacOS", true)
+const transparency = storage.getData("internal", "transparency", false)
 
 class BrowserWindow extends electron.BrowserWindow {
   static original = electron.BrowserWindow
@@ -23,6 +24,11 @@ class BrowserWindow extends electron.BrowserWindow {
     }
 
     if (process.platform === "darwin" && !newMacOS) opts.titleBarStyle = "default"
+
+    if (transparency) {
+      opts.transparent = true
+      opts.backgroundColor = "#00000000"
+    }
 
     super(opts)
 
