@@ -9,6 +9,8 @@ const storage = require("./storage")
 const newMacOS = storage.getData("internal", "newMacOS", true)
 
 class BrowserWindow extends electron.BrowserWindow {
+  static original = electron.BrowserWindow
+
   constructor(opts) {
     if (!opts.webPreferences || !opts.webPreferences.preload) return super(props)
 
@@ -61,4 +63,15 @@ electron.app.once("ready", () => {
   } catch (error) {}
 })
 
-Module._load(path.join(process.resourcesPath, "app.asar"), null, true)
+const basePath = path.join(process.resourcesPath, "app.asar")
+const pkg = require(path.join(basePath, "package.json"))
+electron.app.setAppPath(basePath)
+electron.app.name = pkg.name
+
+const appOld = path.join(process.resourcesPath, "app-old")
+
+if (require("fs").existsSync(appOld)) {
+  const res = require(appOld)
+  if (typeof res === "function") res(() => Module._load(path.join(basePath, pkg.main), null, true))
+}
+else Module._load(path.join(basePath, pkg.main), null, true)
