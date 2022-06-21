@@ -709,6 +709,18 @@ module.exports = async (React) => {
     })
   }
 
+  const PopoutWindow = webpack.getModule(e => e.default.toString().indexOf("DndProvider") > -1 && React.isValidElement(e.default())).default
+  const dispatcher = webpack.getModuleByProps("dirtyDispatch", "dispatch")
+
+  function CustomCSS() {
+    return React.createElement(PopoutWindow, {
+      windowKey: "DISCORD_CUSTOM_CSS",
+      withTitleBar: true,
+      title: "Custom CSS",
+      children: ["Test"]
+    })
+  }
+
   const settings = [
     { section: "DIVIDER" },
     {
@@ -728,7 +740,12 @@ module.exports = async (React) => {
       section: "Discord Re-envisioned Themes"
     },
     {
-      onClick: () => {},
+      onClick: () => dispatcher.dirtyDispatch({
+        type: "POPOUT_WINDOW_OPEN",
+        key: "DISCORD_CUSTOM_CSS",
+        render: () => React.createElement(CustomCSS),
+        features: {}
+      }),
       icon: React.createElement(Pencil, { width: 20, height: 20 }),
       label: "Custom CSS",
       section: "Discord Re-envisioned Custom CSS"
