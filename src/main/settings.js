@@ -10,6 +10,7 @@ const shell = DrApiNative.runInNative(`require("electron").shell`)
 
 module.exports = async (React) => {
   const sectionsModule = await webpack.getModuleByPropsAsync("getUserSettingsSections")
+
   const NotificationSettings = webpack.getModuleByDisplayName("NotificationSettings", true)
   const FormSection = webpack.getModuleByDisplayName("FormSection", true)
   const SwitchItem = webpack.getModuleByDisplayName("SwitchItem", true)
@@ -58,6 +59,7 @@ module.exports = async (React) => {
   const { icon:iconMenu } = DrApi.webpack.getModuleByProps("colorPremium", "icon")
   const { line } = webpack.getModuleByProps("line", "versionHash")
   const { search } = DrApi.webpack.getModuleByProps("search", "toolbar")
+  const { macDragRegion } = DrApi.webpack.getModuleByProps("macDragRegion")
 
   styles("DrApi-settings", `.dr-header:not(:last-child) .dr-catorgory-icon {
     color: var(--header-primary);
@@ -711,13 +713,38 @@ module.exports = async (React) => {
 
   const PopoutWindow = webpack.getModule(e => e.default.toString().indexOf("DndProvider") > -1 && React.isValidElement(e.default())).default
   const dispatcher = webpack.getModuleByProps("dirtyDispatch", "dispatch")
+  const PopoutWindowStore = webpack.getModuleByProps("getWindow", "getName", "getIsAlwaysOnTop")
+  const { useStateFromStores } = webpack.getModuleByProps("useStateFromStores") 
 
   function CustomCSS() {
+    const windowInstance = useStateFromStores([PopoutWindowStore], () => PopoutWindowStore.getWindow("DISCORD_CUSTOM_CSS"))
+
+    const ref = React.useRef()
+
+    React.useEffect(() => {
+      window.windowInstance = windowInstance
+      
+      const editor = ace.edit(ref.current)
+      editor.setTheme("ace/theme/monokai")
+      editor.getSession().setMode("ace/mode/css")
+      editor.setValue(storage.customCSS() ?? "")
+      editor.on("change", () => {
+        const value = editor.getValue()
+        storage.customCSS(value)
+        styles.customCSS.innerHTML = value
+      })
+
+      windowInstance.document.head.appendChild(Object.assign(document.createElement("style"), {
+        textContent: `${[...document.querySelectorAll("style")].filter(e => e.innerHTML.includes("sourceURL=ace/")).reduce((styles, style) => styles += style.textContent, "")}.${macDragRegion}{ display: none }`,
+        id: "dr-custom-css-popout-style"
+      }))
+    })
+
     return React.createElement(PopoutWindow, {
       windowKey: "DISCORD_CUSTOM_CSS",
       withTitleBar: true,
       title: "Custom CSS",
-      children: ["Test"]
+      children: React.createElement("div", { ref, style: { width: "100vw", height: "calc(100vh - 22px)" } })
     })
   }
 

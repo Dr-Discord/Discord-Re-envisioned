@@ -3,8 +3,9 @@ const styles = document.createElement("dr-styles")
 const internal = document.createElement("dr-internal")
 const themes = document.createElement("dr-themes")
 const plugins = document.createElement("dr-plugins")
+const customCSS = document.createElement("style")
 
-styles.append(internal, plugins, themes)
+styles.append(internal, plugins, themes, customCSS)
 
 module.exports = function(id, css) {
   const isInternal = id.startsWith("DrApi")
@@ -25,3 +26,4 @@ module.exports.styles = styles
 module.exports.internal = internal
 module.exports.plugins = plugins
 module.exports.themes = themes
+module.exports.customCSS = customCSS

@@ -50,34 +50,19 @@ function jQuery() {
   node.onload = () => window.$ = window.jQuery
   document.head.append(node)
 }
-async function requireJS() {
-  eval(await (await fetch("https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.1/require.min.js")).text())
-
-  window.MonacoEnvironment = {
-    getWorkerUrl: function (workerId, label) {
-      return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-        self.MonacoEnvironment = {
-          baseUrl: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/"
-        };
-        importScripts("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs/base/worker/workerMain.js");`
-      )}`
-    }
-  }
-  
-  requirejs.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs" } })
-
-  window.define = define
-  requirejs(["vs/editor/editor.main"], () => delete window.define)
+function ace() {
+  const node = document.createElement("script")
+  node.src = "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
+  document.head.append(node)
 }
 
 function documentReady() {
-  jQuery()
-  requireJS()
-
+  globalThis.console = { ...globalThis.console }
   styles.documentReady()
   themes()
 
-  globalThis.console = { ...globalThis.console }
+  jQuery()
+  ace()
 }
 
 if (document.readyState === "complete") documentReady()

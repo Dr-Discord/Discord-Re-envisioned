@@ -31,12 +31,18 @@ const [
 })()
 
 const settingsDir = join(dirName, "settings")
-
 if (!exists(settingsDir)) mkdir(settingsDir)
+
+const customCSS = join(settingsDir, "custom.css")
+if (!exists(customCSS)) writeFile(customCSS, "")
 
 const listeners = {}
 
 module.exports = new class rawStorage {
+  customCSS(value) {
+    if (typeof value === "string") writeFile(customCSS, value)
+    else readFile(customCSS)
+  }
   useStorage(name, key, defaultValue) {
     if (!isTopWindow) throw new Error()
 
