@@ -50,28 +50,24 @@ function jQuery() {
   node.onload = () => window.$ = window.jQuery
   document.head.append(node)
 }
-function requireJS() {
-  const node = document.createElement("script")
-  node.src = "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.1/require.min.js"
-  node.onload = () => {
-    requirejs.config({
-      paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs" }
-    })
+async function requireJS() {
+  eval(await (await fetch("https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.1/require.min.js")).text())
 
-    window.MonacoEnvironment = {
-      getWorkerUrl: function (workerId, label) {
-        return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-          self.MonacoEnvironment = {
-            baseUrl: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/"
-          };
-          importScripts("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs/base/worker/workerMain.js");`
-        )}`
-      }
+  window.MonacoEnvironment = {
+    getWorkerUrl: function (workerId, label) {
+      return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+        self.MonacoEnvironment = {
+          baseUrl: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/"
+        };
+        importScripts("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs/base/worker/workerMain.js");`
+      )}`
     }
-
-    requirejs(["vs/editor/editor.main"], function () {})
   }
-  document.head.append(node)
+  
+  requirejs.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs" } })
+
+  window.define = define
+  requirejs(["vs/editor/editor.main"], () => delete window.define)
 }
 
 function documentReady() {

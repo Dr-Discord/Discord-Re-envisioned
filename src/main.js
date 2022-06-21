@@ -13,8 +13,8 @@
 
   // src/main/webpack.js
   var require_webpack = __commonJS({
-    "src/main/webpack.js"(exports, module) {
-      module.exports = new class rawWebpack {
+    "src/main/webpack.js"(exports2, module2) {
+      module2.exports = new class rawWebpack {
         constructor() {
           let waiting = [];
           let webpackModules = {};
@@ -29,10 +29,10 @@
               const [, modules] = chunk;
               for (const id2 in modules) {
                 const old2 = modules[id2];
-                modules[id2] = function(_, module2) {
+                modules[id2] = function(_, module3) {
                   const res = old2.apply(this, arguments);
                   for (const ite of waiting)
-                    ite(module2, id2);
+                    ite(module3, id2);
                   webpackModules[id2] = _.exports;
                   if (_.exports && !_.exports.css) {
                     const m = Object.entries(_.exports);
@@ -72,11 +72,11 @@
         getModule(filter) {
           for (const id2 in this.webpackModules) {
             try {
-              const module2 = this.webpackModules[id2];
-              if (!module2)
+              const module3 = this.webpackModules[id2];
+              if (!module3)
                 continue;
-              if (filter(module2))
-                return module2;
+              if (filter(module3))
+                return module3;
             } catch (error) {
               this.errors.push(error);
             }
@@ -87,31 +87,31 @@
         }
         getModuleByProps(...props) {
           let _module;
-          this.getModule((module2) => {
-            if (props.every((prop) => typeof module2[prop] !== "undefined"))
-              return _module = module2;
-            if (!module2?.default)
+          this.getModule((module3) => {
+            if (props.every((prop) => typeof module3[prop] !== "undefined"))
+              return _module = module3;
+            if (!module3?.default)
               return;
-            if (props.every((prop) => typeof module2?.default[prop] !== "undefined"))
-              return _module = module2?.default;
+            if (props.every((prop) => typeof module3?.default[prop] !== "undefined"))
+              return _module = module3?.default;
           });
           return _module;
         }
         getModuleByDisplayName(displayName, returnDefault = false) {
-          const module2 = this.getModule((module3) => module3?.default.displayName === displayName);
+          const module3 = this.getModule((module4) => module4?.default.displayName === displayName);
           if (returnDefault)
-            return module2?.default;
-          return module2;
+            return module3?.default;
+          return module3;
         }
         getAllModules(filter) {
           let modules = [];
           for (const id2 in this.webpackModules) {
             try {
-              const module2 = this.webpackModules[id2];
-              if (!module2)
+              const module3 = this.webpackModules[id2];
+              if (!module3)
                 continue;
-              if (filter(module2))
-                modules.push(module2);
+              if (filter(module3))
+                modules.push(module3);
             } catch (error) {
               this.errors.push(error);
             }
@@ -120,20 +120,20 @@
         }
         getAllModulesByProps(...props) {
           let modules = [];
-          this.getAllModules((module2) => {
-            if (props.every((prop) => typeof module2[prop] !== "undefined"))
-              return modules.push(module2);
-            if (!module2?.default)
+          this.getAllModules((module3) => {
+            if (props.every((prop) => typeof module3[prop] !== "undefined"))
+              return modules.push(module3);
+            if (!module3?.default)
               return;
-            if (props.every((prop) => typeof module2?.default[prop] !== "undefined"))
-              return modules.push(module2?.default);
+            if (props.every((prop) => typeof module3?.default[prop] !== "undefined"))
+              return modules.push(module3?.default);
           });
           return modules;
         }
         getAllModulesByDisplayName(displayName, returnDefault = false) {
-          const modules = this.getAllModules((module2) => module2?.default.displayName === displayName);
+          const modules = this.getAllModules((module3) => module3?.default.displayName === displayName);
           if (returnDefault)
-            modules.map((module2) => module2?.default);
+            modules.map((module3) => module3?.default);
           return modules;
         }
         getModuleAsync(filter) {
@@ -142,14 +142,14 @@
             const cached = _this.getModule(filter);
             if (cached)
               return resolve(cached);
-            function waiter(module2, id2) {
+            function waiter(module3, id2) {
               try {
-                if (!module2)
+                if (!module3)
                   return;
-                if (filter(module2, id2)) {
+                if (filter(module3, id2)) {
                   const i = _this.waiting.indexOf(waiter);
                   _this.waiting.splice(i, 1);
-                  return resolve(module2);
+                  return resolve(module3);
                 }
               } catch (error) {
                 _this.errors.push(error);
@@ -166,21 +166,21 @@
         }
         getModuleByPropsAsync(...props) {
           return new Promise((resolve) => {
-            this.getModuleAsync((module2) => {
-              if (props.every((prop) => typeof module2[prop] !== "undefined"))
-                return resolve(module2);
-              if (!module2?.default)
+            this.getModuleAsync((module3) => {
+              if (props.every((prop) => typeof module3[prop] !== "undefined"))
+                return resolve(module3);
+              if (!module3?.default)
                 return;
-              if (props.every((prop) => typeof module2?.default[prop] !== "undefined"))
-                return resolve(module2?.default);
+              if (props.every((prop) => typeof module3?.default[prop] !== "undefined"))
+                return resolve(module3?.default);
             });
           });
         }
         async getModuleByDisplayNameAsync(displayName, returnDefault = false) {
-          const module2 = await this.getModuleAsync((module3) => module3?.default.displayName === displayName);
+          const module3 = await this.getModuleAsync((module4) => module4?.default.displayName === displayName);
           if (returnDefault)
-            return module2?.default;
-          return module2;
+            return module3?.default;
+          return module3;
         }
       }();
     }
@@ -188,22 +188,22 @@
 
   // src/main/patcher.js
   var require_patcher = __commonJS({
-    "src/main/patcher.js"(exports, module) {
-      module.exports = new class rawPatcher {
+    "src/main/patcher.js"(exports2, module2) {
+      module2.exports = new class rawPatcher {
         Symbol = Symbol("DrApi");
-        hook(module2, fn) {
-          if (!module2[fn])
-            module2[fn] = function() {
+        hook(module3, fn) {
+          if (!module3[fn])
+            module3[fn] = function() {
             };
-          const original = module2[fn];
-          let hook = module2[fn][this.Symbol];
-          if (!(this.Symbol in module2[fn])) {
-            hook = module2[fn][this.Symbol] = {
+          const original = module3[fn];
+          let hook = module3[fn][this.Symbol];
+          if (!(this.Symbol in module3[fn])) {
+            hook = module3[fn][this.Symbol] = {
               before: /* @__PURE__ */ new Set(),
               instead: /* @__PURE__ */ new Set(),
               after: /* @__PURE__ */ new Set()
             };
-            module2[fn] = function() {
+            module3[fn] = function() {
               let args = Array.from(arguments);
               for (const { callback } of [...hook.before]) {
                 const result = callback(this, args);
@@ -223,9 +223,9 @@
               }
               return res;
             };
-            Object.assign(module2[fn], original);
-            module2[fn].toString = () => original.toString();
-            module2[fn].toString.toString = () => original.toString.toString();
+            Object.assign(module3[fn], original);
+            module3[fn].toString = () => original.toString();
+            module3[fn].toString.toString = () => original.toString.toString();
           }
           return hook;
         }
@@ -253,7 +253,7 @@
 
   // src/storage.js
   var require_storage = __commonJS({
-    "src/storage.js"(exports, module) {
+    "src/storage.js"(exports2, module2) {
       var isTopWindow = !!globalThis.DrApiNative;
       var _require = isTopWindow ? DrApiNative.require : __require;
       var [
@@ -285,7 +285,7 @@
       if (!exists(settingsDir))
         mkdir(settingsDir);
       var listeners = {};
-      module.exports = new class rawStorage {
+      module2.exports = new class rawStorage {
         useStorage(name, key, defaultValue) {
           if (!isTopWindow)
             throw new Error();
@@ -340,13 +340,13 @@
 
   // src/main/styles.js
   var require_styles = __commonJS({
-    "src/main/styles.js"(exports, module) {
+    "src/main/styles.js"(exports2, module2) {
       var styles2 = document.createElement("dr-styles");
       var internal = document.createElement("dr-internal");
       var themes2 = document.createElement("dr-themes");
       var plugins = document.createElement("dr-plugins");
       styles2.append(internal, plugins, themes2);
-      module.exports = function(id2, css) {
+      module2.exports = function(id2, css) {
         const isInternal = id2.startsWith("DrApi");
         let style = document.querySelector(`[dr-${isInternal ? "internal" : "plugin"}=${JSON.stringify(id2)}]`);
         if (!style) {
@@ -360,17 +360,17 @@
         style.innerHTML = css;
         return () => style.remove();
       };
-      module.exports.documentReady = () => document.head.append(styles2);
-      module.exports.styles = styles2;
-      module.exports.internal = internal;
-      module.exports.plugins = plugins;
-      module.exports.themes = themes2;
+      module2.exports.documentReady = () => document.head.append(styles2);
+      module2.exports.styles = styles2;
+      module2.exports.internal = internal;
+      module2.exports.plugins = plugins;
+      module2.exports.themes = themes2;
     }
   });
 
   // src/main/themes.js
   var require_themes = __commonJS({
-    "src/main/themes.js"(exports, module) {
+    "src/main/themes.js"(exports2, module2) {
       var storage2 = require_storage();
       var { themes: styles2 } = require_styles();
       var themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes");
@@ -438,7 +438,7 @@
         if (!enabledThemes.includes(meta.name))
           return;
         if (document.readyState === "complete")
-          module.exports.toggleTheme(meta.name);
+          module2.exports.toggleTheme(meta.name);
       }
       function watchSplash(file) {
         const enabledThemes = storage2.getData("internal", "enabledSplashThemes", []);
@@ -472,15 +472,15 @@
         if (file.endsWith(".splash.css"))
           return watchSplash(file);
       });
-      module.exports = () => {
+      module2.exports = () => {
         const enabledThemes = storage2.getData("internal", "enabledThemes", []);
         for (const theme of Object.keys(_themes)) {
           if (!enabledThemes.includes(theme))
             continue;
-          module.exports.toggleTheme(theme);
+          module2.exports.toggleTheme(theme);
         }
       };
-      module.exports.toggleTheme = (id2) => {
+      module2.exports.toggleTheme = (id2) => {
         const theme = _themes[id2];
         const isOn = document.querySelector(`[dr-theme=${JSON.stringify(id2)}]`);
         if (isOn)
@@ -490,13 +490,13 @@
         style.innerHTML = theme.css;
         styles2.appendChild(style);
       };
-      module.exports.getThemes = (splash = false) => splash ? _splashThemes : _themes;
+      module2.exports.getThemes = (splash = false) => splash ? _splashThemes : _themes;
     }
   });
 
   // src/main/settings.js
   var require_settings = __commonJS({
-    "src/main/settings.js"(exports, module) {
+    "src/main/settings.js"(exports2, module2) {
       var patcher = require_patcher();
       var webpack2 = require_webpack();
       var storage2 = require_storage();
@@ -504,7 +504,7 @@
       var { getThemes, toggleTheme } = require_themes();
       window.getThemes = getThemes;
       var shell = DrApiNative.runInNative(`require("electron").shell`);
-      module.exports = async (React) => {
+      module2.exports = async (React) => {
         const sectionsModule = await webpack2.getModuleByPropsAsync("getUserSettingsSections");
         const NotificationSettings = webpack2.getModuleByDisplayName("NotificationSettings", true);
         const FormSection = webpack2.getModuleByDisplayName("FormSection", true);
@@ -1259,12 +1259,12 @@
 
   // src/main/notifications.js
   var require_notifications = __commonJS({
-    "src/main/notifications.js"(exports, module) {
+    "src/main/notifications.js"(exports2, module2) {
       var webpack2 = require_webpack();
       var Patcher2 = require_patcher();
       var storage2 = require_storage();
       var styles2 = require_styles();
-      module.exports = async (React) => {
+      module2.exports = async (React) => {
         styles2("DrApi-Toasts", `#dr-toasts {
     position: fixed;
     z-index: 1000;
@@ -1469,10 +1469,10 @@
 
   // src/main/modals.js
   var require_modals = __commonJS({
-    "src/main/modals.js"(exports, module) {
+    "src/main/modals.js"(exports2, module2) {
       var patcher = require_patcher();
       var webpack2 = require_webpack();
-      module.exports = async (React) => {
+      module2.exports = async (React) => {
         let _id = 0;
         const {
           openModal,
@@ -1538,81 +1538,80 @@
   });
 
   // src/main/index.js
-  var originalConsole = globalThis.console;
-  for (const key in originalConsole) {
-    const e = originalConsole[key];
-    Object.defineProperty(console, key, {
-      get: () => e,
-      set: () => e
-    });
-  }
-  var webpack = require_webpack();
-  var Patcher = require_patcher();
-  var storage = require_storage();
-  var settings = require_settings();
-  var notifications = require_notifications();
-  var styles = require_styles();
-  var modals = require_modals();
-  var themes = require_themes();
-  void function() {
-    function changeClasses(that, classes, old) {
-      return old.apply(that, classes.map((c) => c.includes(" dr-") ? c.split(" ")[0] : c));
-    }
-    Patcher.instead("DrApi", DOMTokenList.prototype, "add", changeClasses);
-    Patcher.instead("DrApi", DOMTokenList.prototype, "remove", changeClasses);
-    Patcher.instead("DrApi", DOMTokenList.prototype, "contains", changeClasses);
-  }();
-  window.DrApi = {
-    webpack,
-    Patcher,
-    storage: {
-      getData: (pluginName, key) => storage.getData(pluginName, key),
-      setData: (pluginName, key, value) => storage.setData(pluginName, key, value)
-    }
-  };
-  webpack.getModuleByPropsAsync("isDeveloper").then((e) => Object.defineProperty(e, "isDeveloper", { get: () => true }));
-  webpack.getModuleByPropsAsync("memo", "createElement").then((React) => {
-    window.DrApi.React = React;
-    settings(React);
-    notifications(React);
-    modals(React);
-  });
-  function jQuery() {
-    const node = document.createElement("script");
-    node.src = "https://code.jquery.com/jquery-3.6.0.min.js";
-    node.onload = () => window.$ = window.jQuery;
-    document.head.append(node);
-  }
-  function requireJS() {
-    const node = document.createElement("script");
-    node.src = "https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.1/require.min.js";
-    node.onload = () => {
-      requirejs.config({
-        paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs" }
-      });
-      window.MonacoEnvironment = {
-        getWorkerUrl: function(workerId, label) {
-          return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
-          self.MonacoEnvironment = {
-            baseUrl: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/"
-          };
-          importScripts("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs/base/worker/workerMain.js");`)}`;
+  var require_main = __commonJS({
+    "src/main/index.js"(exports, module) {
+      var originalConsole = globalThis.console;
+      for (const key in originalConsole) {
+        const e = originalConsole[key];
+        Object.defineProperty(console, key, {
+          get: () => e,
+          set: () => e
+        });
+      }
+      var webpack = require_webpack();
+      var Patcher = require_patcher();
+      var storage = require_storage();
+      var settings = require_settings();
+      var notifications = require_notifications();
+      var styles = require_styles();
+      var modals = require_modals();
+      var themes = require_themes();
+      void function() {
+        function changeClasses(that, classes, old) {
+          return old.apply(that, classes.map((c) => c.includes(" dr-") ? c.split(" ")[0] : c));
+        }
+        Patcher.instead("DrApi", DOMTokenList.prototype, "add", changeClasses);
+        Patcher.instead("DrApi", DOMTokenList.prototype, "remove", changeClasses);
+        Patcher.instead("DrApi", DOMTokenList.prototype, "contains", changeClasses);
+      }();
+      window.DrApi = {
+        webpack,
+        Patcher,
+        storage: {
+          getData: (pluginName, key) => storage.getData(pluginName, key),
+          setData: (pluginName, key, value) => storage.setData(pluginName, key, value)
         }
       };
-      requirejs(["vs/editor/editor.main"], function() {
+      webpack.getModuleByPropsAsync("isDeveloper").then((e) => Object.defineProperty(e, "isDeveloper", { get: () => true }));
+      webpack.getModuleByPropsAsync("memo", "createElement").then((React) => {
+        window.DrApi.React = React;
+        settings(React);
+        notifications(React);
+        modals(React);
       });
-    };
-    document.head.append(node);
-  }
-  function documentReady() {
-    jQuery();
-    requireJS();
-    styles.documentReady();
-    themes();
-    globalThis.console = { ...globalThis.console };
-  }
-  if (document.readyState === "complete")
-    documentReady();
-  else
-    document.addEventListener("DOMContentLoaded", documentReady);
+      function jQuery() {
+        const node = document.createElement("script");
+        node.src = "https://code.jquery.com/jquery-3.6.0.min.js";
+        node.onload = () => window.$ = window.jQuery;
+        document.head.append(node);
+      }
+      async function requireJS() {
+        eval(await (await fetch("https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.1/require.min.js")).text());
+        window.MonacoEnvironment = {
+          getWorkerUrl: function(workerId, label) {
+            return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+        self.MonacoEnvironment = {
+          baseUrl: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/"
+        };
+        importScripts("https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs/base/worker/workerMain.js");`)}`;
+          }
+        };
+        requirejs.config({ paths: { vs: "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.16.2/min/vs" } });
+        window.define = define;
+        requirejs(["vs/editor/editor.main"], () => delete window.define);
+      }
+      function documentReady() {
+        jQuery();
+        requireJS();
+        styles.documentReady();
+        themes();
+        globalThis.console = { ...globalThis.console };
+      }
+      if (document.readyState === "complete")
+        documentReady();
+      else
+        document.addEventListener("DOMContentLoaded", documentReady);
+    }
+  });
+  require_main();
 })();
