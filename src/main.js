@@ -384,6 +384,7 @@
     "src/main/themes.js"(exports, module) {
       var storage2 = require_storage();
       var { themes: styles2 } = require_styles();
+      var webpack2 = require_webpack();
       var themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes");
       if (!DrApiNative.fileSystem.exists(themesFolder))
         DrApiNative.fileSystem.mkdir(themesFolder);
@@ -421,6 +422,8 @@
         meta.filePath = filePath;
         _splashThemes[meta.name] = meta;
       }
+      var Creative;
+      var DoubleStarIcon;
       function watchTheme(file) {
         const enabledThemes = storage2.getData("internal", "enabledThemes", []);
         const filePath = DrApiNative.fileSystem.join(themesFolder, file);
@@ -445,6 +448,15 @@
         meta.css = themeContent;
         meta.filePath = filePath;
         _themes[meta.name] = meta;
+        if (DrApi.toast) {
+          if (!Creative)
+            Creative = webpack2.getModuleByDisplayName("Creative", true);
+          setTimeout(DrApi.toast.show({
+            title: `Theme '${meta.name}' updated`,
+            type: "info",
+            icon: DrApi.React.createElement(Creative)
+          }), 4e3);
+        }
         storage2.setData("internal", "enabledThemes", enabledThemes);
         if (!enabledThemes.includes(meta.name))
           return;
@@ -475,9 +487,23 @@
         meta.css = themeContent;
         meta.filePath = filePath;
         _splashThemes[meta.name] = meta;
+        if (DrApi.toast) {
+          if (!DoubleStarIcon)
+            DoubleStarIcon = webpack2.getModuleByDisplayName("DoubleStarIcon", true);
+          setTimeout(DrApi.toast.show({
+            title: `Splash theme '${meta.name}' updated`,
+            type: "info",
+            icon: DrApi.React.createElement(DoubleStarIcon)
+          }), 4e3);
+        }
         storage2.setData("internal", "enabledSplashThemes", enabledThemes);
       }
+      var flippyBit = 0;
       DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
+        if (!(flippyBit++ % 2))
+          return;
+        if (!file)
+          return;
         if (file.endsWith(".theme.css"))
           return watchTheme(file);
         if (file.endsWith(".splash.css"))
@@ -980,6 +1006,11 @@
                             return;
                           enabledAddons.splice(i, 1);
                         }
+                        setTimeout(DrApi.toast.show({
+                          title: `${val ? "Enabled" : "Disabled"} '${addon.name}'`,
+                          type: "info",
+                          icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : Alert)
+                        }), 4e3);
                         setEnabledAddons([...enabledAddons]);
                         if (addon.filePath.endsWith(".theme.css"))
                           toggleTheme(addon.name);
@@ -1502,7 +1533,6 @@
   // src/main/modals.js
   var require_modals = __commonJS({
     "src/main/modals.js"(exports, module) {
-      var patcher = require_patcher();
       var webpack2 = require_webpack();
       module.exports = async (React) => {
         let _id = 0;
@@ -1536,11 +1566,9 @@
             openModal(typeof content === "function" ? content : () => content, {
               modalKey: id2
             });
-            return () => this.close(id2);
+            return { close: () => closeModal(id2), id: id2 };
           },
-          close(id2) {
-            closeModal(id2);
-          },
+          close: (id2) => closeModal(id2),
           alert(title, content, opts = {}) {
             const { confirmText = Messages.OKAY, onConfirm } = opts;
             this.open((props) => React.createElement(Alert, {
@@ -1602,13 +1630,13 @@
       setData: (pluginName, key, value) => storage.setData(pluginName, key, value)
     }
   };
-  webpack.getModuleByPropsAsync("isDeveloper").then((e) => Object.defineProperty(e, "isDeveloper", { get: () => true }));
-  webpack.getModuleByPropsAsync("memo", "createElement").then((React) => {
+  void async function() {
+    const React = await webpack.getModuleByPropsAsync("memo", "createElement");
     window.DrApi.React = React;
     settings(React);
     notifications(React);
     modals(React);
-  });
+  }();
   function jQuery() {
     const node = document.createElement("script");
     node.src = "https://code.jquery.com/jquery-3.6.0.min.js";

@@ -36,13 +36,15 @@ window.DrApi = {
   }
 }
 
-webpack.getModuleByPropsAsync("isDeveloper").then(e => Object.defineProperty(e, "isDeveloper", { get: () => true }))
-webpack.getModuleByPropsAsync("memo", "createElement").then(React => {
+void async function() {
+  const React = await webpack.getModuleByPropsAsync("memo", "createElement")
+  
   window.DrApi.React = React
+
   settings(React)
   notifications(React)
   modals(React)
-})
+}()
 
 function jQuery() {
   const node = document.createElement("script")

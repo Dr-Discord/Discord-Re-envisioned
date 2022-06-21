@@ -1,5 +1,6 @@
 const storage = require("../storage")
 const { themes:styles } = require("./styles")
+const webpack = require("./webpack")
 
 const themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes")
 
@@ -47,6 +48,9 @@ for (const theme of splashThemes) {
   _splashThemes[meta.name] = meta
 }
 
+let Creative
+let DoubleStarIcon
+
 function watchTheme(file) {
   const enabledThemes = storage.getData("internal", "enabledThemes", [])
 
@@ -79,6 +83,15 @@ function watchTheme(file) {
   meta.css = themeContent
   meta.filePath = filePath
   _themes[meta.name] = meta
+
+  if (DrApi.toast) {
+    if (!Creative) Creative = webpack.getModuleByDisplayName("Creative", true)
+    setTimeout(DrApi.toast.show({
+      title: `Theme '${meta.name}' updated`,
+      type: "info",
+      icon: DrApi.React.createElement(Creative)
+    }), 4e3)
+  }
 
   storage.setData("internal", "enabledThemes", enabledThemes)
 
@@ -118,10 +131,22 @@ function watchSplash(file) {
   meta.filePath = filePath
   _splashThemes[meta.name] = meta
 
+  if (DrApi.toast) {
+    if (!DoubleStarIcon) DoubleStarIcon = webpack.getModuleByDisplayName("DoubleStarIcon", true)
+    setTimeout(DrApi.toast.show({
+      title: `Splash theme '${meta.name}' updated`,
+      type: "info",
+      icon: DrApi.React.createElement(DoubleStarIcon)
+    }), 4e3)
+  }
+
   storage.setData("internal", "enabledSplashThemes", enabledThemes)
 }
 
+let flippyBit = 0
 DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
+  if (!(flippyBit++ % 2)) return
+  if (!file) return
   if (file.endsWith(".theme.css")) return watchTheme(file)
   if (file.endsWith(".splash.css")) return watchSplash(file)
 })

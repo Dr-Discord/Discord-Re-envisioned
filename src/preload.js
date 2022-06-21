@@ -20,9 +20,7 @@ Object.defineProperty(require.cache.electron.exports, "contextBridge", {
 })
 Object.entries(electron).map(([key, value]) => {
   if (key in require.cache.electron.exports) return
-  Object.defineProperty(require.cache.electron.exports, key, {
-    get: () => value
-  })
+  Object.defineProperty(require.cache.electron.exports, key, { get: () => value })
 })
 
 console.log("[DrApi]: Loading...")

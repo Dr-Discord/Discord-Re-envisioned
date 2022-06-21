@@ -480,6 +480,12 @@ module.exports = async (React) => {
                     enabledAddons.splice(i, 1)
                   }
 
+                  setTimeout(DrApi.toast.show({
+                    title: `${val ? "Enabled" : "Disabled"} '${addon.name}'`,
+                    type: "info",
+                    icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : Alert)
+                  }), 4e3)
+
                   setEnabledAddons([...enabledAddons])
 
                   if (addon.filePath.endsWith(".theme.css")) toggleTheme(addon.name)

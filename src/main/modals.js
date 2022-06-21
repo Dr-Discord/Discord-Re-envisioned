@@ -1,4 +1,3 @@
-const patcher = require("./patcher")
 const webpack = require("./webpack")
 
 module.exports = async (React) => {
@@ -38,9 +37,9 @@ module.exports = async (React) => {
         modalKey: id
       })
 
-      return () => this.close(id)
+      return { close: () => closeModal(id), id }
     },
-    close(id) { closeModal(id) },
+    close: (id) => closeModal(id),
     alert(title, content, opts = {}) {
       const { confirmText = Messages.OKAY, onConfirm } = opts
       this.open((props) => React.createElement(Alert, {
