@@ -61,7 +61,7 @@ void async function() {
     const package = DrApiNative.require(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "package.json"))
     DrApi.request("https://api.github.com/repos/Dr-Discord/dev/releases", async request => {
       const json = (await request.json()).shift()
-      if (package.version > json.tag_name) return
+      if (package.version >= json.tag_name) return
       DrApi.modals.confirmModal("You version is out of date!", [
         "Do you want to update Discord Re-envisioned",
         "This will restart discord too"
