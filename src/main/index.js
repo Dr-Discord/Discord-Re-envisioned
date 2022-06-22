@@ -64,7 +64,7 @@ void async function() {
       if (package.version >= json.tag_name) return
       DrApi.modals.confirmModal("You version is out of date!", [
         "Do you want to update Discord Re-envisioned",
-        "This will restart discord too"
+        `You version is '${package.version}' and the latest is '${json.tag_name}'`
       ], {
         confirmText: "Update",
         onConfirm: () => {

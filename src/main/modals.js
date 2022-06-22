@@ -27,7 +27,7 @@ module.exports = async (React) => {
       const { content } = renderMessageMarkup({ content: " *s* " + con })
       content.shift()
       content.shift()
-      return React.createElement("span", { style: { color: "var(--text-normal)" } }, content)
+      return React.createElement("div", { style: { color: "var(--text-normal)" } }, content)
     })() : con)
   }
 
