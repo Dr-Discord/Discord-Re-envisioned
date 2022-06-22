@@ -57,15 +57,14 @@ module.exports = new class rawWebpack {
 
     this.webpackModules = webpackModules
     this.waiting = waiting
-    this.errors = []
   }
   getModule(filter) {
     for (const id in this.webpackModules) {
       try {
         const module = this.webpackModules[id]
         if (!module) continue
-        if (filter(module)) return module
-      } catch (error) { this.errors.push(error) }
+        if (filter(module, id)) return module
+      } catch (error) {}
     }
   }
   getModuleById(id) { return this.webpackModules[id] }
@@ -90,7 +89,7 @@ module.exports = new class rawWebpack {
         const module = this.webpackModules[id]
         if (!module) continue
         if (filter(module)) modules.push(module)
-      } catch (error) { this.errors.push(error) }
+      } catch (error) {}
     }
     return modules
   }
@@ -121,7 +120,7 @@ module.exports = new class rawWebpack {
             _this.waiting.splice(i, 1)
             return resolve(module)
           }
-        } catch (error) { _this.errors.push(error) }
+        } catch (error) {}
       }
       this.waiting.push(waiter)
     })

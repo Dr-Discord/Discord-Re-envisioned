@@ -30,7 +30,7 @@ const [
   ]
 })()
 
-const settingsDir = join(dirName, "settings")
+const settingsDir = join(dirName, "..", "settings")
 if (!exists(settingsDir)) mkdir(settingsDir)
 
 const customCSS = join(settingsDir, "custom.css")

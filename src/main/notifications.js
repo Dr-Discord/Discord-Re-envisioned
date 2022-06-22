@@ -173,6 +173,7 @@ module.exports = async (React) => {
     
     React.useEffect(() => {
       DrApi.toast = {
+        toasts,
         delete(id) {
           const toast = toasts.find(t => t.id === id)
           const index = toasts.indexOf(toast)

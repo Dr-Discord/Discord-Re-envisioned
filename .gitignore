@@ -1,5 +1,7 @@
-src/settings
-src/themes
-src/plugins
+settings
+themes
+plugins
+built.asar
+dist
 test
 node_modules

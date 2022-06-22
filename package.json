@@ -1,8 +1,11 @@
 {
   "dependencies": {
-    "electron-devtools-installer": "^3.2.0"
+    "asar": "^3.1.0",
+    "electron-devtools-installer": "^3.2.0",
+    "esbuild": "^0.14.47"
   },
   "scripts": {
+    "build:pro": "node build.js",
     "build": "npm run build:splash && npm run build:main",
     "build:splash": "esbuild src/splash/index.js --bundle --outfile=src/splash.js --platform=browser",
     "build:splash:watch": "esbuild src/splash/index.js --bundle --watch --outfile=src/splash.js --platform=browser",

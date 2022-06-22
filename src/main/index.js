@@ -33,10 +33,12 @@ void function() {
 }()
 
 window.DrApi = {
+  request: (url, callback) => fetch(url).then(async request => callback(await request.text(), request)),
   webpack,
   Patcher,
   storage: {
-    getData: (pluginName, key) => storage.getData(pluginName, key),
+    useStorage: (pluginName, key, defaultValue) => storage.useStorage(pluginName, key, defaultValue),
+    getData: (pluginName, key, defaultValue) => storage.getData(pluginName, key, defaultValue),
     setData: (pluginName, key, value) => storage.setData(pluginName, key, value)
   }
 }

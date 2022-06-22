@@ -1,7 +1,7 @@
 const storage = require("../storage")
 const webpack = require("./webpack")
 
-const pluginsFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "plugins")
+const pluginsFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "..", "plugins")
 
 if (!DrApiNative.fileSystem.exists(pluginsFolder)) DrApiNative.fileSystem.mkdir(pluginsFolder)
 
