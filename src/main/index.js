@@ -16,6 +16,7 @@ const styles = require("./styles")
 const modals = require("./modals")
 
 const themes = require("./themes")
+const plugins = require("./plugins")
 
 void function() {
   function changeClasses(that, classes, old) {
@@ -44,6 +45,13 @@ void async function() {
   settings(React)
   notifications(React)
   modals(React)
+
+  const dispatcher = await webpack.getModuleByPropsAsync("dirtyDispatch", "dispatch")
+  function onOpen() {
+    plugins()
+    dispatcher.unsubscribe("CONNECTION_OPEN", onOpen)
+  }
+  dispatcher.subscribe("CONNECTION_OPEN", onOpen)
 }()
 
 function jQuery() {

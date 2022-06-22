@@ -3,6 +3,7 @@ const webpack = require("./webpack")
 const storage = require("../storage")
 const styles = require("./styles")
 const { getThemes, toggleTheme } = require("./themes")
+const { getPlugins, togglePlugin } = require("./plugins")
 
 window.getThemes = getThemes
 
@@ -41,7 +42,6 @@ module.exports = async (React) => {
   const Ticket = webpack.getModuleByDisplayName("Ticket", true)
   const DoubleStarIcon = webpack.getModuleByDisplayName("DoubleStarIcon", true)
   const Creative = webpack.getModuleByDisplayName("Creative", true)
-  const Alert = webpack.getModuleByDisplayName("Alert", true)
   const SortIcon = webpack.getModuleByDisplayName("SortIcon", true)
   const OsMac = webpack.getModuleByDisplayName("OsMac", true)
   const Retry = webpack.getModuleByDisplayName("Retry", true)
@@ -422,7 +422,7 @@ module.exports = async (React) => {
   }
 
   function AddonCard(addon) {
-    const [enabledAddons, setEnabledAddons] = storage.useStorage("internal", addon.filePath.endsWith(".theme.css") ? "enabledThemes" : addon.filePath.endsWith(".splash.css") ? "enabledSplashThemes" : "UNKNOWN", [])
+    const [enabledAddons, setEnabledAddons] = storage.useStorage("internal", addon.filePath.endsWith(".theme.css") ? "enabledThemes" : addon.filePath.endsWith(".splash.css") ? "enabledSplashThemes" : "enabledPlugins", [])
 
     return React.createElement(Card, {
       ...Card.defaultProps,
@@ -444,8 +444,8 @@ module.exports = async (React) => {
                     style: { marginBottom: 4 },
                     children: [
                       React.createElement(Tooltip, {
-                        text: addon.filePath.endsWith(".theme.css") ? "Theme" : addon.filePath.endsWith(".splash.css") ? "Splash Theme" : "UNKNOWN",
-                        children: (props) => React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : Alert, { className: iconToolbar, style: { marginRight: 8 }, ...props })
+                        text: addon.filePath.endsWith(".theme.css") ? "Theme" : addon.filePath.endsWith(".splash.css") ? "Splash Theme" : "Plugin",
+                        children: (props) => React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode, { className: iconToolbar, style: { marginRight: 8 }, ...props })
                       }),
                       React.createElement(LegacyHeader, {
                         children: addon.name,
@@ -483,12 +483,13 @@ module.exports = async (React) => {
                   setTimeout(DrApi.toast.show({
                     title: `${val ? "Enabled" : "Disabled"} '${addon.name}'`,
                     type: "info",
-                    icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : Alert)
+                    icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode)
                   }), 4e3)
 
                   setEnabledAddons([...enabledAddons])
 
                   if (addon.filePath.endsWith(".theme.css")) toggleTheme(addon.name)
+                  else if (addon.filePath.endsWith(".plugin.js")) togglePlugin(addon.name)
                 }
               })
             ]
@@ -564,7 +565,7 @@ module.exports = async (React) => {
     })
   }
 
-  function AddonConfiguration(event) {
+  function AddonConfiguration({ event, filter:showFilter }) {
     const [sortByWhat, setSortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
     const [filter, setFilter] = storage.useStorage("internal", "addonFilterBy", 0)
 
@@ -580,21 +581,23 @@ module.exports = async (React) => {
           icon: () => React.createElement(SortIcon, { className: iconMenu }),
           action: () => setSortByWhat(sortByWhat === "name" ? "author" : "name")
         }),
+        showFilter ? [
+          React.createElement(MenuSeparator),
+          React.createElement(MenuItem, {
+            id: "filter-by",
+            label: filter === 0 ? "Not filtering" : `Filtering out ${filter === 1 ? "Splash Themes" : "Normal Themes"}`,
+            dontCloseOnActionIfHoldingShiftKey: true,
+            icon: () => React.createElement(Filter, { className: iconMenu }),
+            action: () => {
+              if ((filter + 1) === 3) return setFilter(0)
+              setFilter(filter + 1)
+            }
+          })
+        ] : false,
         React.createElement(MenuSeparator),
         React.createElement(MenuItem, {
-          id: "filter-by",
-          label: filter === 0 ? "Not filtering" : `Filtering out ${filter === 1 ? "Splash Themes" : "Normal Themes"}`,
-          dontCloseOnActionIfHoldingShiftKey: true,
-          icon: () => React.createElement(Filter, { className: iconMenu }),
-          action: () => {
-            if ((filter + 1) === 3) return setFilter(0)
-            setFilter(filter + 1)
-          }
-        }),
-        React.createElement(MenuSeparator),
-        React.createElement(MenuItem, {
-          id: "open-theme-folder",
-          label: "Open Theme Folder",
+          id: `open-${filter ? "theme" : "plugin"}-folder`,
+          label: `Open ${filter ? "Theme" : "Plugin"} Folder`,
           icon: () => React.createElement(Folder, { className: iconMenu }),
           action: () => () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes"))
         })
@@ -608,7 +611,7 @@ module.exports = async (React) => {
     return 0
   }
 
-  const filterThemes = (val, [theme, { author }]) => val.map(v => theme.toLowerCase().includes(v.toLowerCase()) || author.toLowerCase().includes(v.toLowerCase())).filter(l => l).length
+  const filterAddons = (val, [addon, { author }]) => val.map(v => addon.toLowerCase().includes(v.toLowerCase()) || author.toLowerCase().includes(v.toLowerCase())).filter(l => l).length
 
   function Themes() {
     storage.useStorage("internal", "enabledThemes", [])
@@ -658,10 +661,10 @@ module.exports = async (React) => {
 
                   const searchValue = tags.length ? tags : [query]
 
-                  const filtered = Object.entries(getThemes()).filter(filterThemes.bind(null, searchValue))
+                  const filtered = Object.entries(getThemes()).filter(filterAddons.bind(null, searchValue))
                   setThemes(Object.fromEntries(filtered))
 
-                  const _filtered = Object.entries(getThemes(true)).filter(filterThemes.bind(null, searchValue))
+                  const _filtered = Object.entries(getThemes(true)).filter(filterAddons.bind(null, searchValue))
                   setSplashThemes(Object.fromEntries(_filtered))
                 },
                 onKeyDown: (event) => {
@@ -679,10 +682,10 @@ module.exports = async (React) => {
 
                   const searchValue = tags.concat(val)
 
-                  const filtered = Object.entries(getThemes()).filter(filterThemes.bind(null, searchValue))
+                  const filtered = Object.entries(getThemes()).filter(filterAddons.bind(null, searchValue))
                   setThemes(Object.fromEntries(filtered))
 
-                  const _filtered = Object.entries(getThemes(true)).filter(filterThemes.bind(null, searchValue))
+                  const _filtered = Object.entries(getThemes(true)).filter(filterAddons.bind(null, searchValue))
                   setSplashThemes(Object.fromEntries(_filtered))
                 },
                 onClear: () => {
@@ -695,7 +698,7 @@ module.exports = async (React) => {
                 shouldShow: isConfigOpen,
                 position: "left",
                 onRequestClose: () => setConfigOpen(false),
-                renderPopout: (event) => React.createElement(AddonConfiguration, event),
+                renderPopout: (event) => React.createElement(AddonConfiguration, { event, filter: true }),
                 children: () => React.createElement(Icon, {
                   selected: isConfigOpen,
                   icon: () => React.createElement(OverflowMenu, { className: iconToolbar }),
@@ -754,6 +757,103 @@ module.exports = async (React) => {
     })
   }
 
+  function Plugins() {
+    storage.useStorage("internal", "enabledPlugins", [])
+
+    const [sortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
+    const [query, setQuery] = React.useState("")
+    const [tags, setTags] = React.useState([])
+    const [plugins, setPlugins] = React.useState(getPlugins())
+    const [isConfigOpen, setConfigOpen] = React.useState(false)
+
+    const _plugins = Object.values(plugins)
+
+    return React.createElement(FormSection, {
+      title: React.createElement(Flex, {
+        justify: justifyBetween,
+        children: [
+          React.createElement(Flex, {
+            children: [
+              React.createElement(InlineCode, { style: { marginRight: 8 }, width: 24, height: 24 }),
+              "Plugins"
+            ]
+          }),
+          React.createElement(Flex, {
+            id: "dr-addon-header",
+            justify: justifyEnd,
+            children: [
+              React.createElement(Icon, {
+                icon: () => React.createElement(Folder, { className: iconToolbar }),
+                onClick: () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "plugins")),
+                tooltip: "Open Plugin Folder"
+              }),
+              React.createElement(SearchBar, {
+                placeholder: "Search Plugins",
+                className: search,
+                query,
+                tags,
+                isLoading: false,
+                disabled: false,
+                autoFocus: true,
+                size: SearchBar.Sizes.SMALL,
+                onRemoveTag: (tag) => {
+                  tags.splice(tag, 1)
+                  setTags([...tags])
+
+                  const searchValue = tags.length ? tags : [query]
+
+                  const filtered = Object.entries(getPlugins()).filter(filterAddons.bind(null, searchValue))
+                  setPlugins(Object.fromEntries(filtered))
+                },
+                onKeyDown: (event) => {
+                  if (event.key !== "Tab") return
+                  event.stopPropagation()
+                  event.preventDefault()
+
+                  if (!query) return
+                  
+                  setTags(tags.concat(query))
+                  setQuery("")
+                },
+                onQueryChange: (val) => {
+                  setQuery(val)
+
+                  const searchValue = tags.concat(val)
+
+                  const filtered = Object.entries(getPlugins()).filter(filterAddons.bind(null, searchValue))
+                  setPlugins(Object.fromEntries(filtered))
+                },
+                onClear: () => {
+                  setQuery("")
+                  setPlugins(getPlugins())
+                }
+              }),
+              React.createElement(Popout, {
+                shouldShow: isConfigOpen,
+                position: "left",
+                onRequestClose: () => setConfigOpen(false),
+                renderPopout: (event) => React.createElement(AddonConfiguration, { event, filter: false }),
+                children: () => React.createElement(Icon, {
+                  selected: isConfigOpen,
+                  icon: () => React.createElement(OverflowMenu, { className: iconToolbar }),
+                  onClick: () => setConfigOpen(!isConfigOpen),
+                  tooltip: "Configuration"
+                })
+              })
+            ]
+          })
+        ]
+      }),
+      tag: FormSection.Tags.H1,
+      children: [
+        React.createElement("div", {
+          id: "dr-addon-list",
+          children: _plugins.sort(sortBy(sortByWhat)).map((plugin) => React.createElement(AddonCard, plugin))
+        })
+      ]
+    })
+  }
+
   const settings = [
     { section: "DIVIDER" },
     {
@@ -782,6 +882,12 @@ module.exports = async (React) => {
       icon: React.createElement(Pencil, { width: 20, height: 20 }),
       label: "Custom CSS",
       section: "Discord Re-envisioned Custom CSS"
+    },
+    {
+      element: () => React.createElement(Plugins),
+      icon: React.createElement(InlineCode, { width: 20, height: 20 }),
+      label: "Plugins",
+      section: "Discord Re-envisioned Plugins"
     }
   ]
 

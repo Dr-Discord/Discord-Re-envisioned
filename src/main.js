@@ -13,8 +13,8 @@
 
   // src/main/webpack.js
   var require_webpack = __commonJS({
-    "src/main/webpack.js"(exports, module) {
-      module.exports = new class rawWebpack {
+    "src/main/webpack.js"(exports2, module2) {
+      module2.exports = new class rawWebpack {
         constructor() {
           let waiting = [];
           let webpackModules = {};
@@ -29,10 +29,10 @@
               const [, modules] = chunk;
               for (const id2 in modules) {
                 const old2 = modules[id2];
-                modules[id2] = function(_, module2) {
-                  const res = old2.apply(this, arguments);
+                modules[id2] = function(_, module3) {
+                  const res2 = old2.apply(this, arguments);
                   for (const ite of waiting)
-                    ite(module2, id2);
+                    ite(module3, id2);
                   webpackModules[id2] = _.exports;
                   if (_.exports && !_.exports.css) {
                     const m = Object.entries(_.exports);
@@ -47,7 +47,7 @@
                       _.exports[id3] = newSelector.join(" ");
                     });
                   }
-                  return res;
+                  return res2;
                 };
               }
               return original.apply(this, [chunk]);
@@ -72,11 +72,11 @@
         getModule(filter) {
           for (const id2 in this.webpackModules) {
             try {
-              const module2 = this.webpackModules[id2];
-              if (!module2)
+              const module3 = this.webpackModules[id2];
+              if (!module3)
                 continue;
-              if (filter(module2))
-                return module2;
+              if (filter(module3))
+                return module3;
             } catch (error) {
               this.errors.push(error);
             }
@@ -87,31 +87,31 @@
         }
         getModuleByProps(...props) {
           let _module;
-          this.getModule((module2) => {
-            if (props.every((prop) => typeof module2[prop] !== "undefined"))
-              return _module = module2;
-            if (!module2?.default)
+          this.getModule((module3) => {
+            if (props.every((prop) => typeof module3[prop] !== "undefined"))
+              return _module = module3;
+            if (!module3?.default)
               return;
-            if (props.every((prop) => typeof module2?.default[prop] !== "undefined"))
-              return _module = module2?.default;
+            if (props.every((prop) => typeof module3?.default[prop] !== "undefined"))
+              return _module = module3?.default;
           });
           return _module;
         }
         getModuleByDisplayName(displayName, returnDefault = false) {
-          const module2 = this.getModule((module3) => module3?.default.displayName === displayName);
+          const module3 = this.getModule((module4) => module4?.default.displayName === displayName);
           if (returnDefault)
-            return module2?.default;
-          return module2;
+            return module3?.default;
+          return module3;
         }
         getAllModules(filter) {
           let modules = [];
           for (const id2 in this.webpackModules) {
             try {
-              const module2 = this.webpackModules[id2];
-              if (!module2)
+              const module3 = this.webpackModules[id2];
+              if (!module3)
                 continue;
-              if (filter(module2))
-                modules.push(module2);
+              if (filter(module3))
+                modules.push(module3);
             } catch (error) {
               this.errors.push(error);
             }
@@ -120,20 +120,20 @@
         }
         getAllModulesByProps(...props) {
           let modules = [];
-          this.getAllModules((module2) => {
-            if (props.every((prop) => typeof module2[prop] !== "undefined"))
-              return modules.push(module2);
-            if (!module2?.default)
+          this.getAllModules((module3) => {
+            if (props.every((prop) => typeof module3[prop] !== "undefined"))
+              return modules.push(module3);
+            if (!module3?.default)
               return;
-            if (props.every((prop) => typeof module2?.default[prop] !== "undefined"))
-              return modules.push(module2?.default);
+            if (props.every((prop) => typeof module3?.default[prop] !== "undefined"))
+              return modules.push(module3?.default);
           });
           return modules;
         }
         getAllModulesByDisplayName(displayName, returnDefault = false) {
-          const modules = this.getAllModules((module2) => module2?.default.displayName === displayName);
+          const modules = this.getAllModules((module3) => module3?.default.displayName === displayName);
           if (returnDefault)
-            modules.map((module2) => module2?.default);
+            modules.map((module3) => module3?.default);
           return modules;
         }
         getModuleAsync(filter) {
@@ -142,14 +142,14 @@
             const cached = _this.getModule(filter);
             if (cached)
               return resolve(cached);
-            function waiter(module2, id2) {
+            function waiter(module3, id2) {
               try {
-                if (!module2)
+                if (!module3)
                   return;
-                if (filter(module2, id2)) {
+                if (filter(module3, id2)) {
                   const i = _this.waiting.indexOf(waiter);
                   _this.waiting.splice(i, 1);
-                  return resolve(module2);
+                  return resolve(module3);
                 }
               } catch (error) {
                 _this.errors.push(error);
@@ -166,21 +166,21 @@
         }
         getModuleByPropsAsync(...props) {
           return new Promise((resolve) => {
-            this.getModuleAsync((module2) => {
-              if (props.every((prop) => typeof module2[prop] !== "undefined"))
-                return resolve(module2);
-              if (!module2?.default)
+            this.getModuleAsync((module3) => {
+              if (props.every((prop) => typeof module3[prop] !== "undefined"))
+                return resolve(module3);
+              if (!module3?.default)
                 return;
-              if (props.every((prop) => typeof module2?.default[prop] !== "undefined"))
-                return resolve(module2?.default);
+              if (props.every((prop) => typeof module3?.default[prop] !== "undefined"))
+                return resolve(module3?.default);
             });
           });
         }
         async getModuleByDisplayNameAsync(displayName, returnDefault = false) {
-          const module2 = await this.getModuleAsync((module3) => module3?.default.displayName === displayName);
+          const module3 = await this.getModuleAsync((module4) => module4?.default.displayName === displayName);
           if (returnDefault)
-            return module2?.default;
-          return module2;
+            return module3?.default;
+          return module3;
         }
       }();
     }
@@ -188,44 +188,44 @@
 
   // src/main/patcher.js
   var require_patcher = __commonJS({
-    "src/main/patcher.js"(exports, module) {
-      module.exports = new class rawPatcher {
+    "src/main/patcher.js"(exports2, module2) {
+      module2.exports = new class rawPatcher {
         Symbol = Symbol("DrApi");
-        hook(module2, fn) {
-          if (!module2[fn])
-            module2[fn] = function() {
+        hook(module3, fn) {
+          if (!module3[fn])
+            module3[fn] = function() {
             };
-          const original = module2[fn];
-          let hook = module2[fn][this.Symbol];
-          if (!(this.Symbol in module2[fn])) {
-            hook = module2[fn][this.Symbol] = {
+          const original = module3[fn];
+          let hook = module3[fn][this.Symbol];
+          if (!(this.Symbol in module3[fn])) {
+            hook = module3[fn][this.Symbol] = {
               before: /* @__PURE__ */ new Set(),
               instead: /* @__PURE__ */ new Set(),
               after: /* @__PURE__ */ new Set()
             };
-            module2[fn] = function() {
+            module3[fn] = function() {
               let args = Array.from(arguments);
               for (const { callback } of [...hook.before]) {
                 const result = callback(this, args);
                 if (Array.isArray(result))
                   args = result;
               }
-              let res;
+              let res2;
               if (!hook.instead.size)
-                res = original.apply(this, args);
+                res2 = original.apply(this, args);
               else
                 for (const { callback } of [...hook.instead])
-                  res = callback(this, args, original);
+                  res2 = callback(this, args, original);
               for (const { callback } of [...hook.after]) {
-                const result = callback(this, args, res);
+                const result = callback(this, args, res2);
                 if (typeof result !== "undefined")
-                  res = result;
+                  res2 = result;
               }
-              return res;
+              return res2;
             };
-            Object.assign(module2[fn], original);
-            module2[fn].toString = () => original.toString();
-            module2[fn].toString.toString = () => original.toString.toString();
+            Object.assign(module3[fn], original);
+            module3[fn].toString = () => original.toString();
+            module3[fn].toString.toString = () => original.toString.toString();
           }
           return hook;
         }
@@ -253,7 +253,7 @@
 
   // src/storage.js
   var require_storage = __commonJS({
-    "src/storage.js"(exports, module) {
+    "src/storage.js"(exports2, module2) {
       var isTopWindow = !!globalThis.DrApiNative;
       var _require = isTopWindow ? DrApiNative.require : __require;
       var [
@@ -288,7 +288,7 @@
       if (!exists(customCSS))
         writeFile(customCSS, "");
       var listeners = {};
-      module.exports = new class rawStorage {
+      module2.exports = new class rawStorage {
         customCSS(value) {
           if (typeof value === "string")
             writeFile(customCSS, value);
@@ -349,14 +349,14 @@
 
   // src/main/styles.js
   var require_styles = __commonJS({
-    "src/main/styles.js"(exports, module) {
+    "src/main/styles.js"(exports2, module2) {
       var styles2 = document.createElement("dr-styles");
       var internal = document.createElement("dr-internal");
       var themes2 = document.createElement("dr-themes");
-      var plugins = document.createElement("dr-plugins");
+      var plugins3 = document.createElement("dr-plugins");
       var customCSS = document.createElement("style");
-      styles2.append(internal, plugins, themes2, customCSS);
-      module.exports = function(id2, css) {
+      styles2.append(internal, plugins3, themes2, customCSS);
+      module2.exports = function(id2, css) {
         const isInternal = id2.startsWith("DrApi");
         let style = document.querySelector(`[dr-${isInternal ? "internal" : "plugin"}=${JSON.stringify(id2)}]`);
         if (!style) {
@@ -365,34 +365,34 @@
           if (isInternal)
             internal.append(style);
           else
-            plugins.append(style);
+            plugins3.append(style);
         }
         style.innerHTML = css;
         return () => style.remove();
       };
-      module.exports.documentReady = () => document.head.append(styles2);
-      module.exports.styles = styles2;
-      module.exports.internal = internal;
-      module.exports.plugins = plugins;
-      module.exports.themes = themes2;
-      module.exports.customCSS = customCSS;
+      module2.exports.documentReady = () => document.head.append(styles2);
+      module2.exports.styles = styles2;
+      module2.exports.internal = internal;
+      module2.exports.plugins = plugins3;
+      module2.exports.themes = themes2;
+      module2.exports.customCSS = customCSS;
     }
   });
 
   // src/main/themes.js
   var require_themes = __commonJS({
-    "src/main/themes.js"(exports, module) {
-      var storage2 = require_storage();
+    "src/main/themes.js"(exports2, module2) {
+      var storage3 = require_storage();
       var { themes: styles2 } = require_styles();
-      var webpack2 = require_webpack();
+      var webpack3 = require_webpack();
       var themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes");
       if (!DrApiNative.fileSystem.exists(themesFolder))
         DrApiNative.fileSystem.mkdir(themesFolder);
-      var readDir = DrApiNative.runInNative('require("fs").readdirSync');
-      var dir = readDir(themesFolder);
-      var themes2 = dir.filter((theme) => theme.endsWith(".theme.css"));
-      var splashThemes = dir.filter((theme) => theme.endsWith(".splash.css"));
-      function readMeta(contents) {
+      var readDir2 = DrApiNative.runInNative('require("fs").readdirSync');
+      var dir2 = readDir2(themesFolder);
+      var themes2 = dir2.filter((theme) => theme.endsWith(".theme.css"));
+      var splashThemes = dir2.filter((theme) => theme.endsWith(".splash.css"));
+      function readMeta2(contents) {
         const meta = {};
         const jsdoc = contents.match(/\/\*\*([\s\S]*?)\*\//);
         if (!jsdoc?.[1])
@@ -408,7 +408,7 @@
       for (const theme of themes2) {
         const filePath = DrApiNative.fileSystem.join(themesFolder, theme);
         const themeContent = DrApiNative.fileSystem.readFile(filePath);
-        const meta = readMeta(themeContent);
+        const meta = readMeta2(themeContent);
         meta.css = themeContent;
         meta.filePath = filePath;
         _themes[meta.name] = meta;
@@ -417,7 +417,7 @@
       for (const theme of splashThemes) {
         const filePath = DrApiNative.fileSystem.join(themesFolder, theme);
         const themeContent = DrApiNative.fileSystem.readFile(filePath);
-        const meta = readMeta(themeContent);
+        const meta = readMeta2(themeContent);
         meta.css = themeContent;
         meta.filePath = filePath;
         _splashThemes[meta.name] = meta;
@@ -425,7 +425,7 @@
       var Creative;
       var DoubleStarIcon;
       function watchTheme(file) {
-        const enabledThemes = storage2.getData("internal", "enabledThemes", []);
+        const enabledThemes = storage3.getData("internal", "enabledThemes", []);
         const filePath = DrApiNative.fileSystem.join(themesFolder, file);
         const found = Object.values(_themes).find((theme) => theme.filePath === filePath);
         if (!DrApiNative.fileSystem.exists(filePath)) {
@@ -435,10 +435,10 @@
             enabledThemes.splice(index, 1);
             document.querySelector(`[dr-theme=${JSON.stringify(id)}]`).remove();
           }
-          return storage2.setData("internal", "enabledThemes", [...enabledThemes]);
+          return storage3.setData("internal", "enabledThemes", [...enabledThemes]);
         }
         const themeContent = DrApiNative.fileSystem.readFile(filePath);
-        const meta = readMeta(themeContent);
+        const meta = readMeta2(themeContent);
         if (found) {
           delete _themes[found.name];
           const index = enabledThemes.indexOf(found.name);
@@ -450,21 +450,21 @@
         _themes[meta.name] = meta;
         if (DrApi.toast) {
           if (!Creative)
-            Creative = webpack2.getModuleByDisplayName("Creative", true);
+            Creative = webpack3.getModuleByDisplayName("Creative", true);
           setTimeout(DrApi.toast.show({
             title: `'${meta.name}' updated`,
             type: "info",
             icon: DrApi.React.createElement(Creative)
           }), 4e3);
         }
-        storage2.setData("internal", "enabledThemes", enabledThemes);
+        storage3.setData("internal", "enabledThemes", enabledThemes);
         if (!enabledThemes.includes(meta.name))
           return;
         if (document.readyState === "complete")
-          module.exports.toggleTheme(meta.name);
+          module2.exports.toggleTheme(meta.name);
       }
       function watchSplash(file) {
-        const enabledThemes = storage2.getData("internal", "enabledSplashThemes", []);
+        const enabledThemes = storage3.getData("internal", "enabledSplashThemes", []);
         const filePath = DrApiNative.fileSystem.join(themesFolder, file);
         const found = Object.values(_splashThemes).find((theme) => theme.filePath === filePath);
         if (!DrApiNative.fileSystem.exists(filePath)) {
@@ -472,12 +472,12 @@
           const index = enabledThemes.indexOf(found.name);
           if (index !== -1)
             enabledThemes.splice(index, 1);
-          return storage2.setData("internal", "enabledSplashThemes", [...enabledThemes]);
+          return storage3.setData("internal", "enabledSplashThemes", [...enabledThemes]);
         }
         const themeContent = DrApiNative.fileSystem.readFile(filePath);
         if (found)
           delete _splashThemes[found.name];
-        const meta = readMeta(themeContent);
+        const meta = readMeta2(themeContent);
         if (found) {
           delete _splashThemes[found.name];
           const index = enabledThemes.indexOf(found.name);
@@ -489,14 +489,14 @@
         _splashThemes[meta.name] = meta;
         if (DrApi.toast) {
           if (!DoubleStarIcon)
-            DoubleStarIcon = webpack2.getModuleByDisplayName("DoubleStarIcon", true);
+            DoubleStarIcon = webpack3.getModuleByDisplayName("DoubleStarIcon", true);
           setTimeout(DrApi.toast.show({
             title: `'${meta.name}' updated`,
             type: "info",
             icon: DrApi.React.createElement(DoubleStarIcon)
           }), 4e3);
         }
-        storage2.setData("internal", "enabledSplashThemes", enabledThemes);
+        storage3.setData("internal", "enabledSplashThemes", enabledThemes);
       }
       var flippyBit = 0;
       DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
@@ -509,15 +509,15 @@
         if (file.endsWith(".splash.css"))
           return watchSplash(file);
       });
-      module.exports = () => {
-        const enabledThemes = storage2.getData("internal", "enabledThemes", []);
+      module2.exports = () => {
+        const enabledThemes = storage3.getData("internal", "enabledThemes", []);
         for (const theme of Object.keys(_themes)) {
           if (!enabledThemes.includes(theme))
             continue;
-          module.exports.toggleTheme(theme);
+          module2.exports.toggleTheme(theme);
         }
       };
-      module.exports.toggleTheme = (id2) => {
+      module2.exports.toggleTheme = (id2) => {
         const theme = _themes[id2];
         const isOn = document.querySelector(`[dr-theme=${JSON.stringify(id2)}]`);
         if (isOn)
@@ -527,68 +527,130 @@
         style.innerHTML = theme.css;
         styles2.appendChild(style);
       };
-      module.exports.getThemes = (splash = false) => splash ? _splashThemes : _themes;
+      module2.exports.getThemes = (splash = false) => splash ? _splashThemes : _themes;
+    }
+  });
+
+  // src/main/plugins.js
+  var require_plugins = __commonJS({
+    "src/main/plugins.js"(exports, module) {
+      var storage = require_storage();
+      var webpack = require_webpack();
+      var pluginsFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "plugins");
+      if (!DrApiNative.fileSystem.exists(pluginsFolder))
+        DrApiNative.fileSystem.mkdir(pluginsFolder);
+      var readDir = DrApiNative.runInNative('require("fs").readdirSync');
+      var dir = readDir(pluginsFolder);
+      var plugins = dir.filter((plugin2) => plugin2.endsWith(".plugin.js"));
+      function readMeta(contents) {
+        const meta = {};
+        const jsdoc = contents.match(/\/\*\*([\s\S]*?)\*\//);
+        if (!jsdoc?.[1])
+          return meta;
+        for (let ite of jsdoc[1].match(/\*\s([^\n]*)/g)) {
+          ite = ite.replace(/\*( +|)@/, "");
+          const split = ite.split(" ");
+          meta[split[0]] = split.slice(1).join(" ").trim();
+        }
+        return meta;
+      }
+      var _plugins = {};
+      for (const plugin2 of plugins) {
+        const filePath = DrApiNative.fileSystem.join(pluginsFolder, plugin2);
+        const pluginContent = DrApiNative.fileSystem.readFile(filePath);
+        const meta = readMeta(pluginContent);
+        meta.js = pluginContent;
+        meta.filePath = filePath;
+        _plugins[meta.name] = meta;
+      }
+      module.exports = () => {
+        const enabledPlugins = storage.getData("internal", "enabledPlugins", []);
+        for (const plugin of Object.values(_plugins)) {
+          const res = eval(`(function() {
+${plugin.js}
+})()//# sourceURL=${encodeURIComponent(plugin.name)}`);
+          plugin.exports = typeof res === "function" ? new res() : res;
+          if (plugin.exports.onLoad)
+            plugin.exports.onLoad();
+          if (enabledPlugins.includes(plugin.name)) {
+            if (plugin.exports.onStart)
+              plugin.exports.onStart();
+          }
+        }
+      };
+      module.exports.getPlugins = () => _plugins;
+      module.exports.togglePlugin = (name) => {
+        const enabledPlugins2 = storage.getData("internal", "enabledPlugins", []);
+        const plugin2 = _plugins[name];
+        if (!enabledPlugins2.includes(name)) {
+          if (plugin2.exports.onStop)
+            plugin2.exports.onStop();
+        } else {
+          if (plugin2.exports.onStart)
+            plugin2.exports.onStart();
+        }
+      };
     }
   });
 
   // src/main/settings.js
   var require_settings = __commonJS({
-    "src/main/settings.js"(exports, module) {
+    "src/main/settings.js"(exports2, module2) {
       var patcher = require_patcher();
-      var webpack2 = require_webpack();
-      var storage2 = require_storage();
+      var webpack3 = require_webpack();
+      var storage3 = require_storage();
       var styles2 = require_styles();
       var { getThemes, toggleTheme } = require_themes();
+      var { getPlugins, togglePlugin } = require_plugins();
       window.getThemes = getThemes;
       var shell = DrApiNative.runInNative(`require("electron").shell`);
-      module.exports = async (React) => {
-        const sectionsModule = await webpack2.getModuleByPropsAsync("getUserSettingsSections");
-        const NotificationSettings = webpack2.getModuleByDisplayName("NotificationSettings", true);
-        const FormSection = webpack2.getModuleByDisplayName("FormSection", true);
-        const SwitchItem = webpack2.getModuleByDisplayName("SwitchItem", true);
-        const Card = webpack2.getModuleByDisplayName("Card", true);
-        const Flex = webpack2.getModuleByDisplayName("Flex", true);
-        const Clickable = webpack2.getModuleByDisplayName("Clickable", true);
-        const FormDivider = webpack2.getModuleByDisplayName("FormDivider", true);
-        const Caret = webpack2.getModuleByDisplayName("Caret", true);
-        const Mail = webpack2.getModuleByDisplayName("Mail", true);
-        const LegacyHeader = webpack2.getModuleByDisplayName("LegacyHeader", true);
-        const FormItem = webpack2.getModuleByDisplayName("FormItem", true);
-        const Slider = webpack2.getModuleByDisplayName("Slider", true);
-        const { Text } = webpack2.getModule((m) => m.Text.displayName);
-        const { Messages } = webpack2.getAllModulesByProps("Messages")[1];
-        const Switch = webpack2.getModuleByDisplayName("Switch", true);
-        const SearchBar = webpack2.getModuleByDisplayName("SearchBar", true);
-        const Folder = webpack2.getModuleByDisplayName("Folder", true);
-        const OverflowMenu = webpack2.getModuleByDisplayName("OverflowMenu", true);
+      module2.exports = async (React) => {
+        const sectionsModule = await webpack3.getModuleByPropsAsync("getUserSettingsSections");
+        const NotificationSettings = webpack3.getModuleByDisplayName("NotificationSettings", true);
+        const FormSection = webpack3.getModuleByDisplayName("FormSection", true);
+        const SwitchItem = webpack3.getModuleByDisplayName("SwitchItem", true);
+        const Card = webpack3.getModuleByDisplayName("Card", true);
+        const Flex = webpack3.getModuleByDisplayName("Flex", true);
+        const Clickable = webpack3.getModuleByDisplayName("Clickable", true);
+        const FormDivider = webpack3.getModuleByDisplayName("FormDivider", true);
+        const Caret = webpack3.getModuleByDisplayName("Caret", true);
+        const Mail = webpack3.getModuleByDisplayName("Mail", true);
+        const LegacyHeader = webpack3.getModuleByDisplayName("LegacyHeader", true);
+        const FormItem = webpack3.getModuleByDisplayName("FormItem", true);
+        const Slider = webpack3.getModuleByDisplayName("Slider", true);
+        const { Text } = webpack3.getModule((m) => m.Text.displayName);
+        const { Messages } = webpack3.getAllModulesByProps("Messages")[1];
+        const Switch = webpack3.getModuleByDisplayName("Switch", true);
+        const SearchBar = webpack3.getModuleByDisplayName("SearchBar", true);
+        const Folder = webpack3.getModuleByDisplayName("Folder", true);
+        const OverflowMenu = webpack3.getModuleByDisplayName("OverflowMenu", true);
         const { Icon } = DrApi.webpack.getModuleByProps("Icon", "default");
-        const { default: Menu, MenuItem, MenuSeparator } = webpack2.getModuleByDisplayName("Menu");
-        const Popout = webpack2.getModuleByDisplayName("Popout", true);
-        const Filter = webpack2.getModuleByDisplayName("Filter", true);
-        const Trash = webpack2.getModuleByDisplayName("Trash", true);
-        const Globe = webpack2.getModuleByDisplayName("Globe", true);
-        const Link = webpack2.getModuleByDisplayName("Link", true);
-        const InlineCode = webpack2.getModuleByDisplayName("InlineCode", true);
-        const WalletIcon = webpack2.getModuleByDisplayName("WalletIcon", true);
-        const Ticket = webpack2.getModuleByDisplayName("Ticket", true);
-        const DoubleStarIcon = webpack2.getModuleByDisplayName("DoubleStarIcon", true);
-        const Creative = webpack2.getModuleByDisplayName("Creative", true);
-        const Alert = webpack2.getModuleByDisplayName("Alert", true);
-        const SortIcon = webpack2.getModuleByDisplayName("SortIcon", true);
-        const OsMac = webpack2.getModuleByDisplayName("OsMac", true);
-        const Retry = webpack2.getModuleByDisplayName("Retry", true);
-        const Gear = webpack2.getModuleByDisplayName("Gear", true);
-        const Pencil = webpack2.getModuleByDisplayName("Pencil", true);
-        const Tooltip = webpack2.getModuleByDisplayName("Tooltip", true);
-        const { openContextMenu, closeContextMenu } = webpack2.getModuleByProps("openContextMenuLazy");
-        const { header, topDivider, body, expandIcon } = webpack2.getModuleByProps("header", "topDivider");
-        const { iconWrapper, wrapper, secondaryHeader } = webpack2.getModuleByProps("detailsWrapper", "icon", "iconWrapper");
-        const { justifyCenter, alignCenter, justifyBetween, justifyEnd } = webpack2.getModuleByProps("justifyCenter", "alignCenter");
-        const { card } = webpack2.getModuleByProps("card", "pulse", "topDivider");
-        const { size16, size20 } = webpack2.getModuleByProps("size20", "size16");
+        const { default: Menu, MenuItem, MenuSeparator } = webpack3.getModuleByDisplayName("Menu");
+        const Popout = webpack3.getModuleByDisplayName("Popout", true);
+        const Filter = webpack3.getModuleByDisplayName("Filter", true);
+        const Trash = webpack3.getModuleByDisplayName("Trash", true);
+        const Globe = webpack3.getModuleByDisplayName("Globe", true);
+        const Link = webpack3.getModuleByDisplayName("Link", true);
+        const InlineCode = webpack3.getModuleByDisplayName("InlineCode", true);
+        const WalletIcon = webpack3.getModuleByDisplayName("WalletIcon", true);
+        const Ticket = webpack3.getModuleByDisplayName("Ticket", true);
+        const DoubleStarIcon = webpack3.getModuleByDisplayName("DoubleStarIcon", true);
+        const Creative = webpack3.getModuleByDisplayName("Creative", true);
+        const SortIcon = webpack3.getModuleByDisplayName("SortIcon", true);
+        const OsMac = webpack3.getModuleByDisplayName("OsMac", true);
+        const Retry = webpack3.getModuleByDisplayName("Retry", true);
+        const Gear = webpack3.getModuleByDisplayName("Gear", true);
+        const Pencil = webpack3.getModuleByDisplayName("Pencil", true);
+        const Tooltip = webpack3.getModuleByDisplayName("Tooltip", true);
+        const { openContextMenu, closeContextMenu } = webpack3.getModuleByProps("openContextMenuLazy");
+        const { header, topDivider, body, expandIcon } = webpack3.getModuleByProps("header", "topDivider");
+        const { iconWrapper, wrapper, secondaryHeader } = webpack3.getModuleByProps("detailsWrapper", "icon", "iconWrapper");
+        const { justifyCenter, alignCenter, justifyBetween, justifyEnd } = webpack3.getModuleByProps("justifyCenter", "alignCenter");
+        const { card } = webpack3.getModuleByProps("card", "pulse", "topDivider");
+        const { size16, size20 } = webpack3.getModuleByProps("size20", "size16");
         const { icon: iconToolbar } = DrApi.webpack.getModuleByProps("icon", "transparent", "iconWrapper");
         const { icon: iconMenu } = DrApi.webpack.getModuleByProps("colorPremium", "icon");
-        const { line } = webpack2.getModuleByProps("line", "versionHash");
+        const { line } = webpack3.getModuleByProps("line", "versionHash");
         const { search } = DrApi.webpack.getModuleByProps("search", "toolbar");
         const { macDragRegion } = DrApi.webpack.getModuleByProps("macDragRegion");
         styles2("DrApi-settings", `.dr-header:not(:last-child) .dr-catorgory-icon {
@@ -710,14 +772,14 @@
           });
         }
         function Settings() {
-          const [newMacOS, setNewMacOS] = storage2.useStorage("internal", "newMacOS", true);
-          const [transparency, setTransparency] = storage2.useStorage("internal", "transparency", false);
-          const [position, setPosition] = storage2.useStorage("internal", "notificationLocation", NotificationSettings.Positions.TOP_RIGHT);
-          const [positionX, setPositionX] = storage2.useStorage("internal", "notificationPositionX", 20);
-          const [positionY, setPositionY] = storage2.useStorage("internal", "notificationPositionY", 20);
-          const [maxHeight, setMaxHeight] = storage2.useStorage("internal", "notificationMaxHeight", 30);
-          const [blur, setBlur] = storage2.useStorage("internal", "notificationBlur", 0);
-          const [opacity, setOpacity] = storage2.useStorage("internal", "notificationOpacity", 80);
+          const [newMacOS, setNewMacOS] = storage3.useStorage("internal", "newMacOS", true);
+          const [transparency, setTransparency] = storage3.useStorage("internal", "transparency", false);
+          const [position, setPosition] = storage3.useStorage("internal", "notificationLocation", NotificationSettings.Positions.TOP_RIGHT);
+          const [positionX, setPositionX] = storage3.useStorage("internal", "notificationPositionX", 20);
+          const [positionY, setPositionY] = storage3.useStorage("internal", "notificationPositionY", 20);
+          const [maxHeight, setMaxHeight] = storage3.useStorage("internal", "notificationMaxHeight", 30);
+          const [blur, setBlur] = storage3.useStorage("internal", "notificationBlur", 0);
+          const [opacity, setOpacity] = storage3.useStorage("internal", "notificationOpacity", 80);
           return React.createElement(FormSection, {
             title: "Settings",
             tag: FormSection.Tags.H1,
@@ -735,7 +797,7 @@
                         position,
                         onChange: (e, val) => {
                           setPosition(val);
-                          storage2.setData("internal", "notificationLocation", val);
+                          storage3.setData("internal", "notificationLocation", val);
                         }
                       })
                     })
@@ -909,9 +971,9 @@
             ]
           });
         }
-        const { openUserProfileModal } = webpack2.getModuleByProps("openUserProfileModal");
-        const renderMessageMarkup = webpack2.getModuleByProps("renderMessageMarkupToAST").default;
-        const [{ getUser: fetchUser }, { getUser }] = webpack2.getAllModulesByProps("getUser");
+        const { openUserProfileModal } = webpack3.getModuleByProps("openUserProfileModal");
+        const renderMessageMarkup = webpack3.getModuleByProps("renderMessageMarkupToAST").default;
+        const [{ getUser: fetchUser }, { getUser }] = webpack3.getAllModulesByProps("getUser");
         function Avatar({ author, userId, authorLink }) {
           const [user, setUser] = React.useState(getUser(userId));
           React.useEffect(() => {
@@ -948,7 +1010,7 @@
           ];
         }
         function AddonCard(addon) {
-          const [enabledAddons, setEnabledAddons] = storage2.useStorage("internal", addon.filePath.endsWith(".theme.css") ? "enabledThemes" : addon.filePath.endsWith(".splash.css") ? "enabledSplashThemes" : "UNKNOWN", []);
+          const [enabledAddons, setEnabledAddons] = storage3.useStorage("internal", addon.filePath.endsWith(".theme.css") ? "enabledThemes" : addon.filePath.endsWith(".splash.css") ? "enabledSplashThemes" : "enabledPlugins", []);
           return React.createElement(Card, {
             ...Card.defaultProps,
             editable: true,
@@ -969,8 +1031,8 @@
                           style: { marginBottom: 4 },
                           children: [
                             React.createElement(Tooltip, {
-                              text: addon.filePath.endsWith(".theme.css") ? "Theme" : addon.filePath.endsWith(".splash.css") ? "Splash Theme" : "UNKNOWN",
-                              children: (props) => React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : Alert, { className: iconToolbar, style: { marginRight: 8 }, ...props })
+                              text: addon.filePath.endsWith(".theme.css") ? "Theme" : addon.filePath.endsWith(".splash.css") ? "Splash Theme" : "Plugin",
+                              children: (props) => React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode, { className: iconToolbar, style: { marginRight: 8 }, ...props })
                             }),
                             React.createElement(LegacyHeader, {
                               children: addon.name,
@@ -1009,11 +1071,13 @@
                         setTimeout(DrApi.toast.show({
                           title: `${val ? "Enabled" : "Disabled"} '${addon.name}'`,
                           type: "info",
-                          icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : Alert)
+                          icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode)
                         }), 4e3);
                         setEnabledAddons([...enabledAddons]);
                         if (addon.filePath.endsWith(".theme.css"))
                           toggleTheme(addon.name);
+                        else if (addon.filePath.endsWith(".plugin.js"))
+                          togglePlugin(addon.name);
                       }
                     })
                   ]
@@ -1086,9 +1150,9 @@
             ]
           });
         }
-        function AddonConfiguration(event) {
-          const [sortByWhat, setSortByWhat] = storage2.useStorage("internal", "addonSortBy", "name");
-          const [filter, setFilter] = storage2.useStorage("internal", "addonFilterBy", 0);
+        function AddonConfiguration({ event, filter: showFilter }) {
+          const [sortByWhat, setSortByWhat] = storage3.useStorage("internal", "addonSortBy", "name");
+          const [filter, setFilter] = storage3.useStorage("internal", "addonFilterBy", 0);
           return React.createElement(Menu, {
             ...event,
             onClose: event.closePopout,
@@ -1101,22 +1165,24 @@
                 icon: () => React.createElement(SortIcon, { className: iconMenu }),
                 action: () => setSortByWhat(sortByWhat === "name" ? "author" : "name")
               }),
+              showFilter ? [
+                React.createElement(MenuSeparator),
+                React.createElement(MenuItem, {
+                  id: "filter-by",
+                  label: filter === 0 ? "Not filtering" : `Filtering out ${filter === 1 ? "Splash Themes" : "Normal Themes"}`,
+                  dontCloseOnActionIfHoldingShiftKey: true,
+                  icon: () => React.createElement(Filter, { className: iconMenu }),
+                  action: () => {
+                    if (filter + 1 === 3)
+                      return setFilter(0);
+                    setFilter(filter + 1);
+                  }
+                })
+              ] : false,
               React.createElement(MenuSeparator),
               React.createElement(MenuItem, {
-                id: "filter-by",
-                label: filter === 0 ? "Not filtering" : `Filtering out ${filter === 1 ? "Splash Themes" : "Normal Themes"}`,
-                dontCloseOnActionIfHoldingShiftKey: true,
-                icon: () => React.createElement(Filter, { className: iconMenu }),
-                action: () => {
-                  if (filter + 1 === 3)
-                    return setFilter(0);
-                  setFilter(filter + 1);
-                }
-              }),
-              React.createElement(MenuSeparator),
-              React.createElement(MenuItem, {
-                id: "open-theme-folder",
-                label: "Open Theme Folder",
+                id: `open-${filter ? "theme" : "plugin"}-folder`,
+                label: `Open ${filter ? "Theme" : "Plugin"} Folder`,
                 icon: () => React.createElement(Folder, { className: iconMenu }),
                 action: () => () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes"))
               })
@@ -1130,12 +1196,12 @@
             return 1;
           return 0;
         };
-        const filterThemes = (val, [theme, { author }]) => val.map((v) => theme.toLowerCase().includes(v.toLowerCase()) || author.toLowerCase().includes(v.toLowerCase())).filter((l) => l).length;
+        const filterAddons = (val, [addon, { author }]) => val.map((v) => addon.toLowerCase().includes(v.toLowerCase()) || author.toLowerCase().includes(v.toLowerCase())).filter((l) => l).length;
         function Themes() {
-          storage2.useStorage("internal", "enabledThemes", []);
-          storage2.useStorage("internal", "enabledSplashThemes", []);
-          const [sortByWhat] = storage2.useStorage("internal", "addonSortBy", "name");
-          const [filter] = storage2.useStorage("internal", "addonFilterBy", 0);
+          storage3.useStorage("internal", "enabledThemes", []);
+          storage3.useStorage("internal", "enabledSplashThemes", []);
+          const [sortByWhat] = storage3.useStorage("internal", "addonSortBy", "name");
+          const [filter] = storage3.useStorage("internal", "addonFilterBy", 0);
           const [query, setQuery] = React.useState("");
           const [tags, setTags] = React.useState([]);
           const [themes2, setThemes] = React.useState(getThemes());
@@ -1174,9 +1240,9 @@
                         tags.splice(tag, 1);
                         setTags([...tags]);
                         const searchValue = tags.length ? tags : [query];
-                        const filtered = Object.entries(getThemes()).filter(filterThemes.bind(null, searchValue));
+                        const filtered = Object.entries(getThemes()).filter(filterAddons.bind(null, searchValue));
                         setThemes(Object.fromEntries(filtered));
-                        const _filtered = Object.entries(getThemes(true)).filter(filterThemes.bind(null, searchValue));
+                        const _filtered = Object.entries(getThemes(true)).filter(filterAddons.bind(null, searchValue));
                         setSplashThemes(Object.fromEntries(_filtered));
                       },
                       onKeyDown: (event) => {
@@ -1192,9 +1258,9 @@
                       onQueryChange: (val) => {
                         setQuery(val);
                         const searchValue = tags.concat(val);
-                        const filtered = Object.entries(getThemes()).filter(filterThemes.bind(null, searchValue));
+                        const filtered = Object.entries(getThemes()).filter(filterAddons.bind(null, searchValue));
                         setThemes(Object.fromEntries(filtered));
-                        const _filtered = Object.entries(getThemes(true)).filter(filterThemes.bind(null, searchValue));
+                        const _filtered = Object.entries(getThemes(true)).filter(filterAddons.bind(null, searchValue));
                         setSplashThemes(Object.fromEntries(_filtered));
                       },
                       onClear: () => {
@@ -1207,7 +1273,7 @@
                       shouldShow: isConfigOpen,
                       position: "left",
                       onRequestClose: () => setConfigOpen(false),
-                      renderPopout: (event) => React.createElement(AddonConfiguration, event),
+                      renderPopout: (event) => React.createElement(AddonConfiguration, { event, filter: true }),
                       children: () => React.createElement(Icon, {
                         selected: isConfigOpen,
                         icon: () => React.createElement(OverflowMenu, { className: iconToolbar }),
@@ -1228,10 +1294,10 @@
             ]
           });
         }
-        const PopoutWindow = webpack2.getModule((e) => e.default.toString().indexOf("DndProvider") > -1 && React.isValidElement(e.default())).default;
-        const dispatcher = webpack2.getModuleByProps("dirtyDispatch", "dispatch");
-        const PopoutWindowStore = webpack2.getModuleByProps("getWindow", "getName", "getIsAlwaysOnTop");
-        const { useStateFromStores } = webpack2.getModuleByProps("useStateFromStores");
+        const PopoutWindow = webpack3.getModule((e) => e.default.toString().indexOf("DndProvider") > -1 && React.isValidElement(e.default())).default;
+        const dispatcher = webpack3.getModuleByProps("dirtyDispatch", "dispatch");
+        const PopoutWindowStore = webpack3.getModuleByProps("getWindow", "getName", "getIsAlwaysOnTop");
+        const { useStateFromStores } = webpack3.getModuleByProps("useStateFromStores");
         function CustomCSS() {
           const windowInstance = useStateFromStores([PopoutWindowStore], () => PopoutWindowStore.getWindow("DISCORD_CUSTOM_CSS"));
           const ref = React.useRef();
@@ -1240,10 +1306,10 @@
             const editor = ace.edit(ref.current);
             editor.setTheme("ace/theme/monokai");
             editor.getSession().setMode("ace/mode/css");
-            editor.setValue(storage2.customCSS() ?? "");
+            editor.setValue(storage3.customCSS() ?? "");
             editor.on("change", () => {
               const value = editor.getValue();
-              storage2.customCSS(value);
+              storage3.customCSS(value);
               styles2.customCSS.innerHTML = value;
             });
             windowInstance.document.head.appendChild(Object.assign(document.createElement("style"), {
@@ -1256,6 +1322,95 @@
             withTitleBar: true,
             title: "Custom CSS",
             children: React.createElement("div", { ref, style: { width: "100vw", height: "calc(100vh - 22px)" } })
+          });
+        }
+        function Plugins() {
+          storage3.useStorage("internal", "enabledPlugins", []);
+          const [sortByWhat] = storage3.useStorage("internal", "addonSortBy", "name");
+          const [query, setQuery] = React.useState("");
+          const [tags, setTags] = React.useState([]);
+          const [plugins3, setPlugins] = React.useState(getPlugins());
+          const [isConfigOpen, setConfigOpen] = React.useState(false);
+          const _plugins2 = Object.values(plugins3);
+          return React.createElement(FormSection, {
+            title: React.createElement(Flex, {
+              justify: justifyBetween,
+              children: [
+                React.createElement(Flex, {
+                  children: [
+                    React.createElement(InlineCode, { style: { marginRight: 8 }, width: 24, height: 24 }),
+                    "Plugins"
+                  ]
+                }),
+                React.createElement(Flex, {
+                  id: "dr-addon-header",
+                  justify: justifyEnd,
+                  children: [
+                    React.createElement(Icon, {
+                      icon: () => React.createElement(Folder, { className: iconToolbar }),
+                      onClick: () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "plugins")),
+                      tooltip: "Open Plugin Folder"
+                    }),
+                    React.createElement(SearchBar, {
+                      placeholder: "Search Plugins",
+                      className: search,
+                      query,
+                      tags,
+                      isLoading: false,
+                      disabled: false,
+                      autoFocus: true,
+                      size: SearchBar.Sizes.SMALL,
+                      onRemoveTag: (tag) => {
+                        tags.splice(tag, 1);
+                        setTags([...tags]);
+                        const searchValue = tags.length ? tags : [query];
+                        const filtered = Object.entries(getPlugins()).filter(filterAddons.bind(null, searchValue));
+                        setPlugins(Object.fromEntries(filtered));
+                      },
+                      onKeyDown: (event) => {
+                        if (event.key !== "Tab")
+                          return;
+                        event.stopPropagation();
+                        event.preventDefault();
+                        if (!query)
+                          return;
+                        setTags(tags.concat(query));
+                        setQuery("");
+                      },
+                      onQueryChange: (val) => {
+                        setQuery(val);
+                        const searchValue = tags.concat(val);
+                        const filtered = Object.entries(getPlugins()).filter(filterAddons.bind(null, searchValue));
+                        setPlugins(Object.fromEntries(filtered));
+                      },
+                      onClear: () => {
+                        setQuery("");
+                        setPlugins(getPlugins());
+                      }
+                    }),
+                    React.createElement(Popout, {
+                      shouldShow: isConfigOpen,
+                      position: "left",
+                      onRequestClose: () => setConfigOpen(false),
+                      renderPopout: (event) => React.createElement(AddonConfiguration, { event, filter: false }),
+                      children: () => React.createElement(Icon, {
+                        selected: isConfigOpen,
+                        icon: () => React.createElement(OverflowMenu, { className: iconToolbar }),
+                        onClick: () => setConfigOpen(!isConfigOpen),
+                        tooltip: "Configuration"
+                      })
+                    })
+                  ]
+                })
+              ]
+            }),
+            tag: FormSection.Tags.H1,
+            children: [
+              React.createElement("div", {
+                id: "dr-addon-list",
+                children: _plugins2.sort(sortBy(sortByWhat)).map((plugin2) => React.createElement(AddonCard, plugin2))
+              })
+            ]
           });
         }
         const settings2 = [
@@ -1286,10 +1441,16 @@
             icon: React.createElement(Pencil, { width: 20, height: 20 }),
             label: "Custom CSS",
             section: "Discord Re-envisioned Custom CSS"
+          },
+          {
+            element: () => React.createElement(Plugins),
+            icon: React.createElement(InlineCode, { width: 20, height: 20 }),
+            label: "Plugins",
+            section: "Discord Re-envisioned Plugins"
           }
         ];
-        patcher.after("DrApi", sectionsModule.default, "render", (that, args, res) => {
-          const { sections } = res.props.children.props.children.props;
+        patcher.after("DrApi", sectionsModule.default, "render", (that, args, res2) => {
+          const { sections } = res2.props.children.props.children.props;
           const index = sections.indexOf(sections.find((s) => s.section === "Connections")) + 1;
           if (!index)
             return;
@@ -1297,8 +1458,8 @@
             return;
           sections.splice(index, 0, ...settings2);
         });
-        patcher.after("DrApi", webpack2.getModuleByDisplayName("ClientDebugInfo"), "default", (that, args, res) => {
-          res.props.children.push(React.createElement(Text, {
+        patcher.after("DrApi", webpack3.getModuleByDisplayName("ClientDebugInfo"), "default", (that, args, res2) => {
+          res2.props.children.push(React.createElement(Text, {
             className: line,
             color: "text-muted",
             tag: "span",
@@ -1322,12 +1483,12 @@
 
   // src/main/notifications.js
   var require_notifications = __commonJS({
-    "src/main/notifications.js"(exports, module) {
-      var webpack2 = require_webpack();
+    "src/main/notifications.js"(exports2, module2) {
+      var webpack3 = require_webpack();
       var Patcher2 = require_patcher();
-      var storage2 = require_storage();
+      var storage3 = require_storage();
       var styles2 = require_styles();
-      module.exports = async (React) => {
+      module2.exports = async (React) => {
         styles2("DrApi-Toasts", `#dr-toasts {
     position: fixed;
     z-index: 1000;
@@ -1389,15 +1550,15 @@
     border-radius: 4px;
     user-select: text
   }`);
-        const Shakeable = await webpack2.getModuleByDisplayNameAsync("Shakeable", true);
-        const Button = webpack2.getModuleByProps("ButtonColors", "ButtonSizes").default;
-        const Flex = webpack2.getModuleByDisplayName("Flex", true);
-        const { Heading } = webpack2.getModuleByProps("Heading");
-        const Close = webpack2.getModuleByDisplayName("Close", true);
-        const Clickable = webpack2.getModuleByDisplayName("Clickable", true);
-        const renderMessageMarkup = webpack2.getModuleByProps("renderMessageMarkupToAST").default;
-        const { thin, fade } = webpack2.getModuleByProps("thin", "fade");
-        const { scroller } = webpack2.getModuleByProps("scroller");
+        const Shakeable = await webpack3.getModuleByDisplayNameAsync("Shakeable", true);
+        const Button = webpack3.getModuleByProps("ButtonColors", "ButtonSizes").default;
+        const Flex = webpack3.getModuleByDisplayName("Flex", true);
+        const { Heading } = webpack3.getModuleByProps("Heading");
+        const Close = webpack3.getModuleByDisplayName("Close", true);
+        const Clickable = webpack3.getModuleByDisplayName("Clickable", true);
+        const renderMessageMarkup = webpack3.getModuleByProps("renderMessageMarkupToAST").default;
+        const { thin, fade } = webpack3.getModuleByProps("thin", "fade");
+        const { scroller } = webpack3.getModuleByProps("scroller");
         function toastContent(content) {
           if (!Array.isArray(content))
             content = [content];
@@ -1409,8 +1570,8 @@
           })() : con);
         }
         function Toast({ title, content, icon, buttons = [], hideToast, id: id2, type = "" }) {
-          const [blur] = storage2.useStorage("internal", "notificationBlur", 0);
-          const [opacity] = storage2.useStorage("internal", "notificationOpacity", 80);
+          const [blur] = storage3.useStorage("internal", "notificationBlur", 0);
+          const [opacity] = storage3.useStorage("internal", "notificationOpacity", 80);
           buttons = buttons.map((button) => {
             return React.createElement(Flex.Child, {
               children: React.createElement(Button, {
@@ -1479,10 +1640,10 @@
         }
         let toastId = 0;
         function Toasts() {
-          const [location] = storage2.useStorage("internal", "notificationLocation", "topRight");
-          const [positionX] = storage2.useStorage("internal", "notificationPositionX", 20);
-          const [positionY] = storage2.useStorage("internal", "notificationPositionY", 20);
-          const [maxHeight] = storage2.useStorage("internal", "notificationMaxHeight", 30);
+          const [location] = storage3.useStorage("internal", "notificationLocation", "topRight");
+          const [positionX] = storage3.useStorage("internal", "notificationPositionX", 20);
+          const [positionY] = storage3.useStorage("internal", "notificationPositionY", 20);
+          const [maxHeight] = storage3.useStorage("internal", "notificationMaxHeight", 30);
           const [toasts, setToasts] = React.useState([]);
           React.useEffect(() => {
             DrApi.toast = {
@@ -1521,10 +1682,10 @@
             children: location === "disabled" ? null : toasts.map((toast) => React.createElement(Toast, toast))
           });
         }
-        Patcher2.after("DrApi", Shakeable.prototype, "render", (that, args, res) => {
-          if (res.props.children.find((child) => child.type === Toasts))
+        Patcher2.after("DrApi", Shakeable.prototype, "render", (that, args, res2) => {
+          if (res2.props.children.find((child) => child.type === Toasts))
             return;
-          res.props.children.push(React.createElement(Toasts));
+          res2.props.children.push(React.createElement(Toasts));
         });
       };
     }
@@ -1532,22 +1693,22 @@
 
   // src/main/modals.js
   var require_modals = __commonJS({
-    "src/main/modals.js"(exports, module) {
-      var webpack2 = require_webpack();
-      module.exports = async (React) => {
+    "src/main/modals.js"(exports2, module2) {
+      var webpack3 = require_webpack();
+      module2.exports = async (React) => {
         let _id = 0;
         const {
           openModal,
           closeModal
-        } = webpack2.getModuleByProps("openModalLazy", "openModal");
-        const Alert = webpack2.getModuleByDisplayName("Alert", true);
-        const ConfirmModal = webpack2.getModuleByDisplayName("ConfirmModal", true);
-        const { Messages } = webpack2.getAllModulesByProps("Messages")[1];
-        const Button = webpack2.getModuleByProps("ButtonColors", "ButtonSizes").default;
+        } = webpack3.getModuleByProps("openModalLazy", "openModal");
+        const Alert = webpack3.getModuleByDisplayName("Alert", true);
+        const ConfirmModal = webpack3.getModuleByDisplayName("ConfirmModal", true);
+        const { Messages } = webpack3.getAllModulesByProps("Messages")[1];
+        const Button = webpack3.getModuleByProps("ButtonColors", "ButtonSizes").default;
         let renderMessageMarkup;
         function makeContent(content) {
           if (!renderMessageMarkup)
-            renderMessageMarkup = webpack2.getModuleByProps("renderMessageMarkupToAST").default;
+            renderMessageMarkup = webpack3.getModuleByProps("renderMessageMarkupToAST").default;
           if (!renderMessageMarkup)
             return;
           if (!Array.isArray(content))
@@ -1606,14 +1767,15 @@
       set: () => e
     });
   }
-  var webpack = require_webpack();
+  var webpack2 = require_webpack();
   var Patcher = require_patcher();
-  var storage = require_storage();
+  var storage2 = require_storage();
   var settings = require_settings();
   var notifications = require_notifications();
   var styles = require_styles();
   var modals = require_modals();
   var themes = require_themes();
+  var plugins2 = require_plugins();
   void function() {
     function changeClasses(that, classes, old) {
       return old.apply(that, classes.map((c) => c.includes(" dr-") ? c.split(" ")[0] : c));
@@ -1623,19 +1785,25 @@
     Patcher.instead("DrApi", DOMTokenList.prototype, "contains", changeClasses);
   }();
   window.DrApi = {
-    webpack,
+    webpack: webpack2,
     Patcher,
     storage: {
-      getData: (pluginName, key) => storage.getData(pluginName, key),
-      setData: (pluginName, key, value) => storage.setData(pluginName, key, value)
+      getData: (pluginName, key) => storage2.getData(pluginName, key),
+      setData: (pluginName, key, value) => storage2.setData(pluginName, key, value)
     }
   };
   void async function() {
-    const React = await webpack.getModuleByPropsAsync("memo", "createElement");
+    const React = await webpack2.getModuleByPropsAsync("memo", "createElement");
     window.DrApi.React = React;
     settings(React);
     notifications(React);
     modals(React);
+    const dispatcher = await webpack2.getModuleByPropsAsync("dirtyDispatch", "dispatch");
+    function onOpen() {
+      plugins2();
+      dispatcher.unsubscribe("CONNECTION_OPEN", onOpen);
+    }
+    dispatcher.subscribe("CONNECTION_OPEN", onOpen);
   }();
   function jQuery() {
     const node = document.createElement("script");
