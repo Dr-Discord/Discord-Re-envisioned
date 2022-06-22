@@ -87,7 +87,7 @@ function watchTheme(file) {
   if (DrApi.toast) {
     if (!Creative) Creative = webpack.getModuleByDisplayName("Creative", true)
     setTimeout(DrApi.toast.show({
-      title: `Theme '${meta.name}' updated`,
+      title: `'${meta.name}' updated`,
       type: "info",
       icon: DrApi.React.createElement(Creative)
     }), 4e3)
@@ -134,7 +134,7 @@ function watchSplash(file) {
   if (DrApi.toast) {
     if (!DoubleStarIcon) DoubleStarIcon = webpack.getModuleByDisplayName("DoubleStarIcon", true)
     setTimeout(DrApi.toast.show({
-      title: `Splash theme '${meta.name}' updated`,
+      title: `'${meta.name}' updated`,
       type: "info",
       icon: DrApi.React.createElement(DoubleStarIcon)
     }), 4e3)

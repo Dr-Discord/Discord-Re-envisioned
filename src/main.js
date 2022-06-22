@@ -452,7 +452,7 @@
           if (!Creative)
             Creative = webpack2.getModuleByDisplayName("Creative", true);
           setTimeout(DrApi.toast.show({
-            title: `Theme '${meta.name}' updated`,
+            title: `'${meta.name}' updated`,
             type: "info",
             icon: DrApi.React.createElement(Creative)
           }), 4e3);
@@ -491,7 +491,7 @@
           if (!DoubleStarIcon)
             DoubleStarIcon = webpack2.getModuleByDisplayName("DoubleStarIcon", true);
           setTimeout(DrApi.toast.show({
-            title: `Splash theme '${meta.name}' updated`,
+            title: `'${meta.name}' updated`,
             type: "info",
             icon: DrApi.React.createElement(DoubleStarIcon)
           }), 4e3);
