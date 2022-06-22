@@ -320,8 +320,8 @@
           ];
         }
         readJSON(name) {
-          const file = join(settingsDir, `${name}.json`);
-          if (exists(file))
+          const file2 = join(settingsDir, `${name}.json`);
+          if (exists(file2))
             return JSON.parse(readFile(join(settingsDir, `${name}.json`), "utf-8"));
           return {};
         }
@@ -332,8 +332,8 @@
           return defaultValue;
         }
         writeJSON(name, data) {
-          const file = join(settingsDir, `${name}.json`);
-          writeFile(file, JSON.stringify(data, null, "	"));
+          const file2 = join(settingsDir, `${name}.json`);
+          writeFile(file2, JSON.stringify(data, null, "	"));
         }
         setData(name, key, value) {
           const data = this.readJSON(name);
@@ -393,121 +393,121 @@
       var themes2 = dir2.filter((theme) => theme.endsWith(".theme.css"));
       var splashThemes = dir2.filter((theme) => theme.endsWith(".splash.css"));
       function readMeta2(contents) {
-        const meta = {};
+        const meta2 = {};
         const jsdoc = contents.match(/\/\*\*([\s\S]*?)\*\//);
         if (!jsdoc?.[1])
-          return meta;
+          return meta2;
         for (let ite of jsdoc[1].match(/\*\s([^\n]*)/g)) {
           ite = ite.replace(/\*( +|)@/, "");
           const split = ite.split(" ");
-          meta[split[0]] = split.slice(1).join(" ").trim();
+          meta2[split[0]] = split.slice(1).join(" ").trim();
         }
-        return meta;
+        return meta2;
       }
       var _themes = {};
       for (const theme of themes2) {
-        const filePath = DrApiNative.fileSystem.join(themesFolder, theme);
-        const themeContent = DrApiNative.fileSystem.readFile(filePath);
-        const meta = readMeta2(themeContent);
-        meta.css = themeContent;
-        meta.filePath = filePath;
-        _themes[meta.name] = meta;
+        const filePath2 = DrApiNative.fileSystem.join(themesFolder, theme);
+        const themeContent = DrApiNative.fileSystem.readFile(filePath2);
+        const meta2 = readMeta2(themeContent);
+        meta2.css = themeContent;
+        meta2.filePath = filePath2;
+        _themes[meta2.name] = meta2;
       }
       var _splashThemes = {};
       for (const theme of splashThemes) {
-        const filePath = DrApiNative.fileSystem.join(themesFolder, theme);
-        const themeContent = DrApiNative.fileSystem.readFile(filePath);
-        const meta = readMeta2(themeContent);
-        meta.css = themeContent;
-        meta.filePath = filePath;
-        _splashThemes[meta.name] = meta;
+        const filePath2 = DrApiNative.fileSystem.join(themesFolder, theme);
+        const themeContent = DrApiNative.fileSystem.readFile(filePath2);
+        const meta2 = readMeta2(themeContent);
+        meta2.css = themeContent;
+        meta2.filePath = filePath2;
+        _splashThemes[meta2.name] = meta2;
       }
       var Creative;
       var DoubleStarIcon;
-      function watchTheme(file) {
+      function watchTheme(file2) {
         const enabledThemes = storage3.getData("internal", "enabledThemes", []);
-        const filePath = DrApiNative.fileSystem.join(themesFolder, file);
-        const found = Object.values(_themes).find((theme) => theme.filePath === filePath);
-        if (!DrApiNative.fileSystem.exists(filePath)) {
-          delete _themes[found.name];
-          const index = enabledThemes.indexOf(found.name);
+        const filePath2 = DrApiNative.fileSystem.join(themesFolder, file2);
+        const found2 = Object.values(_themes).find((theme) => theme.filePath === filePath2);
+        if (!DrApiNative.fileSystem.exists(filePath2)) {
+          delete _themes[found2.name];
+          const index = enabledThemes.indexOf(found2.name);
           if (index !== -1) {
             enabledThemes.splice(index, 1);
             document.querySelector(`[dr-theme=${JSON.stringify(id)}]`).remove();
           }
           return storage3.setData("internal", "enabledThemes", [...enabledThemes]);
         }
-        const themeContent = DrApiNative.fileSystem.readFile(filePath);
-        const meta = readMeta2(themeContent);
-        if (found) {
-          delete _themes[found.name];
-          const index = enabledThemes.indexOf(found.name);
+        const themeContent = DrApiNative.fileSystem.readFile(filePath2);
+        const meta2 = readMeta2(themeContent);
+        if (found2) {
+          delete _themes[found2.name];
+          const index = enabledThemes.indexOf(found2.name);
           if (index !== -1)
-            enabledThemes.splice(index, 1, meta.name);
+            enabledThemes.splice(index, 1, meta2.name);
         }
-        meta.css = themeContent;
-        meta.filePath = filePath;
-        _themes[meta.name] = meta;
+        meta2.css = themeContent;
+        meta2.filePath = filePath2;
+        _themes[meta2.name] = meta2;
         if (DrApi.toast) {
           if (!Creative)
             Creative = webpack3.getModuleByDisplayName("Creative", true);
           setTimeout(DrApi.toast.show({
-            title: `'${meta.name}' updated`,
+            title: `'${meta2.name}' updated`,
             type: "info",
             icon: DrApi.React.createElement(Creative)
           }), 4e3);
         }
         storage3.setData("internal", "enabledThemes", enabledThemes);
-        if (!enabledThemes.includes(meta.name))
+        if (!enabledThemes.includes(meta2.name))
           return;
         if (document.readyState === "complete")
-          module2.exports.toggleTheme(meta.name);
+          module2.exports.toggleTheme(meta2.name);
       }
-      function watchSplash(file) {
+      function watchSplash(file2) {
         const enabledThemes = storage3.getData("internal", "enabledSplashThemes", []);
-        const filePath = DrApiNative.fileSystem.join(themesFolder, file);
-        const found = Object.values(_splashThemes).find((theme) => theme.filePath === filePath);
-        if (!DrApiNative.fileSystem.exists(filePath)) {
-          delete _splashThemes[found.name];
-          const index = enabledThemes.indexOf(found.name);
+        const filePath2 = DrApiNative.fileSystem.join(themesFolder, file2);
+        const found2 = Object.values(_splashThemes).find((theme) => theme.filePath === filePath2);
+        if (!DrApiNative.fileSystem.exists(filePath2)) {
+          delete _splashThemes[found2.name];
+          const index = enabledThemes.indexOf(found2.name);
           if (index !== -1)
             enabledThemes.splice(index, 1);
           return storage3.setData("internal", "enabledSplashThemes", [...enabledThemes]);
         }
-        const themeContent = DrApiNative.fileSystem.readFile(filePath);
-        if (found)
-          delete _splashThemes[found.name];
-        const meta = readMeta2(themeContent);
-        if (found) {
-          delete _splashThemes[found.name];
-          const index = enabledThemes.indexOf(found.name);
+        const themeContent = DrApiNative.fileSystem.readFile(filePath2);
+        if (found2)
+          delete _splashThemes[found2.name];
+        const meta2 = readMeta2(themeContent);
+        if (found2) {
+          delete _splashThemes[found2.name];
+          const index = enabledThemes.indexOf(found2.name);
           if (index !== -1)
-            enabledThemes.splice(index, 1, meta.name);
+            enabledThemes.splice(index, 1, meta2.name);
         }
-        meta.css = themeContent;
-        meta.filePath = filePath;
-        _splashThemes[meta.name] = meta;
+        meta2.css = themeContent;
+        meta2.filePath = filePath2;
+        _splashThemes[meta2.name] = meta2;
         if (DrApi.toast) {
           if (!DoubleStarIcon)
             DoubleStarIcon = webpack3.getModuleByDisplayName("DoubleStarIcon", true);
           setTimeout(DrApi.toast.show({
-            title: `'${meta.name}' updated`,
+            title: `'${meta2.name}' updated`,
             type: "info",
             icon: DrApi.React.createElement(DoubleStarIcon)
           }), 4e3);
         }
         storage3.setData("internal", "enabledSplashThemes", enabledThemes);
       }
-      var flippyBit = 0;
-      DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
-        if (!(flippyBit++ % 2))
+      var flippyBit2 = 0;
+      DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type2, file2) => {
+        if (!(flippyBit2++ % 2))
           return;
-        if (!file)
+        if (!file2)
           return;
-        if (file.endsWith(".theme.css"))
-          return watchTheme(file);
-        if (file.endsWith(".splash.css"))
-          return watchSplash(file);
+        if (file2.endsWith(".theme.css"))
+          return watchTheme(file2);
+        if (file2.endsWith(".splash.css"))
+          return watchSplash(file2);
       });
       module2.exports = () => {
         const enabledThemes = storage3.getData("internal", "enabledThemes", []);
@@ -543,39 +543,95 @@
       var dir = readDir(pluginsFolder);
       var plugins = dir.filter((plugin2) => plugin2.endsWith(".plugin.js"));
       function readMeta(contents) {
-        const meta = {};
+        const meta2 = {};
         const jsdoc = contents.match(/\/\*\*([\s\S]*?)\*\//);
         if (!jsdoc?.[1])
-          return meta;
+          return meta2;
         for (let ite of jsdoc[1].match(/\*\s([^\n]*)/g)) {
           ite = ite.replace(/\*( +|)@/, "");
           const split = ite.split(" ");
-          meta[split[0]] = split.slice(1).join(" ").trim();
+          meta2[split[0]] = split.slice(1).join(" ").trim();
         }
-        return meta;
+        return meta2;
       }
       var _plugins = {};
       for (const plugin2 of plugins) {
-        const filePath = DrApiNative.fileSystem.join(pluginsFolder, plugin2);
+        const filePath2 = DrApiNative.fileSystem.join(pluginsFolder, plugin2);
+        const pluginContent2 = DrApiNative.fileSystem.readFile(filePath2);
+        const meta2 = readMeta(pluginContent2);
+        meta2.js = pluginContent2;
+        meta2.filePath = filePath2;
+        _plugins[meta2.name] = meta2;
+      }
+      var ready = false;
+      var InlineCode;
+      var flippyBit = 0;
+      DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (type, file) => {
+        if (!(flippyBit++ % 2))
+          return;
+        if (!file)
+          return;
+        const enabledPlugins = storage.getData("internal", "enabledPlugins", []);
+        const filePath = DrApiNative.fileSystem.join(pluginsFolder, file);
+        const found = Object.values(_plugins).find((plugin2) => plugin2.filePath === filePath);
+        if (!DrApiNative.fileSystem.exists(filePath)) {
+          delete _plugins[found.name];
+          const index = enabledPlugins.indexOf(found.name);
+          if (index !== -1) {
+            enabledPlugins.splice(index, 1);
+            if (ready)
+              found.exports.onStop?.();
+          }
+          return storage.setData("internal", "enabledPlugins", [...enabledPlugins]);
+        }
         const pluginContent = DrApiNative.fileSystem.readFile(filePath);
         const meta = readMeta(pluginContent);
+        if (found) {
+          delete _plugins[found.name];
+          const index = enabledPlugins.indexOf(found.name);
+          if (index !== -1) {
+            enabledPlugins.splice(index, 1, meta.name);
+            if (ready)
+              found.exports.onStop?.();
+          }
+        }
         meta.js = pluginContent;
         meta.filePath = filePath;
         _plugins[meta.name] = meta;
-      }
+        if (DrApi.toast) {
+          if (!InlineCode)
+            InlineCode = webpack.getModuleByDisplayName("InlineCode", true);
+          setTimeout(DrApi.toast.show({
+            title: `'${meta.name}' updated`,
+            type: "info",
+            icon: DrApi.React.createElement(InlineCode)
+          }), 4e3);
+        }
+        storage.setData("internal", "enabledPlugins", enabledPlugins);
+        if (ready) {
+          const res = eval(`(function() {
+${meta.js}
+})()
+//# sourceURL=${encodeURIComponent(meta.name)}`);
+          meta.exports = typeof res === "function" ? new res() : res;
+          meta.exports.onLoad?.();
+          if (!enabledPlugins.includes(meta.name))
+            return;
+          meta.exports.onStart?.();
+        }
+      });
       module.exports = () => {
+        ready = true;
         const enabledPlugins = storage.getData("internal", "enabledPlugins", []);
         for (const plugin of Object.values(_plugins)) {
           const res = eval(`(function() {
 ${plugin.js}
-})()//# sourceURL=${encodeURIComponent(plugin.name)}`);
+})()
+//# sourceURL=${encodeURIComponent(plugin.name)}`);
           plugin.exports = typeof res === "function" ? new res() : res;
-          if (plugin.exports.onLoad)
-            plugin.exports.onLoad();
-          if (enabledPlugins.includes(plugin.name)) {
-            if (plugin.exports.onStart)
-              plugin.exports.onStart();
-          }
+          plugin.exports.onLoad?.();
+          if (enabledPlugins.includes(plugin.name))
+            plugin.exports.onStart?.();
         }
       };
       module.exports.getPlugins = () => _plugins;
@@ -628,7 +684,7 @@ ${plugin.js}
         const Trash = webpack3.getModuleByDisplayName("Trash", true);
         const Globe = webpack3.getModuleByDisplayName("Globe", true);
         const Link = webpack3.getModuleByDisplayName("Link", true);
-        const InlineCode = webpack3.getModuleByDisplayName("InlineCode", true);
+        const InlineCode2 = webpack3.getModuleByDisplayName("InlineCode", true);
         const WalletIcon = webpack3.getModuleByDisplayName("WalletIcon", true);
         const Ticket = webpack3.getModuleByDisplayName("Ticket", true);
         const DoubleStarIcon = webpack3.getModuleByDisplayName("DoubleStarIcon", true);
@@ -1029,7 +1085,7 @@ ${plugin.js}
                           children: [
                             React.createElement(Tooltip, {
                               text: addon.filePath.endsWith(".theme.css") ? "Theme" : addon.filePath.endsWith(".splash.css") ? "Splash Theme" : "Plugin",
-                              children: (props) => React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode, { className: iconToolbar, style: { marginRight: 8 }, ...props })
+                              children: (props) => React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode2, { className: iconToolbar, style: { marginRight: 8 }, ...props })
                             }),
                             React.createElement(LegacyHeader, {
                               children: addon.name,
@@ -1068,7 +1124,7 @@ ${plugin.js}
                         setTimeout(DrApi.toast.show({
                           title: `${val ? "Enabled" : "Disabled"} '${addon.name}'`,
                           type: "info",
-                          icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode)
+                          icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode2)
                         }), 4e3);
                         setEnabledAddons([...enabledAddons]);
                         if (addon.filePath.endsWith(".theme.css"))
@@ -1108,7 +1164,7 @@ ${plugin.js}
             addon.source ? React.createElement(MenuItem, {
               id: "source-addon",
               label: "Source",
-              icon: () => React.createElement(InlineCode, { className: iconMenu }),
+              icon: () => React.createElement(InlineCode2, { className: iconMenu }),
               action: () => shell.openExternal(addon.source)
             }) : false,
             addon.donate ? React.createElement(MenuItem, {
@@ -1335,7 +1391,7 @@ ${plugin.js}
               children: [
                 React.createElement(Flex, {
                   children: [
-                    React.createElement(InlineCode, { style: { marginRight: 8 }, width: 24, height: 24 }),
+                    React.createElement(InlineCode2, { style: { marginRight: 8 }, width: 24, height: 24 }),
                     "Plugins"
                   ]
                 }),
@@ -1441,7 +1497,7 @@ ${plugin.js}
           },
           {
             element: () => React.createElement(Plugins),
-            icon: React.createElement(InlineCode, { width: 20, height: 20 }),
+            icon: React.createElement(InlineCode2, { width: 20, height: 20 }),
             label: "Plugins",
             section: "Discord Re-envisioned Plugins"
           }
@@ -1566,7 +1622,7 @@ ${plugin.js}
             return content2;
           })() : con);
         }
-        function Toast({ title, content, icon, buttons = [], hideToast, id: id2, type = "" }) {
+        function Toast({ title, content, icon, buttons = [], hideToast, id: id2, type: type2 = "" }) {
           const [blur] = storage3.useStorage("internal", "notificationBlur", 0);
           const [opacity] = storage3.useStorage("internal", "notificationOpacity", 80);
           buttons = buttons.map((button) => {
@@ -1587,7 +1643,7 @@ ${plugin.js}
           return React.createElement("div", {
             className: "dr-toast",
             id: id2,
-            type: type.toLowerCase(),
+            type: type2.toLowerCase(),
             children: [
               React.createElement("div", {
                 className: "dr-toast-background",
