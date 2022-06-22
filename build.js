@@ -2,6 +2,8 @@ const esbuild = require("esbuild")
 const asar = require("asar")
 const fs = require("fs")
 
+const { version } = require("./package.json")
+
 function buildFile(file) {
   esbuild.buildSync({
     entryPoints: [file.endsWith(".js") ? `src/${file}` : `src/${file}/index.js`],
@@ -19,6 +21,7 @@ buildFile("index.js")
 
 fs.appendFileSync("dist/main.js", `//# sourceURL=${encodeURIComponent("Discord Re-envisioned")}`)
 fs.writeFileSync("dist/package.json", JSON.stringify({
+  version,
   name: "Discord Re-envisioned",
   main: "index.js"
 }))
