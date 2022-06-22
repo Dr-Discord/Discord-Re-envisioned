@@ -46,7 +46,7 @@ const Native = {
   quit(restart = false) { ipcRenderer.send("@DrApi/quit", restart) },
   platform: process.platform,
   downloadAsar(id, callback) {
-    require("request")(`https://api.github.com/repos/Dr-Discord/dev/releases/assets/${id}`, {
+    require("request")(`https://api.github.com/repos/Dr-Discord/Discord-Re-envisioned/releases/assets/${id}`, {
       encoding: null,
       headers: {
         "User-Agent": "Updater", 
