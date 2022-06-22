@@ -23,8 +23,6 @@ Object.entries(electron).map(([key, value]) => {
   Object.defineProperty(require.cache.electron.exports, key, { get: () => value })
 })
 
-console.log("[DrApi]: Loading...")
-
 try {
   const preload = ipcRenderer.sendSync("@DrApi/preload")
   if (preload) require(preload)

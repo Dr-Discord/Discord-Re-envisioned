@@ -7,6 +7,7 @@ for (const key in originalConsole) {
   })
 }
 
+const logger = require("./logger")
 const webpack = require("./webpack")
 const Patcher = require("./patcher")
 const storage = require("../storage")
@@ -15,10 +16,13 @@ const notifications = require("./notifications")
 const styles = require("./styles")
 const modals = require("./modals")
 
+logger.log("Discord Re-invisioned", "Loading...")
+window.logger = logger
+
 const themes = require("./themes")
 const plugins = require("./plugins")
 
-void function() {
+void function() {  
   function changeClasses(that, classes, old) {
     return old.apply(that, classes.map(c => c.includes(" dr-") ? c.split(" ")[0] : c))
   }
@@ -48,6 +52,7 @@ void async function() {
 
   const dispatcher = await webpack.getModuleByPropsAsync("dirtyDispatch", "dispatch")
   function onOpen() {
+    logger.log("Plugins", "Initializing all plugins")
     plugins()
     dispatcher.unsubscribe("CONNECTION_OPEN", onOpen)
   }
@@ -57,17 +62,23 @@ void async function() {
 function jQuery() {
   const node = document.createElement("script")
   node.src = "https://code.jquery.com/jquery-3.6.0.min.js"
-  node.onload = () => window.$ = window.jQuery
+  node.onload = () => {
+    window.$ = window.jQuery
+    logger.log("jQuery", "Loaded jQuery")
+  }
   document.head.append(node)
 }
 function ace() {
   const node = document.createElement("script")
   node.src = "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
+  node.onload = () => logger.log("Ace", "Loaded the Ace editor")
   document.head.append(node)
 }
 
 function documentReady() {
   globalThis.console = { ...globalThis.console }
+
+  logger.log("Themes", "Adding themes")
   styles.documentReady()
   themes()
 

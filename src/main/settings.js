@@ -4,6 +4,7 @@ const storage = require("../storage")
 const styles = require("./styles")
 const { getThemes, toggleTheme } = require("./themes")
 const { getPlugins, togglePlugin } = require("./plugins")
+const logger = require("./logger")
 
 window.getThemes = getThemes
 
@@ -11,6 +12,7 @@ const shell = DrApiNative.runInNative(`require("electron").shell`)
 
 module.exports = async (React) => {
   const sectionsModule = await webpack.getModuleByPropsAsync("getUserSettingsSections")
+  logger.log("Settings", "Patching 'getUserSettingsSections' to add settings")
 
   const NotificationSettings = webpack.getModuleByDisplayName("NotificationSettings", true)
   const FormSection = webpack.getModuleByDisplayName("FormSection", true)

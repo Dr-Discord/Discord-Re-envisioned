@@ -2,6 +2,7 @@ const webpack = require("./webpack")
 const Patcher = require("./patcher")
 const storage = require("../storage")
 const styles = require("./styles")
+const logger = require("./logger")
 
 module.exports = async (React) => {
   styles("DrApi-Toasts", `#dr-toasts {
@@ -67,6 +68,7 @@ module.exports = async (React) => {
   }`)
 
   const Shakeable = await webpack.getModuleByDisplayNameAsync("Shakeable", true)
+  logger.log("Notifications", "Patching 'Shakeable' to add notifications")
 
   const Button = webpack.getModuleByProps("ButtonColors", "ButtonSizes").default
   const Flex = webpack.getModuleByDisplayName("Flex", true)

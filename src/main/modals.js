@@ -1,6 +1,9 @@
+const logger = require("./logger")
 const webpack = require("./webpack")
 
 module.exports = async (React) => {
+  logger.log("Modals", "Initializing Modal api")
+
   let _id = 0
 
   const { 
