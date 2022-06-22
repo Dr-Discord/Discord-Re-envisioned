@@ -33,7 +33,7 @@ void function() {
 }()
 
 window.DrApi = {
-  request: (url, callback) => fetch(url).then(async request => callback(await request.text(), request)),
+  request: (url, callback) => fetch(url).then(request => callback(request)),
   webpack,
   Patcher,
   storage: {
@@ -56,6 +56,24 @@ void async function() {
   function onOpen() {
     logger.log("Plugins", "Initializing all plugins")
     plugins()
+
+    logger.log("Updater", "Checking for new update")
+    const package = DrApiNative.require(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "package.json"))
+    DrApi.request("https://api.github.com/repos/Dr-Discord/dev/releases", async request => {
+      const json = (await request.json()).shift()
+      if (package.version > json.tag_name) return
+      DrApi.modals.confirmModal("You version is out of date!", [
+        "Do you want to update Discord Re-envisioned",
+        "This will restart discord too"
+      ], {
+        confirmText: "Update",
+        onConfirm: () => {
+          const hash = json.assets.find(a => a.name.endsWith(".asar")).url.split("/").pop()
+          DrApiNative.downloadAsar(hash, (err) => err ? null : DrApiNative.quit(true))
+        }
+      })
+    })
+    
     dispatcher.unsubscribe("CONNECTION_OPEN", onOpen)
   }
   dispatcher.subscribe("CONNECTION_OPEN", onOpen)

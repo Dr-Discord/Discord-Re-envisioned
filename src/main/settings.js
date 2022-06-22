@@ -601,7 +601,7 @@ module.exports = async (React) => {
           id: `open-${filter ? "theme" : "plugin"}-folder`,
           label: `Open ${filter ? "Theme" : "Plugin"} Folder`,
           icon: () => React.createElement(Folder, { className: iconMenu }),
-          action: () => () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes"))
+          action: () => () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "..", filter ? "theme" : "plugin"))
         })
       ]
     })
@@ -645,7 +645,7 @@ module.exports = async (React) => {
             children: [
               React.createElement(Icon, {
                 icon: () => React.createElement(Folder, { className: iconToolbar }),
-                onClick: () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes")),
+                onClick: () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "..", "themes")),
                 tooltip: "Open Theme Folder"
               }),
               React.createElement(SearchBar, {
@@ -786,7 +786,7 @@ module.exports = async (React) => {
             children: [
               React.createElement(Icon, {
                 icon: () => React.createElement(Folder, { className: iconToolbar }),
-                onClick: () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "plugins")),
+                onClick: () => shell.openPath(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "..", "plugins")),
                 tooltip: "Open Plugin Folder"
               }),
               React.createElement(SearchBar, {
@@ -903,6 +903,7 @@ module.exports = async (React) => {
     sections.splice(index, 0, ...settings)
   })
 
+  const package = DrApiNative.require(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "package.json"))
   patcher.after("DrApi", webpack.getModuleByDisplayName("ClientDebugInfo"), "default", (that, args, res) => {
     res.props.children.push(React.createElement(Text, {
       className: line,
@@ -914,8 +915,8 @@ module.exports = async (React) => {
         " (",
         React.createElement("span", {
           onClick: () => {},
-          children: "ALPHA",
-          style: { color: "var(--status-danger)", cursor: "pointer" }
+          children: package.version,
+          style: { cursor: "pointer" }
         }),
         ")"
       ]

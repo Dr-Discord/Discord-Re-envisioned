@@ -1,6 +1,6 @@
 {
   "name": "drdiscord",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "dependencies": {
     "asar": "^3.1.0",
     "electron-devtools-installer": "^3.2.0",

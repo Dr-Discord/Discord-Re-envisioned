@@ -2,7 +2,7 @@ const storage = require("../storage")
 
 const enabledThemes = storage.getData("internal", "enabledSplashThemes", [])
 
-const themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "themes")
+const themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "..", "themes")
 
 if (!DrApiNative.fileSystem.exists(themesFolder)) DrApiNative.fileSystem.mkdir(themesFolder)
 
