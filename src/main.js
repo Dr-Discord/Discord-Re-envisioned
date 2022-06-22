@@ -582,13 +582,10 @@ ${plugin.js}
       module.exports.togglePlugin = (name) => {
         const enabledPlugins2 = storage.getData("internal", "enabledPlugins", []);
         const plugin2 = _plugins[name];
-        if (!enabledPlugins2.includes(name)) {
-          if (plugin2.exports.onStop)
-            plugin2.exports.onStop();
-        } else {
-          if (plugin2.exports.onStart)
-            plugin2.exports.onStart();
-        }
+        if (!enabledPlugins2.includes(name))
+          plugin2.exports.onStop?.();
+        else
+          plugin2.exports.onStart?.();
       };
     }
   });

@@ -55,10 +55,6 @@ module.exports.togglePlugin = (name) => {
 
   const plugin = _plugins[name]
 
-  if (!enabledPlugins.includes(name)) {
-    if (plugin.exports.onStop) plugin.exports.onStop()
-  }
-  else {
-    if (plugin.exports.onStart) plugin.exports.onStart()
-  }
+  if (!enabledPlugins.includes(name)) plugin.exports.onStop?.()
+  else plugin.exports.onStart?.()
 }
