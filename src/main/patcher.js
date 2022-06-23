@@ -1,5 +1,6 @@
 module.exports = new class rawPatcher {
   Symbol = Symbol("DrApi")
+  patches = {}
   hook(module, fn) {
     if (!module[fn]) module[fn] = function() {}
     const original = module[fn]
@@ -45,18 +46,34 @@ module.exports = new class rawPatcher {
     const hook = this.hook(mod, fn)
     const obj = { callback, id }
     hook.before.add(obj)
-    return () => hook.after.delete(obj)
+    
+    this.patches[id] ??= []
+    this.patches[id].push(() => hook.before.delete(obj))
+
+    return () => hook.before.delete(obj)
   }
   instead(id, mod, fn, callback) {
     const hook = this.hook(mod, fn)
     const obj = { callback, id }
     hook.instead.add(obj)
-    return () => hook.after.delete(obj)
+
+    this.patches[id] ??= []
+    this.patches[id].push(() => hook.instead.delete(obj))
+
+    return () => hook.instead.delete(obj)
   }
   after(id, mod, fn, callback) {
     const hook = this.hook(mod, fn)
     const obj = { callback, id }
     hook.after.add(obj)
+
+    this.patches[id] ??= []
+    this.patches[id].push(() => hook.after.delete(obj))
+
     return () => hook.after.delete(obj)
+  }
+  unpatchAll(id) {
+    this.patches[id] ??= []
+    for (const undo of this.patches[id]) undo()
   }
 }
