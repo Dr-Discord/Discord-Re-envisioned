@@ -38,7 +38,7 @@ module.exports = async (React) => {
   const Filter = webpack.getModuleByDisplayName("Filter", true)
   const Trash = webpack.getModuleByDisplayName("Trash", true)
   const Globe = webpack.getModuleByDisplayName("Globe", true)
-  const Link = webpack.getModuleByDisplayName("Link", true)
+  const Discord = webpack.getModuleByDisplayName("Discord", true)
   const InlineCode = webpack.getModuleByDisplayName("InlineCode", true)
   const WalletIcon = webpack.getModuleByDisplayName("WalletIcon", true)
   const Ticket = webpack.getModuleByDisplayName("Ticket", true)
@@ -50,16 +50,17 @@ module.exports = async (React) => {
   const Gear = webpack.getModuleByDisplayName("Gear", true)
   const Pencil = webpack.getModuleByDisplayName("Pencil", true)
   const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
+  const Anchor = webpack.getModuleByDisplayName("Anchor", true)
   const { openContextMenu, closeContextMenu } = webpack.getModuleByProps("openContextMenuLazy")
   const { ModalRoot, ModalHeader, ModalCloseButton, ModalContent, ModalFooter } = webpack.getModuleByProps("ModalRoot", "ModalContent")
   const { Heading } = webpack.getModule(m => m.Heading.displayName)
 
-  const { date, container, footer, added, fixed, improved, marginTop } = webpack.getModuleByProps("date", "premiumIcon", "improved")
+  const { date, container, footer, added, fixed, improved, marginTop, socialLink } = webpack.getModuleByProps("date", "premiumIcon", "improved")
   const { content, modal } = webpack.getModuleByProps("content", "modal", "maxModalWidth")
   const { horizontal } = webpack.getModuleByProps("flexChild", "horizontal")
   const { header, topDivider, body, expandIcon } = webpack.getModuleByProps("header", "topDivider")
   const { iconWrapper, wrapper, secondaryHeader } = webpack.getModuleByProps("detailsWrapper", "icon", "iconWrapper")
-  const { justifyCenter, alignCenter, justifyBetween, justifyEnd} = webpack.getModuleByProps("justifyCenter", "alignCenter")
+  const { justifyCenter, alignCenter, justifyBetween, justifyEnd } = webpack.getModuleByProps("justifyCenter", "alignCenter")
   const { card } = webpack.getModuleByProps("card", "pulse", "topDivider")
   const { size16, size20 } = webpack.getModuleByProps("size20", "size16")
   const { icon:iconToolbar } = DrApi.webpack.getModuleByProps("icon", "transparent", "iconWrapper")
@@ -67,7 +68,7 @@ module.exports = async (React) => {
   const { line } = webpack.getModuleByProps("line", "versionHash")
   const { search } = DrApi.webpack.getModuleByProps("search", "toolbar")
   const { macDragRegion } = DrApi.webpack.getModuleByProps("macDragRegion")
-  
+
   const types = { added, fixed, improved }
 
   styles("DrApi-settings", `.dr-header:not(:last-child) .dr-catorgory-icon {
@@ -526,8 +527,8 @@ module.exports = async (React) => {
       }) : false,
       addon.invite ? React.createElement(MenuItem, {
         id: "invite-addon",
-        label: "Discord Invite",
-        icon: () => React.createElement(Link, { className: iconMenu }),
+        label: "Invite",
+        icon: () => React.createElement(Discord, { className: iconMenu }),
         action: () => shell.openExternal(`https://discord.gg/${addon.invite.split("/").pop()}`)
       }) : false,
       addon.source ? React.createElement(MenuItem, {
@@ -977,6 +978,13 @@ module.exports = async (React) => {
                   children: React.createElement("div", {
                     className: footer,
                     children: [
+                      // @todo find a better way to go to the server
+                      React.createElement(Anchor, {
+                        className: socialLink,
+                        href: "https://discord.gg/yYJA3qQE5F",
+                        children: React.createElement(Discord, { width: 16, height: 16 }),
+                        target: "_blank"
+                      }),
                       React.createElement(Text, {
                         children: "Follow us for more updates!",
                         variant: "text-xs/normal"
