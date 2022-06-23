@@ -40,6 +40,19 @@ window.DrApi = {
     useStorage: (pluginName, key, defaultValue) => storage.useStorage(pluginName, key, defaultValue),
     getData: (pluginName, key, defaultValue) => storage.getData(pluginName, key, defaultValue),
     setData: (pluginName, key, value) => storage.setData(pluginName, key, value)
+  },
+  styling: {
+    insert: (id, css) => {
+      let node = document.querySelector(`[dr-plugin=${JSON.stringify(id)}]`)
+      if (!node) {
+        node = document.createElement("style")
+        node.setAttribute("dr-plugin", id)
+        styles.plugins.appendChild(node)
+      }
+      node.innerHTML = css
+      return () => node.remove()
+    },
+    remove: (id) => document.querySelector(`[dr-plugin=${JSON.stringify(id)}]`)?.remove?.()
   }
 }
 
@@ -58,13 +71,12 @@ void async function() {
     plugins()
 
     logger.log("Updater", "Checking for new update")
-    const package = DrApiNative.require(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "package.json"))
     DrApi.request("https://api.github.com/repos/Dr-Discord/Discord-Re-envisioned/releases", async request => {
       const json = (await request.json()).shift()
-      if (package.version >= json.tag_name) return
+      if (DrApiNative.package.version >= json.tag_name) return
       DrApi.modals.confirmModal("You version is out of date!", [
         "Do you want to update Discord Re-envisioned",
-        `You version is '${package.version}' and the latest is '${json.tag_name}'`
+        `You version is '${DrApiNative.package.version}' and the latest is '${json.tag_name}'`
       ], {
         confirmText: "Update",
         onConfirm: () => {

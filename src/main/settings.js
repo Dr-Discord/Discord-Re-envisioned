@@ -51,7 +51,12 @@ module.exports = async (React) => {
   const Pencil = webpack.getModuleByDisplayName("Pencil", true)
   const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
   const { openContextMenu, closeContextMenu } = webpack.getModuleByProps("openContextMenuLazy")
+  const { ModalRoot, ModalHeader, ModalCloseButton, ModalContent, ModalFooter } = webpack.getModuleByProps("ModalRoot", "ModalContent")
+  const { Heading } = webpack.getModule(m => m.Heading.displayName)
 
+  const { date, container, footer, added, fixed, improved, marginTop } = webpack.getModuleByProps("date", "premiumIcon", "improved")
+  const { content, modal } = webpack.getModuleByProps("content", "modal", "maxModalWidth")
+  const { horizontal } = webpack.getModuleByProps("flexChild", "horizontal")
   const { header, topDivider, body, expandIcon } = webpack.getModuleByProps("header", "topDivider")
   const { iconWrapper, wrapper, secondaryHeader } = webpack.getModuleByProps("detailsWrapper", "icon", "iconWrapper")
   const { justifyCenter, alignCenter, justifyBetween, justifyEnd} = webpack.getModuleByProps("justifyCenter", "alignCenter")
@@ -62,6 +67,8 @@ module.exports = async (React) => {
   const { line } = webpack.getModuleByProps("line", "versionHash")
   const { search } = DrApi.webpack.getModuleByProps("search", "toolbar")
   const { macDragRegion } = DrApi.webpack.getModuleByProps("macDragRegion")
+  
+  const types = { added, fixed, improved }
 
   styles("DrApi-settings", `.dr-header:not(:last-child) .dr-catorgory-icon {
     color: var(--header-primary);
@@ -554,7 +561,7 @@ module.exports = async (React) => {
         ] : false,
         React.createElement(MenuItem, {
           id: "uninstall-addon",
-          label: "Uninstall Theme",
+          label: `Uninstall ${addon.filePath.endsWith(".plugin.js") ? "Plugin" : "Theme"}`,
           color: "colorDanger",
           icon: () => React.createElement(Trash, { className: iconMenu }),
           action: () => DrApi.modals.confirmModal(`Uninstall ${addon.name}`, `Are you sure you want to uninstall '${addon.name}'?`, {
@@ -903,7 +910,8 @@ module.exports = async (React) => {
     sections.splice(index, 0, ...settings)
   })
 
-  const package = DrApiNative.require(DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "package.json"))
+  const latestChangelog = DrApiNative.changelog[0]
+
   patcher.after("DrApi", webpack.getModuleByDisplayName("ClientDebugInfo"), "default", (that, args, res) => {
     res.props.children.push(React.createElement(Text, {
       className: line,
@@ -914,8 +922,72 @@ module.exports = async (React) => {
         "Discord Re-envisioned",
         " (",
         React.createElement("span", {
-          onClick: () => {},
-          children: package.version,
+          onClick: () => {
+            DrApi.modals.open(props => React.createElement(ModalRoot, {
+              ...props,
+              className: modal,
+              children: [
+                React.createElement(ModalHeader, {
+                  separator: false,
+                  align: justifyBetween,
+                  children: [
+                    React.createElement(Flex.Child, {
+                      children: [
+                        React.createElement(Heading, {
+                          children: latestChangelog.title,
+                          level: 2,
+                          variant: "heading-lg/medium"
+                        }),
+                        React.createElement(Text, {
+                          children: latestChangelog.subtitle,
+                          className: date,
+                          variant: "text-xs/normal"
+                        })
+                      ]
+                    }),
+                    React.createElement(Flex.Child, {
+                      grow: 0,
+                      children: React.createElement(ModalCloseButton, { onClick: props.onClose })
+                    })
+                  ]
+                }),
+                React.createElement(ModalContent, {
+                  className: `${container} ${content}`,
+                  children: DrApiNative.changelog[0].body.map((item, i) => {
+                    return [
+                      React.createElement("h1", {
+                        children: item.title,
+                        className: `${types[item.type]}${item.marginTop ? ` ${marginTop}` : ""}`,
+                        style: !i ? { marginTop: 0 } : undefined
+                      }),
+                      React.createElement("ul", {
+                        children: item.content.map(item => React.createElement("li", {
+                          children: [
+                            React.createElement("strong", {}, item.title),
+                            " ",
+                            item.content
+                          ]
+                        }))
+                      })
+                    ]
+                  })
+                }),
+                React.createElement(ModalFooter, {
+                  direction: horizontal,
+                  children: React.createElement("div", {
+                    className: footer,
+                    children: [
+                      React.createElement(Text, {
+                        children: "Follow us for more updates!",
+                        variant: "text-xs/normal"
+                      })
+                    ]
+                  })
+                })
+              ]
+            }))
+          },
+          children: DrApiNative.package.version,
           style: { cursor: "pointer" }
         }),
         ")"

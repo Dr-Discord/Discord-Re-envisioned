@@ -19,6 +19,8 @@ buildFile("splashPreload.js")
 buildFile("storage.js")
 buildFile("index.js")
 
+fs.copyFileSync("src/changelog.json", "dist/changelog.json")
+
 fs.appendFileSync("dist/main.js", `//# sourceURL=${encodeURIComponent("Discord Re-envisioned")}`)
 fs.writeFileSync("dist/package.json", JSON.stringify({
   version,

@@ -45,6 +45,8 @@ const Native = {
   runInNative(code) { return eval(code) },
   quit(restart = false) { ipcRenderer.send("@DrApi/quit", restart) },
   platform: process.platform,
+  package: require(path.join(__dirname, "package.json")),
+  changelog: require(path.join(__dirname, "changelog.json")),
   downloadAsar(id, callback) {
     require("request")(`https://api.github.com/repos/Dr-Discord/Discord-Re-envisioned/releases/assets/${id}`, {
       encoding: null,

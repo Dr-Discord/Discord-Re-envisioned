@@ -1,0 +1,41 @@
+[
+  {
+    "title": "What's New",
+    "subtitle": "Discord Re-envisioned v1.0.4",
+    "body": [
+      {
+        "title": "NEW FEATURES ",
+        "type": "added",
+        "content": [
+          {
+            "title": "Updater.",
+            "content": "New built in updater to download the latest version."
+          },
+          {
+            "title": "Theming.",
+            "content": "Theming now supports both the Splash screen and the regular app."
+          },
+          {
+            "title": "API.",
+            "content": "Brand new API for plugins to use."
+          }
+        ]
+      },
+      {
+        "title": "USER INTERFACE ",
+        "type": "improved",
+        "marginTop": true,
+        "content": [
+          {
+            "title": "New Design.",
+            "content": "Brand new UI design."
+          },
+          {
+            "title": "Icons.",
+            "content": "Icons are set for one thing and will be used everywhere for that item."
+          }
+        ]
+      }
+    ]
+  }
+]
