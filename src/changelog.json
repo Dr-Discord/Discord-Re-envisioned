@@ -18,6 +18,10 @@
         "type": "added",
         "content": [
           {
+            "title": "Theming.",
+            "content": "Added a release attribute and a userId attribute to the HTML element."
+          },
+          {
             "title": "jQuery.",
             "content": "jQuery devtools can now be loaded in."
           }

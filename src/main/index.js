@@ -88,7 +88,11 @@ void async function() {
     
     dispatcher.unsubscribe("CONNECTION_OPEN", onOpen)
   }
+
+
   dispatcher.subscribe("CONNECTION_OPEN", onOpen)
+  dispatcher.subscribe("CONNECTION_OPEN", ({ user }) => document.documentElement.setAttribute("user-id", user.id))
+  dispatcher.subscribe("LOGOUT", () => document.documentElement.removeAttribute("user-id"))
 }()
 
 function jQuery() {
@@ -116,6 +120,8 @@ function documentReady() {
 
   jQuery()
   ace()
+
+  document.documentElement.setAttribute("release", window.GLOBAL_ENV.RELEASE_CHANNEL)
 }
 
 if (document.readyState === "complete") documentReady()
