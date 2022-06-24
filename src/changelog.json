@@ -1,6 +1,32 @@
 [
   {
     "title": "What's New",
+    "subtitle": "Discord Re-envisioned v1.0.5",
+    "body": [
+      {
+        "title": "FIXED ",
+        "type": "fixed",
+        "content": [
+          {
+            "title": "Custom CSS",
+            "content": "Custom CSS loads instantly now."
+          }
+        ]
+      },
+      {
+        "title": "NEW FEATURES ",
+        "type": "added",
+        "content": [
+          {
+            "title": "jQuery.",
+            "content": "jQuery devtools can now be loaded in."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "What's New",
     "subtitle": "Discord Re-envisioned v1.0.4",
     "body": [
       {

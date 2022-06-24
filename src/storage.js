@@ -41,7 +41,7 @@ const listeners = {}
 module.exports = new class rawStorage {
   customCSS(value) {
     if (typeof value === "string") writeFile(customCSS, value)
-    else readFile(customCSS)
+    else return readFile(customCSS)
   }
   useStorage(name, key, defaultValue) {
     if (!isTopWindow) throw new Error()

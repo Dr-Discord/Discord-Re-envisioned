@@ -746,7 +746,7 @@ module.exports = async (React) => {
       const editor = ace.edit(ref.current)
       editor.setTheme("ace/theme/monokai")
       editor.getSession().setMode("ace/mode/css")
-      editor.setValue(storage.customCSS() ?? "")
+      editor.setValue(storage.customCSS())
       editor.on("change", () => {
         const value = editor.getValue()
         storage.customCSS(value)

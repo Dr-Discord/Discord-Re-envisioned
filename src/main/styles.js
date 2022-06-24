@@ -1,3 +1,5 @@
+const storage = require("../storage")
+
 const styles = document.createElement("dr-styles")
 
 const internal = document.createElement("dr-internal")
@@ -6,6 +8,8 @@ const plugins = document.createElement("dr-plugins")
 const customCSS = document.createElement("style")
 
 styles.append(internal, plugins, themes, customCSS)
+
+customCSS.innerHTML = storage.customCSS()
 
 module.exports = function(id, css) {
   const isInternal = id.startsWith("DrApi")
