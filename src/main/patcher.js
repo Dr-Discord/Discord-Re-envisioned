@@ -2,8 +2,10 @@ module.exports = new class rawPatcher {
   Symbol = Symbol("DrApi")
   patches = {}
   hook(module, fn) {
-    if (!module[fn]) module[fn] = function() {}
+    if (!module[fn]) module[fn] = () => {}
     const original = module[fn]
+
+    if (original.startsWith("class")) throw new Error("Classes cannot be patched")
 
     let hook = module[fn][this.Symbol]
 

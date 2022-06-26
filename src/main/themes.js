@@ -143,10 +143,11 @@ function watchSplash(file) {
   storage.setData("internal", "enabledSplashThemes", enabledThemes)
 }
 
-let flippyBit = 0
+const watches = {}
 DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
-  if (!(flippyBit++ % 2)) return
-  if (!file) return
+  if (watches[file]) return
+  watches[file] = true
+  setTimeout(() => watches[file] = false, 200)
   if (file.endsWith(".theme.css")) return watchTheme(file)
   if (file.endsWith(".splash.css")) return watchSplash(file)
 })

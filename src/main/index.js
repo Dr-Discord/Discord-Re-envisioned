@@ -33,13 +33,61 @@ void function() {
 }()
 
 window.DrApi = {
-  request: (url, callback) => fetch(url).then(request => callback(request)),
+  request: (url, then) => fetch(url).then(then),
   webpack,
   Patcher,
   storage: {
     useStorage: (pluginName, key, defaultValue) => storage.useStorage(pluginName, key, defaultValue),
     getData: (pluginName, key, defaultValue) => storage.getData(pluginName, key, defaultValue),
     setData: (pluginName, key, value) => storage.setData(pluginName, key, value)
+  },
+  plugins: {
+    getAll: () => plugins.getPlugins(),
+    get: (id) => plugins.getPlugins()[id],
+    isEnabled: (id) => storage.getData("internal", "enabledPlugins", []).includes(id),
+    toggle: (id) => {
+      const enabledPlugins = storage.getData("internal", "enabledPlugins", [])
+      const plugin = plugins.getPlugins()[id]
+
+      if (!plugin) return
+      const index = enabledPlugins.indexOf(id)
+
+      if (index === -1) {
+        plugin.exports.onStart?.()
+        storage.setData("internal", "enabledPlugins", enabledPlugins.concat(id))
+      }
+      else {
+        enabledPlugins.splice(index, 1)
+        storage.setData("internal", "enabledPlugins", enabledPlugins)
+        plugin.exports.onStop?.()
+      }
+      
+      return index !== -1
+    }
+  },
+  themes: {
+    getAll: () => themes.getThemes(),
+    get: (id) => themes.getThemes()[id],
+    isEnabled: (id) => storage.getData("internal", "enabledPlugins", []).includes(id),
+    toggle: (id) => {
+      const enabledThemes = storage.getData("internal", "enabledThemes", [])
+      const plugin = themes.getThemes()[id]
+
+      if (!plugin) return
+      const index = enabledThemes.indexOf(id)
+
+      if (index === -1) {
+        plugin.exports.onStart?.()
+        storage.setData("internal", "enabledThemes", enabledThemes.concat(id))
+      }
+      else {
+        enabledThemes.splice(index, 1)
+        storage.setData("internal", "enabledThemes", enabledThemes)
+        plugin.exports.onStop?.()
+      }
+
+      return index !== -1
+    }
   },
   styling: {
     insert: (id, css) => {
@@ -95,21 +143,6 @@ void async function() {
   dispatcher.subscribe("LOGOUT", () => document.documentElement.removeAttribute("user-id"))
 }()
 
-function jQuery() {
-  const node = document.createElement("script")
-  node.src = "https://code.jquery.com/jquery-3.6.0.min.js"
-  node.onload = () => {
-    window.$ = window.jQuery
-    logger.log("jQuery", "Loaded jQuery")
-  }
-  document.head.append(node)
-}
-function ace() {
-  const node = document.createElement("script")
-  node.src = "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
-  node.onload = () => logger.log("Ace", "Loaded the Ace editor")
-  document.head.append(node)
-}
 
 function documentReady() {
   globalThis.console = { ...globalThis.console }
@@ -118,8 +151,18 @@ function documentReady() {
   styles.documentReady()
   themes()
 
-  jQuery()
-  ace()
+  const jquery = document.createElement("script")
+  jquery.src = "https://code.jquery.com/jquery-3.6.0.min.js"
+  jquery.onload = () => {
+    window.$ = window.jQuery
+    logger.log("jQuery", "Loaded jQuery")
+  }
+  document.head.append(jquery)
+
+  const ace = document.createElement("script")
+  ace.src = "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
+  ace.onload = () => logger.log("Ace", "Loaded the Ace editor")
+  document.head.append(ace)
 
   document.documentElement.setAttribute("release", window.GLOBAL_ENV.RELEASE_CHANNEL)
 }

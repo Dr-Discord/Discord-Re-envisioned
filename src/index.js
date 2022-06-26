@@ -19,11 +19,10 @@ class BrowserWindow extends electron.BrowserWindow {
 
     let originalPreload = opts.webPreferences.preload
 
-    if (opts.title && opts.webPreferences?.nativeWindowOpen) {
+    if (opts.title && opts.webPreferences?.nativeWindowOpen)
       opts.webPreferences.preload = path.join(__dirname, "preload.js")
-    } else {
+    else
       opts.webPreferences.preload = path.join(__dirname, "splashPreload.js")
-    }
 
     if (process.platform === "darwin" && !newMacOS) opts.titleBarStyle = "default"
 
@@ -34,29 +33,18 @@ class BrowserWindow extends electron.BrowserWindow {
 
     const win = new electron.BrowserWindow(opts)
 
-    win.webContents.DrApi = {
-      preload: originalPreload
-    }
+    win.webContents.DrApi = { preload: originalPreload }
 
     const oldClose = win.close
-    win.close = function() {
-      if (!opts.webPreferences.preload.endsWith("splashPreload.js")) oldClose.apply(this, arguments)
-      if (allowSplashToClose) oldClose.apply(this, arguments)
-    }
+    win.close = () => !opts.webPreferences.preload.endsWith("splashPreload.js") || allowSplashToClose ? oldClose.apply(win, arguments) : null
     const oldHide = win.hide
-    win.hide = function() {
-      if (!opts.webPreferences.preload.endsWith("splashPreload.js")) oldHide.apply(this, arguments)
-      if (allowSplashToClose) oldHide.apply(this, arguments)
-    }
+    win.hide = () => !opts.webPreferences.preload.endsWith("splashPreload.js") || allowSplashToClose ? oldHide.apply(win, arguments) : null
 
     return win
   }
 }
 
-BrowserWindow.toString = () => electron.BrowserWindow.toString()
-
 delete require.cache.electron.exports
-
 require.cache.electron.exports = { ...electron, BrowserWindow }
 
 electron.ipcMain.on("@DrApi/preload", (event) => event.returnValue = event.sender.DrApi.preload)
@@ -75,8 +63,8 @@ electron.app.once("ready", () => {
       if (!header.startsWith("content-security-policy")) continue
       delete responseHeaders[header]
     }
-    if (url.startsWith("devtools://") || url.startsWith("file://") || url.startsWith("wss://gateway.discord.gg/")) callback({ cancel: false, responseHeaders })
-    else callback({ cancel: url.includes("discord.com/api/webhooks"), responseHeaders })
+    
+    callback({ cancel: url.includes("discord.com/api/webhooks"), responseHeaders })
   })
   
   try {

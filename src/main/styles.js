@@ -11,7 +11,7 @@ styles.append(internal, plugins, themes, customCSS)
 
 customCSS.innerHTML = storage.customCSS()
 
-module.exports = function(id, css) {
+module.exports = (id, css) => {
   const isInternal = id.startsWith("DrApi")
 
   let style = document.querySelector(`[dr-${isInternal ? "internal" : "plugin"}=${JSON.stringify(id)}]`)

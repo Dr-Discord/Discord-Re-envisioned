@@ -754,7 +754,7 @@ module.exports = async (React) => {
       })
 
       windowInstance.document.head.appendChild(Object.assign(document.createElement("style"), {
-        textContent: `${[...document.querySelectorAll("style")].filter(e => e.innerHTML.includes("sourceURL=ace/")).reduce((styles, style) => styles += style.textContent, "")}.${macDragRegion}{ display: none }`,
+        textContent: `${[...document.querySelectorAll("style")].filter(e => e.innerHTML.includes("sourceURL=ace/")).reduce((styles, style) => styles += style.textContent, "")}.${macDragRegion},.ace_print-margin-layer{ display: none }`,
         id: "dr-custom-css-popout-style"
       }))
     })
@@ -903,7 +903,7 @@ module.exports = async (React) => {
 
   patcher.after("DrApi", sectionsModule.default, "render", (that, args, res) => {
     const { sections } = res.props.children.props.children.props
-    
+        
     const index = sections.indexOf(sections.find(s => s.section === "Connections")) + 1
     if (!index) return
     if (sections.find(s => s.section === "Discord Re-envisioned")) return

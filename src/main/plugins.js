@@ -37,10 +37,11 @@ for (const plugin of plugins) {
 
 let ready = false
 let InlineCode
-let flippyBit = 0
+const watches = {}
 DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (type, file) => {
-  if (!(flippyBit++ % 2)) return
-  if (!file) return
+  if (watches[file]) return
+  watches[file] = true
+  setTimeout(() => watches[file] = false, 200)
   
   const enabledPlugins = storage.getData("internal", "enabledPlugins", [])
 

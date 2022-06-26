@@ -4,13 +4,20 @@ const fs = require("fs")
 
 const { version } = require("./package.json")
 
+const production = process.argv.includes("--production")
+
+const license = fs.readFileSync("license", "utf-8")
+
 function buildFile(file) {
   esbuild.buildSync({
     entryPoints: [file.endsWith(".js") ? `src/${file}` : `src/${file}/index.js`],
     outfile: `dist/${file.replace(".js", "")}.js`,
     bundle: !file.endsWith(".js"),
+    minify: production,
     platform: file.endsWith(".js") ? "node" : "browser"
   })
+  const js = fs.readFileSync(`dist/${file.replace(".js", "")}.js`, "utf-8")
+  fs.writeFileSync(`dist/${file.replace(".js", "")}.js`, `/*\n${license.split("\n\n").map(str => `\t${str}`).join("\n")}\n*/\n\n${js}`)
 }
 buildFile("splash")
 buildFile("main")
@@ -20,6 +27,7 @@ buildFile("storage.js")
 buildFile("index.js")
 
 fs.copyFileSync("src/changelog.json", "dist/changelog.json")
+fs.writeFileSync("dist/license", license)
 
 fs.appendFileSync("dist/main.js", `//# sourceURL=${encodeURIComponent("Discord Re-envisioned")}`)
 fs.writeFileSync("dist/package.json", JSON.stringify({

@@ -6,14 +6,14 @@ const ofs = require("original-fs")
 
 require("module").globalPaths.push(path.join(process.resourcesPath, "app.asar/node_modules"))
 
-// Replace electron renderer so we can mess with 'DiscordNative'
+// Replace 'electron/renderer' so we can mess with 'DiscordNative'
 delete require.cache.electron.exports
 require.cache.electron.exports = {}
 Object.defineProperty(require.cache.electron.exports, "contextBridge", {
   get: () => ({
     exposeInMainWorld(key, value) {
       if (key === "DiscordNative") {
-        value.window.setDevtoolsCallbacks = function() {}
+        value.window.setDevtoolsCallbacks = () => {}
         value.window.USE_OSX_NATIVE_TRAFFIC_LIGHTS = ipcRenderer.sendSync("@DrApi/newMacOS")
       }
 
@@ -47,20 +47,18 @@ const Native = {
   platform: process.platform,
   package: require(path.join(__dirname, "package.json")),
   changelog: require(path.join(__dirname, "changelog.json")),
-  downloadAsar(id, callback) {
-    require("request")(`https://api.github.com/repos/Dr-Discord/Discord-Re-envisioned/releases/assets/${id}`, {
-      encoding: null,
-      headers: {
-        "User-Agent": "Updater", 
-        "Accept": "application/octet-stream"
-      }
-    }, (err, resp, body) => {
-      if (err || resp.statusCode != 200) return callback(true)
-      ofs.unlinkSync(__dirname)
-      ofs.writeFileSync(__dirname, body)
-      callback(false)
-    })
-  },
+  downloadAsar: (id, callback) => require("request")(`https://api.github.com/repos/Dr-Discord/Discord-Re-envisioned/releases/assets/${id}`, {
+    encoding: null,
+    headers: {
+      "User-Agent": "Updater", 
+      "Accept": "application/octet-stream"
+    }
+  }, (err, resp, body) => {
+    if (err || resp.statusCode != 200) return callback(true)
+    ofs.unlinkSync(__dirname)
+    ofs.writeFileSync(__dirname, body)
+    callback(false)
+  }),
   fileSystem: {
     dirName: __dirname,
     join: (...paths) => path.join(...paths),
