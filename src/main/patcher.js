@@ -5,7 +5,7 @@ module.exports = new class rawPatcher {
     if (!module[fn]) module[fn] = () => {}
     const original = module[fn]
 
-    if (original.startsWith("class")) throw new Error("Classes cannot be patched")
+    if (String(original).startsWith("class")) throw new Error("Classes cannot be patched")
 
     let hook = module[fn][this.Symbol]
 

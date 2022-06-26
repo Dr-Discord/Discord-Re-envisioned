@@ -1,6 +1,21 @@
 [
   {
     "title": "What's New",
+    "subtitle": "Discord Re-envisioned v1.0.7",
+    "body": [
+      {
+        "title": "CRASHING ",
+        "type": "fixed",
+        "content": [
+          {
+            "title": "Fixed crashing."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "What's New",
     "subtitle": "Discord Re-envisioned v1.0.6",
     "body": [
       {
