@@ -2,9 +2,10 @@ const patcher = require("./patcher")
 const webpack = require("./webpack")
 const storage = require("../storage")
 const styles = require("./styles")
-const { getThemes, toggleTheme } = require("./themes")
+const { getThemes, toggleTheme, parseTheme } = require("./themes")
 const { getPlugins, togglePlugin } = require("./plugins")
 const logger = require("./logger")
+const { readJSON } = require("../storage")
 
 window.getThemes = getThemes
 
@@ -32,7 +33,7 @@ module.exports = async (React) => {
   const SearchBar = webpack.getModuleByDisplayName("SearchBar", true)
   const Folder = webpack.getModuleByDisplayName("Folder", true)
   const OverflowMenu = webpack.getModuleByDisplayName("OverflowMenu", true)
-  const { Icon } = DrApi.webpack.getModuleByProps("Icon", "default")
+  const { Icon } = webpack.getModuleByProps("Icon", "default")
   const { default: Menu, MenuItem, MenuSeparator } = webpack.getModuleByDisplayName("Menu")
   const Popout = webpack.getModuleByDisplayName("Popout", true)
   const Filter = webpack.getModuleByDisplayName("Filter", true)
@@ -49,11 +50,17 @@ module.exports = async (React) => {
   const Retry = webpack.getModuleByDisplayName("Retry", true)
   const Gear = webpack.getModuleByDisplayName("Gear", true)
   const Pencil = webpack.getModuleByDisplayName("Pencil", true)
+  const Monitor = webpack.getModuleByDisplayName("Monitor", true)
   const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
   const Anchor = webpack.getModuleByDisplayName("Anchor", true)
+  const FormText = webpack.getModuleByDisplayName("FormText", true)
+  const TextInput = webpack.getModuleByDisplayName("TextInput", true)
   const { openContextMenu, closeContextMenu } = webpack.getModuleByProps("openContextMenuLazy")
-  const { ModalRoot, ModalHeader, ModalCloseButton, ModalContent, ModalFooter } = webpack.getModuleByProps("ModalRoot", "ModalContent")
+  const { ModalRoot, ModalHeader, ModalCloseButton, ModalContent, ModalFooter, ModalSize } = webpack.getModuleByProps("ModalRoot", "ModalContent")
   const { Heading } = webpack.getModule(m => m.Heading.displayName)
+  const Button = webpack.getModuleByProps("ButtonColors", "ButtonSizes").default
+  const SlideIn = webpack.getModuleByDisplayName("SlideIn", true)
+  const SettingsNotice = webpack.getModuleByDisplayName("SettingsNotice", true)
 
   const { date, container, footer, added, fixed, improved, marginTop, socialLink } = webpack.getModuleByProps("date", "premiumIcon", "improved")
   const { content, modal } = webpack.getModuleByProps("content", "modal", "maxModalWidth")
@@ -63,12 +70,14 @@ module.exports = async (React) => {
   const { justifyCenter, alignCenter, justifyBetween, justifyEnd } = webpack.getModuleByProps("justifyCenter", "alignCenter")
   const { card } = webpack.getModuleByProps("card", "pulse", "topDivider")
   const { size16, size20 } = webpack.getModuleByProps("size20", "size16")
-  const { icon:iconToolbar } = DrApi.webpack.getModuleByProps("icon", "transparent", "iconWrapper")
-  const { icon:iconMenu } = DrApi.webpack.getModuleByProps("colorPremium", "icon")
+  const { icon:iconToolbar } = webpack.getModuleByProps("icon", "transparent", "iconWrapper")
+  const { icon:iconMenu } = webpack.getModuleByProps("colorPremium", "icon")
   const { line } = webpack.getModuleByProps("line", "versionHash")
-  const { search } = DrApi.webpack.getModuleByProps("search", "toolbar")
-  const { macDragRegion } = DrApi.webpack.getModuleByProps("macDragRegion")
+  const { search } = webpack.getModuleByProps("search", "toolbar")
+  const { macDragRegion } = webpack.getModuleByProps("macDragRegion")
+  const { marginBottom8, marginBottom4 } = webpack.getModuleByProps("marginBottom8", "marginBottom4")
 
+  const { ROLE_COLORS } = webpack.getModuleByProps("ROLE_COLORS")
   const types = { added, fixed, improved }
 
   styles("DrApi-settings", `.dr-header:not(:last-child) .dr-catorgory-icon {
@@ -90,6 +99,17 @@ module.exports = async (React) => {
     padding-top: 5px;
   } .dr-addon-avatar + h3 + div {
     padding-top: 6px !important
+  } .dr-addon-gear {
+    margin-right: 8px;
+    cursor: pointer;
+    color: var(--interactive-normal)
+  } .dr-addon-gear:hover {
+    color: var(--interactive-hover)
+  } .dr-addon-gear:active {
+    color: var(--interactive-active)
+  } .dr-addon-gear.disabled {
+    cursor: not-allowed;
+    color: var(--interactive-muted)
   }`)
 
   const demoToastObj = {
@@ -109,12 +129,13 @@ module.exports = async (React) => {
     title,
     subTitle,
     id,
+    icon,
     open = false
   }) {
     const [isOpen, setOpen] = React.useState(open)
 
     React.useEffect(() => {
-      if (isOpen) DrApi.toast.show(demoToastObj)
+      if (id === "notifications" && isOpen) DrApi.toast.show(demoToastObj)
       return () => DrApi.toast.delete(demoToastObj.id)
     })
     
@@ -142,7 +163,7 @@ module.exports = async (React) => {
                   children: [
                     React.createElement(Flex.Child, {
                       children: React.createElement("div", {
-                        children: React.createElement(Mail, {
+                        children: React.createElement(icon, {
                           className: "dr-catorgory-icon",
                           width: 32,
                           height: 32
@@ -208,6 +229,7 @@ module.exports = async (React) => {
           title: "Notifictions",
           subTitle: "Customize the notifications inside the app",
           id: "notifications",
+          icon: (props) => React.createElement(Mail, props),
           content: [
             React.createElement(FormItem, {
               title: Messages.FORM_LABEL_NOTIFICATION_POSITION,
@@ -311,80 +333,88 @@ module.exports = async (React) => {
             })
           ]
         }),
-        React.createElement(SwitchItem, {
-          value: transparency,
-          children: [
-            "Transparency",
-            React.createElement(Tooltip, {
-              text: "Reloading is needed",
-              children: (props) => React.createElement(Retry, {
-                ...props, 
-                width: 18, 
-                height: 18,
-                style: {
-                  marginLeft: 4,
-                  transform: "translateY(2px) rotate(180deg)"
-                }
-              })
-            })
-          ],
-          note: "Make Discord transparent. Warning this will break window snapping.",
-          onChange: (value) => {
-            DrApi.modals.confirmModal("Restart Discord?", [
-              "To toggle transparency you need to restart Discord."
-            ], {
-              onConfirm() {
-                DrApiNative.quit(true)
-                setTransparency(value)
-              },
-              confirmText: "Restart",
-              danger: true
-            })
-          }
-        }),
-        React.createElement(SwitchItem, {
-          value: newMacOS,
-          children: [
-            React.createElement(Tooltip, {
-              text: "MacOS only",
-              children: (props) => React.createElement(OsMac, {
-                ...props, 
-                width: 18, 
-                height: 18,
-                style: {
-                  marginRight: 4,
-                  transform: "translateY(2px)"
-                }
-              })
+        React.createElement(Category, {
+          title: "App",
+          subTitle: "Customize the Main app.",
+          id: "app",
+          icon: (props) => React.createElement(Monitor, props),
+          content: [
+            React.createElement(SwitchItem, {
+              value: transparency,
+              children: [
+                "Transparency",
+                React.createElement(Tooltip, {
+                  text: "Restarting is needed",
+                  children: (props) => React.createElement(Retry, {
+                    ...props, 
+                    width: 18, 
+                    height: 18,
+                    style: {
+                      marginLeft: 4,
+                      transform: "translateY(2px) rotate(180deg)"
+                    }
+                  })
+                })
+              ],
+              note: "Make Discord transparent. Warning this will break window snapping.",
+              onChange: (value) => {
+                DrApi.modals.confirmModal("Restart Discord?", [
+                  "To toggle transparency you need to restart Discord."
+                ], {
+                  onConfirm() {
+                    DrApiNative.quit(true)
+                    setTransparency(value)
+                  },
+                  confirmText: "Restart",
+                  danger: true
+                })
+              }
             }),
-            "New MacOS Titlebar Style",
-            React.createElement(Tooltip, {
-              text: "Reloading is needed",
-              children: (props) => React.createElement(Retry, {
-                ...props, 
-                width: 18, 
-                height: 18,
-                style: {
-                  marginLeft: 4,
-                  transform: "translateY(2px) rotate(180deg)"
-                }
-              })
+            React.createElement(SwitchItem, {
+              value: newMacOS,
+              children: [
+                React.createElement(Tooltip, {
+                  text: "MacOS only",
+                  children: (props) => React.createElement(OsMac, {
+                    ...props, 
+                    width: 18, 
+                    height: 18,
+                    style: {
+                      marginRight: 4,
+                      transform: "translateY(2px)"
+                    }
+                  })
+                }),
+                "New MacOS Titlebar Style",
+                React.createElement(Tooltip, {
+                  text: "Restarting is needed",
+                  children: (props) => React.createElement(Retry, {
+                    ...props, 
+                    width: 18, 
+                    height: 18,
+                    style: {
+                      marginLeft: 4,
+                      transform: "translateY(2px) rotate(180deg)"
+                    }
+                  })
+                })
+              ],
+              note: "Use Electrons titlebar or Discords titlebar.",
+              disabled: !(DrApiNative.platform === "darwin"),
+              onChange: (value) => {
+                DrApi.modals.confirmModal("Restart Discord?", [
+                  `To use ${value ? "new" : "old"} MacOS titlebar style you need to restart Discord.`
+                ], {
+                  onConfirm() {
+                    DrApiNative.quit(true)
+                    setNewMacOS(value)
+                  },
+                  confirmText: "Restart",
+                  danger: true
+                })
+              }
             })
-          ],
-          note: "Use Electrons titlebar or Discords titlebar.",
-          disabled: !(DrApiNative.platform === "darwin"),
-          onChange: (value) => {
-            DrApi.modals.confirmModal("Restart Discord?", [
-              `To use ${value ? "new" : "old"} MacOS titlebar style you need to restart Discord.`
-            ], {
-              onConfirm() {
-                DrApiNative.quit(true)
-                setNewMacOS(value)
-              },
-              confirmText: "Restart",
-              danger: true
-            })
-          }
+          ]
         })
       ]
     })
@@ -429,6 +459,137 @@ module.exports = async (React) => {
         variant: "text-sm/normal"
       }) : false
     ]
+  }
+
+  let ColorPicker = () => false
+  webpack.instance.e("36623").then(() => ColorPicker = webpack.instance("593642").default)
+
+  function makeThemeSettings(addon, settings) {
+    const orig = readJSON(`${addon.name}.theme`)
+    return React.createElement(() => {
+      const [dataChanged, setDataChanged] = React.useState(false)
+      const result = []
+      
+      for (const [key, value] of Object.entries(settings)) {
+        const [data, setData] = storage.useStorage(`${addon.name}.theme`, key, value.initial)
+
+        let content = React.createElement("div", { style: { color: "var(--text-danger)" } }, `ERROR: UNKNOWN TYPE '${value.type}'`)
+
+        if (value.type.toLowerCase() === "color") content = React.createElement(ColorPicker, {
+          colors: ROLE_COLORS,
+          defaultColor: value.initial,
+          onChange: (val) => {
+            setData(val)
+
+            const start = Date.now()
+            parseTheme(addon.originalCSS).css
+            console.log(Date.now() - start);
+          },
+          value: data
+        })
+        else if (value.type.toLowerCase() === "text") {
+          const [danger, setDanger] = React.useState(false)
+          React.useEffect(() => value.regex && setDanger(!value.regex.test(data)))
+
+          content = React.createElement(TextInput, {
+            size: value.size,
+            placeholder: value.placeholder,
+            value: data,
+            style: danger ? { border: "1px solid var(--status-danger)" } : { border: "1px solid var(--status-positive)" },
+            onChange: (val) => {
+              if (value.regex) setDanger(!value.regex.test(val))
+              setData(val)
+              setDataChanged(true)
+            }
+          })
+        }
+        else if (value.type.toLowerCase() === "switch") {
+          result.push(React.createElement(SwitchItem, {
+            value: JSON.parse(String(value.initial)),
+            note: value.note,
+            children: value.name,
+            onChange: (val) => {
+              setData(val)
+            }
+          }))
+          continue
+        } 
+        else if (value.type.toLowerCase() === "slider") {
+          content = React.createElement(Slider, {
+            maxValue: value.max ? Number(value.max) : 100,
+            minValue: value.min ? Number(value.min) : 0,
+            markers: Array.from({ length: 11 }, (_, i) => i * (value.max ? Number(value.max) : 100) / 10),
+            onValueChange: (val) => setData(Math.round(val)),
+            onValueRender: (val) => `${Math.round(val)}${value.sizing ?? "px"}`,
+            initialValue: Number(data)
+          })
+        }
+
+        result.push(React.createElement(FormItem, {
+          title: value.name,
+          className: marginBottom4,
+          children: [
+            value.note ? React.createElement(FormText, {
+              type: FormText.Types.DESCRIPTION,
+              className: marginBottom8,
+              children: value.note
+            }) : false,
+            content
+          ]
+        }))
+      }
+
+      return React.createElement("div", {
+        children: [
+          result,
+          dataChanged ? React.createElement(SlideIn, {
+            className: "noticeRegion-qjyUVg dr-noticeRegion",
+            children: React.createElement(SettingsNotice, {
+              onReset: () => console.log(1),
+              onSave: () => console.log(2),
+              submitting: false,
+              theme: "dark"
+            })
+          }) : false
+        ]
+      })
+    })
+  }
+
+  function showAddonSettings(addon, settings) {
+    if (addon.filePath.endsWith(".theme.css")) settings = makeThemeSettings(addon, settings)
+
+    DrApi.modals.open((props) => React.createElement(ModalRoot, {
+      ...props,
+      size: ModalSize.LARGE,
+      children: [
+        React.createElement(ModalHeader, {
+          separator: false,
+          align: justifyBetween,
+          children: [
+            React.createElement(Flex.Child, {
+              children: [
+                React.createElement(Heading, {
+                  children: addon.name,
+                  level: 2,
+                  variant: "heading-lg/medium"
+                }),
+                React.createElement(Text, {
+                  children: ["v", addon.version],
+                  className: date,
+                  variant: "text-xs/normal"
+                })
+              ]
+            }),
+            React.createElement(Flex.Child, {
+              grow: 0,
+              children: React.createElement(ModalCloseButton, { onClick: props.onClose })
+            })
+          ]
+        }),
+        React.createElement(ModalContent, {}, settings)
+      ]
+    }))
   }
 
   function AddonCard(addon) {
@@ -480,27 +641,46 @@ module.exports = async (React) => {
                   })
                 ]
               }),
-              React.createElement(Switch, {
-                checked: enabledAddons.includes(addon.name),
-                onChange: (val) => {
-                  if (val) enabledAddons.push(addon.name)
-                  else {
-                    const i = enabledAddons.indexOf(addon.name)
-                    if (i === -1) return
-                    enabledAddons.splice(i, 1)
-                  }
-
-                  setTimeout(DrApi.toast.show({
-                    title: `${val ? "Enabled" : "Disabled"} '${addon.name}'`,
-                    type: "info",
-                    icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode)
-                  }), 4e3)
-
-                  setEnabledAddons([...enabledAddons])
-
-                  if (addon.filePath.endsWith(".theme.css")) toggleTheme(addon.name)
-                  else if (addon.filePath.endsWith(".plugin.js")) togglePlugin(addon.name)
-                }
+              React.createElement(Flex, {
+                grow: 0,
+                children: [
+                  (addon.settings || addon.exports?.onSettings) ? React.createElement(Clickable, {
+                    className: `dr-addon-gear${enabledAddons.includes(addon.name) ? "" : " disabled"}`,
+                    onClick: () => {
+                      if (!enabledAddons.includes(addon.name)) return
+                      if (addon.exports?.onSettings) {
+                        let preventDefault = false
+                        const settings = addon.exports?.onSettings(() => preventDefault = true)
+                        if (preventDefault) return
+                        return showAddonSettings(addon, settings)
+                      }
+                      showAddonSettings(addon, addon.settings)
+                    },
+                    children: React.createElement(Gear)
+                  }) : false,
+                  React.createElement(Switch, {
+                    checked: enabledAddons.includes(addon.name),
+                    onChange: (val) => {
+                      if (val) enabledAddons.push(addon.name)
+                      else {
+                        const i = enabledAddons.indexOf(addon.name)
+                        if (i === -1) return
+                        enabledAddons.splice(i, 1)
+                      }
+    
+                      setTimeout(DrApi.toast.show({
+                        title: `${val ? "Enabled" : "Disabled"} '${addon.name}'`,
+                        type: "info",
+                        icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode)
+                      }), 4e3)
+    
+                      setEnabledAddons([...enabledAddons])
+    
+                      if (addon.filePath.endsWith(".theme.css")) toggleTheme(addon.name)
+                      else if (addon.filePath.endsWith(".plugin.js")) togglePlugin(addon.name)
+                    }
+                  })
+                ]
               })
             ]
           }),

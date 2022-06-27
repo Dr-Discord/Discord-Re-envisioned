@@ -1,3 +1,5 @@
+const start = Date.now()
+
 const esbuild = require("esbuild")
 const asar = require("asar")
 const fs = require("fs")
@@ -36,4 +38,6 @@ fs.writeFileSync("dist/package.json", JSON.stringify({
   main: "index.js"
 }))
 
-asar.createPackage("dist", "built.asar")
+asar.createPackage("dist", "built.asar").then(() => {
+  console.log("Done!", Date.now() - start, "ms")
+})
