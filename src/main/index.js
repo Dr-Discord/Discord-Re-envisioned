@@ -158,7 +158,7 @@ function documentReady() {
 
   const jquery = document.createElement("script")
   jquery.src = "https://code.jquery.com/jquery-3.6.0.min.js"
-  jquery.onerror = () => logger.err("jQuery", "Cannot load jQuery")
+  jquery.onerror = (event) => logger.err("jQuery", "Cannot load jQuery", event)
   jquery.onload = () => {
     window.$ = window.jQuery
     logger.log("jQuery", "Loaded jQuery")
@@ -167,7 +167,7 @@ function documentReady() {
 
   const ace = document.createElement("script")
   ace.src = "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
-  ace.onerror = () => logger.err("Ace", "Cannot the Ace editor")
+  ace.onerror = (event) => logger.err("Ace", "Cannot the Ace editor", event)
   ace.onload = () => logger.log("Ace", "Loaded the Ace editor")
   document.head.append(ace)
 
