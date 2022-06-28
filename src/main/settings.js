@@ -59,8 +59,6 @@ module.exports = async (React) => {
   const { ModalRoot, ModalHeader, ModalCloseButton, ModalContent, ModalFooter, ModalSize } = webpack.getModuleByProps("ModalRoot", "ModalContent")
   const { Heading } = webpack.getModule(m => m.Heading.displayName)
   const Button = webpack.getModuleByProps("ButtonColors", "ButtonSizes").default
-  const SlideIn = webpack.getModuleByDisplayName("SlideIn", true)
-  const SettingsNotice = webpack.getModuleByDisplayName("SettingsNotice", true)
 
   const { date, container, footer, added, fixed, improved, marginTop, socialLink } = webpack.getModuleByProps("date", "premiumIcon", "improved")
   const { content, modal } = webpack.getModuleByProps("content", "modal", "maxModalWidth")
@@ -75,7 +73,8 @@ module.exports = async (React) => {
   const { line } = webpack.getModuleByProps("line", "versionHash")
   const { search } = webpack.getModuleByProps("search", "toolbar")
   const { macDragRegion } = webpack.getModuleByProps("macDragRegion")
-  const { marginBottom8, marginBottom4 } = webpack.getModuleByProps("marginBottom8", "marginBottom4")
+  const { marginBottom8 } = webpack.getModuleByProps("marginBottom8", "marginBottom4")
+  const { container:formContainer, dividerDefault } = webpack.getModuleByProps("container", "dividerDefault")
 
   const { ROLE_COLORS } = webpack.getModuleByProps("ROLE_COLORS")
   const types = { added, fixed, improved }
@@ -465,9 +464,7 @@ module.exports = async (React) => {
   webpack.instance.e("36623").then(() => ColorPicker = webpack.instance("593642").default)
 
   function makeThemeSettings(addon, settings) {
-    const orig = readJSON(`${addon.name}.theme`)
     return React.createElement(() => {
-      const [dataChanged, setDataChanged] = React.useState(false)
       const result = []
       
       for (const [key, value] of Object.entries(settings)) {
@@ -478,13 +475,7 @@ module.exports = async (React) => {
         if (value.type.toLowerCase() === "color") content = React.createElement(ColorPicker, {
           colors: ROLE_COLORS,
           defaultColor: value.initial,
-          onChange: (val) => {
-            setData(val)
-
-            const start = Date.now()
-            parseTheme(addon.originalCSS).css
-            console.log(Date.now() - start);
-          },
+          onChange: (val) => setData(val),
           value: data
         })
         else if (value.type.toLowerCase() === "text") {
@@ -499,18 +490,15 @@ module.exports = async (React) => {
             onChange: (val) => {
               if (value.regex) setDanger(!value.regex.test(val))
               setData(val)
-              setDataChanged(true)
             }
           })
         }
         else if (value.type.toLowerCase() === "switch") {
           result.push(React.createElement(SwitchItem, {
-            value: JSON.parse(String(value.initial)),
+            value: JSON.parse(String(data)),
             note: value.note,
             children: value.name,
-            onChange: (val) => {
-              setData(val)
-            }
+            onChange: (val) => setData(val)
           }))
           continue
         } 
@@ -527,32 +515,42 @@ module.exports = async (React) => {
 
         result.push(React.createElement(FormItem, {
           title: value.name,
-          className: marginBottom4,
+          className: formContainer,
           children: [
             value.note ? React.createElement(FormText, {
               type: FormText.Types.DESCRIPTION,
               className: marginBottom8,
               children: value.note
             }) : false,
-            content
+            content,
+            React.createElement(FormDivider, { className: dividerDefault })
           ]
         }))
       }
 
-      return React.createElement("div", {
-        children: [
-          result,
-          dataChanged ? React.createElement(SlideIn, {
-            className: "noticeRegion-qjyUVg dr-noticeRegion",
-            children: React.createElement(SettingsNotice, {
-              onReset: () => console.log(1),
-              onSave: () => console.log(2),
-              submitting: false,
-              theme: "dark"
-            })
-          }) : false
-        ]
-      })
+      return [
+        React.createElement(FormItem, {
+          title: "Update Settings",
+          className: formContainer,
+          children: [
+            React.createElement(FormText, {
+              type: FormText.Types.DESCRIPTION,
+              className: marginBottom8,
+              children: "Update the Settings on your theme."
+            }),
+            React.createElement(Button, {
+              children: "Update",
+              style: {
+                position: "absolute",
+                right: 10
+              },
+              onClick: () => document.querySelector(`[dr-theme=${JSON.stringify(addon.name)}]`).innerHTML = parseTheme(addon.originalCSS).css
+            }),
+            React.createElement(FormDivider, { className: dividerDefault })
+          ]
+        }),
+        result
+      ]
     })
   }
 

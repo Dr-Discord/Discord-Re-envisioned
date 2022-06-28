@@ -78,8 +78,8 @@ function parseTheme(contents) {
     const _matches = body.match(/((["'])(.*?[^\\])\2|((rgb|#|)(a|)(([A-z]|[0-9])+|\((([0-9]|\.)+(,|\/|)((\s|)+)){0,4}\))|(["'])(.*?[^\\])\1))/g)
     for (const id in _matches) {
       const val = _matches[id]
-      if (/^["']/.test(val)) _properties[properties[id]] = val.substring(1, val.length - 1)
-      else if (/^#/.test(val) || /^rgb/.test(val)) _properties[properties[id]] = int(val)
+      if (val.startsWith("\"") || val.startsWith("'")) _properties[properties[id]] = val.substring(1, val.length - 1)
+      else if (val.startsWith("#") || val.startsWith("rgb")) _properties[properties[id]] = int(val)
       else _properties[properties[id]] = val
     }
 
