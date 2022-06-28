@@ -68,6 +68,4 @@ module.exports = async (React) => {
       }))
     }
   }
-
-  logger.log("Releases", "Checking github for a new release")
 }

@@ -78,4 +78,12 @@ module.exports = new class rawPatcher {
     this.patches[id] ??= []
     for (const undo of this.patches[id]) undo()
   }
+  create(id) {
+    return {
+      unpatchAll: () => this.unpatchAll(id),
+      before: (mod, fn, callback) => this.before(id, mod, fn, callback),
+      instead: (mod, fn, callback) => this.instead(id, mod, fn, callback),
+      after: (mod, fn, callback) => this.after(id, mod, fn, callback)
+    }
+  }
 }

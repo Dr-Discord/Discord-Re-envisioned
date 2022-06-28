@@ -554,12 +554,12 @@ module.exports = async (React) => {
     })
   }
 
-  function showAddonSettings(addon, settings) {
+  function showAddonSettings(addon, settings, size) {
     if (addon.filePath.endsWith(".theme.css")) settings = makeThemeSettings(addon, settings)
 
     DrApi.modals.open((props) => React.createElement(ModalRoot, {
       ...props,
-      size: ModalSize.LARGE,
+      size: ModalSize[size.toUpperCase()],
       children: [
         React.createElement(ModalHeader, {
           separator: false,
@@ -647,12 +647,12 @@ module.exports = async (React) => {
                     onClick: () => {
                       if (!enabledAddons.includes(addon.name)) return
                       if (addon.exports?.onSettings) {
-                        let preventDefault = false
-                        const settings = addon.exports?.onSettings(() => preventDefault = true)
-                        if (preventDefault) return
-                        return showAddonSettings(addon, settings)
+                        let preventDefault = "MEDIUM"
+                        const settings = addon.exports?.onSettings((size = true) => preventDefault = size)
+                        if (preventDefault === true) return
+                        return showAddonSettings(addon, settings, preventDefault)
                       }
-                      showAddonSettings(addon, addon.settings)
+                      showAddonSettings(addon, addon.settings, "MEDIUM")
                     },
                     children: React.createElement(Gear)
                   }) : false,

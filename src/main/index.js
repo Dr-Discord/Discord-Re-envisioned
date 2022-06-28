@@ -17,7 +17,6 @@ const styles = require("./styles")
 const modals = require("./modals")
 
 logger.log("Discord Re-invisioned", "Loading...")
-window.logger = logger
 
 const themes = require("./themes")
 const plugins = require("./plugins")
@@ -37,9 +36,9 @@ window.DrApi = {
   webpack,
   Patcher,
   storage: {
-    useStorage: (pluginName, key, defaultValue) => storage.useStorage(`${pluginName}.plugin`, key, defaultValue),
-    getData: (pluginName, key, defaultValue) => storage.getData(`${pluginName}.plugin`, key, defaultValue),
-    setData: (pluginName, key, value) => storage.setData(`${pluginName}.plugin`, key, value)
+    useStorage: (pluginName, key, defaultValue) => storage.useStorage(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, defaultValue),
+    getData: (pluginName, key, defaultValue) => storage.getData(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, defaultValue),
+    setData: (pluginName, key, value) => storage.setData(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, value)
   },
   plugins: {
     getAll: () => plugins.getPlugins(),
@@ -55,14 +54,14 @@ window.DrApi = {
       if (index === -1) {
         plugin.exports.onStart?.()
         storage.setData("internal", "enabledPlugins", enabledPlugins.concat(id))
-      }
-      else {
-        enabledPlugins.splice(index, 1)
-        storage.setData("internal", "enabledPlugins", enabledPlugins)
-        plugin.exports.onStop?.()
+        return true
       }
       
-      return index !== -1
+      enabledPlugins.splice(index, 1)
+      storage.setData("internal", "enabledPlugins", enabledPlugins)
+      plugin.exports.onStop?.()
+      
+      return false
     }
   },
   themes: {
@@ -71,22 +70,28 @@ window.DrApi = {
     isEnabled: (id) => storage.getData("internal", "enabledPlugins", []).includes(id),
     toggle: (id) => {
       const enabledThemes = storage.getData("internal", "enabledThemes", [])
-      const plugin = themes.getThemes()[id]
+      const theme = themes.getThemes()[id]
 
-      if (!plugin) return
+      if (!theme) return
       const index = enabledThemes.indexOf(id)
 
       if (index === -1) {
-        plugin.exports.onStart?.()
+        theme.exports.onStart?.()
         storage.setData("internal", "enabledThemes", enabledThemes.concat(id))
-      }
-      else {
-        enabledThemes.splice(index, 1)
-        storage.setData("internal", "enabledThemes", enabledThemes)
-        plugin.exports.onStop?.()
+
+        const style = document.createElement("style")
+        style.setAttribute("dr-theme", id)
+        style.innerHTML = theme.css
+        styles.appendChild(style)
+
+        return true
       }
 
-      return index !== -1
+      enabledThemes.splice(index, 1)
+      storage.setData("internal", "enabledThemes", enabledThemes)
+      document.querySelector(`[dr-theme=${JSON.stringify(id)}]`).remove()
+
+      return false
     }
   },
   styling: {
@@ -98,7 +103,7 @@ window.DrApi = {
         styles.plugins.appendChild(node)
       }
       node.innerHTML = css
-      return () => node.remove()
+      return (css) => typeof css === "string" ? DrApi.styling.insert(id, css) : node.remove()
     },
     remove: (id) => document.querySelector(`[dr-plugin=${JSON.stringify(id)}]`)?.remove?.()
   }
