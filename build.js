@@ -1,3 +1,4 @@
+console.log("Starting build...")
 const start = Date.now()
 
 const esbuild = require("esbuild")
@@ -18,6 +19,7 @@ function buildFile(file) {
     minify: production,
     platform: file.endsWith(".js") ? "node" : "browser"
   })
+
   const js = fs.readFileSync(`dist/${file.replace(".js", "")}.js`, "utf-8")
   fs.writeFileSync(`dist/${file.replace(".js", "")}.js`, `/*\n${license.split("\n\n").map(str => `\t${str}`).join("\n")}\n*/\n\n${js}`)
 }
@@ -38,6 +40,16 @@ fs.writeFileSync("dist/package.json", JSON.stringify({
   main: "index.js"
 }))
 
+function generateTime(num) {
+  const { length } = num
+
+  const ms = num.substring(length - 3)
+  const s = num.substring(0, length - 3)
+  const m = String(s / 60).split(".")[0]
+
+  return `${m}m ${s - (m * 60)}s ${ms}ms`
+}
+
 asar.createPackage("dist", "built.asar").then(() => {
-  console.log("Done!", Date.now() - start, "ms")
+  console.log(`Built completed in ${generateTime(String(Date.now() - start))}!`)
 })
