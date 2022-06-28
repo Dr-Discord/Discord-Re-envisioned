@@ -1062,13 +1062,12 @@ module.exports = async (React) => {
       section: "Discord Re-envisioned Themes"
     },
     {
-      onClick: () => dispatcher.dirtyDispatch({
+      onClick: () => window.ace ? dispatcher.dirtyDispatch({
         type: "POPOUT_WINDOW_OPEN",
         key: "DISCORD_CUSTOM_CSS",
         render: () => React.createElement(CustomCSS),
         features: {}
-      }),
-      predicate: () => window.ace,
+      }) : DrApi.modals.alert("Custom CSS", "The Ace editor didnt load, so custom CSS wont be usable"),
       icon: React.createElement(Pencil, { width: 20, height: 20 }),
       label: "Custom CSS",
       section: "Discord Re-envisioned Custom CSS"
