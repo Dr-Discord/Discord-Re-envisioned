@@ -647,10 +647,11 @@ module.exports = async (React) => {
                     onClick: () => {
                       if (!enabledAddons.includes(addon.name)) return
                       if (addon.exports?.onSettings) {
-                        let preventDefault = "MEDIUM"
+                        let defValue = "MEDIUM"
                         const settings = addon.exports?.onSettings((size = true) => preventDefault = size)
-                        if (preventDefault === true) return
-                        return showAddonSettings(addon, settings, preventDefault)
+                        if (!defValue) defValue = "MEDIUM"
+                        if (defValue === true) return
+                        return showAddonSettings(addon, settings, defValue)
                       }
                       showAddonSettings(addon, addon.settings, "MEDIUM")
                     },
@@ -1067,6 +1068,7 @@ module.exports = async (React) => {
         render: () => React.createElement(CustomCSS),
         features: {}
       }),
+      predicate: () => window.ace,
       icon: React.createElement(Pencil, { width: 20, height: 20 }),
       label: "Custom CSS",
       section: "Discord Re-envisioned Custom CSS"
@@ -1085,7 +1087,7 @@ module.exports = async (React) => {
     const index = sections.indexOf(sections.find(s => s.section === "Connections")) + 1
     if (!index) return
     if (sections.find(s => s.section === "Discord Re-envisioned")) return
-
+    
     sections.splice(index, 0, ...settings)
   })
 
