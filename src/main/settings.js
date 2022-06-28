@@ -549,7 +549,7 @@ module.exports = async (React) => {
             React.createElement(FormText, {
               type: FormText.Types.DESCRIPTION,
               className: marginBottom8,
-              children: "Update the Settings on your theme."
+              children: "Update the Settings on your theme. Reloading will also update the theme."
             }),
             React.createElement(Button, {
               children: "Update",

@@ -52,7 +52,7 @@ function parseTheme(contents) {
   meta.originalCSS = contents
   meta.css = contents
 
-  const settings = contents.match(/@setting((\s|)+)(.*?)((\s|)+){((\n|)((\s|)+)([A-z]|[0-9])+:((\s|)+)((rgb|hsl|#|)(a|)(([A-z]|[0-9])+|\((([0-9]|\.)+(,|\/|)((\s|)+)){0,4}\))|(["'])(.*?[^\\])\1)(;|)(\n|)((\s|)+)){0,}}/g)
+  const settings = contents.match(/@settings((\s|)+)(.*?)((\s|)+){((\n|)((\s|)+)([A-z]|[0-9])+:((\s|)+)((rgb|hsl|#|)(a|)(([A-z]|[0-9])+|\((([0-9]|\.)+(,|\/|)((\s|)+)){0,4}\))|(["'])(.*?[^\\])\1)(;|)(\n|)((\s|)+)){0,}}/g)
   if (!settings) return meta
 
   const _settings = {}
@@ -60,7 +60,7 @@ function parseTheme(contents) {
   for (let setting of settings) {
     contents = contents.replace(setting, "")
   
-    setting = setting.replace(/@setting((\s|)+)/g, "")
+    setting = setting.replace(/@settings((\s|)+)/g, "")
   
     let id = setting.match(/(.*?)((\s|)+){/g)[0]
     id = id.replace(id.match(/((\s|)+){/g)[0], "")
