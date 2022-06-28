@@ -172,6 +172,7 @@ function documentReady() {
   document.head.append(ace)
 
   document.documentElement.setAttribute("release", window.GLOBAL_ENV.RELEASE_CHANNEL)
+  if (storage.getData("internal", "transparency", false)) document.documentElement.setAttribute("transparent", "")
 }
 
 if (document.readyState === "complete") documentReady()
