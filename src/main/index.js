@@ -126,12 +126,27 @@ void async function() {
     logger.log("Updater", "Checking for new update")
     DrApi.request("https://api.github.com/repos/Dr-Discord/Discord-Re-envisioned/releases", async request => {
       const json = (await request.json()).shift()
+      
       if (DrApiNative.package.version >= json.tag_name) return
+      
+      const CloudDownload = webpack.getModuleByDisplayName("CloudDownload", true)
       DrApi.modals.confirmModal("You version is out of date!", [
         "Do you want to update Discord Re-envisioned",
         `You version is '${DrApiNative.package.version}' and the latest is '${json.tag_name}'`
       ], {
-        confirmText: "Update",
+        confirmText: [
+          React.createElement(CloudDownload, {
+            style: {
+              position: "absolute",
+              left: 16,
+              top: 6
+            }
+          }), 
+          React.createElement("div", {
+            style: { paddingLeft: 30 },
+            children: "Update"
+          })
+        ],
         onConfirm: () => {
           const hash = json.assets.find(a => a.name.endsWith(".asar")).url.split("/").pop()
           DrApiNative.downloadAsar(hash, (err) => err ? null : DrApiNative.quit(true))
