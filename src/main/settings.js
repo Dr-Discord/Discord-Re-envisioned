@@ -471,14 +471,15 @@ module.exports = async (React) => {
         const [data, setData] = storage.useStorage(`${addon.name}.theme`, key, value.initial)
 
         let content = React.createElement("div", { style: { color: "var(--text-danger)" } }, `ERROR: UNKNOWN TYPE '${value.type}'`)
+        const type = value.type.toLowerCase()
 
-        if (value.type.toLowerCase() === "color") content = React.createElement(ColorPicker, {
+        if (type === "color") content = React.createElement(ColorPicker, {
           colors: ROLE_COLORS,
           defaultColor: value.initial,
           onChange: (val) => setData(val),
           value: data
         })
-        else if (value.type.toLowerCase() === "text") {
+        else if (type === "text") {
           const [danger, setDanger] = React.useState(false)
           React.useEffect(() => value.regex && setDanger(!value.regex.test(data)))
 
@@ -493,7 +494,7 @@ module.exports = async (React) => {
             }
           })
         }
-        else if (value.type.toLowerCase() === "switch") {
+        else if (type === "switch") {
           result.push(React.createElement(SwitchItem, {
             value: JSON.parse(String(data)),
             note: value.note,
@@ -502,13 +503,15 @@ module.exports = async (React) => {
           }))
           continue
         } 
-        else if (value.type.toLowerCase() === "slider") {
+        else if (type === "slider") {
           content = React.createElement(Slider, {
             maxValue: value.max ? Number(value.max) : 100,
             minValue: value.min ? Number(value.min) : 0,
-            markers: Array.from({ length: 11 }, (_, i) => i * (value.max ? Number(value.max) : 100) / 10),
+            markers: Array.from({ length: value.markers ? Number(value.markers) + 1 : 6}, (_, i) => i * (value.max ? Number(value.max) : 100) / (value.markers ? Number(value.markers) : 5)),
             onValueChange: (val) => setData(Math.round(val)),
             onValueRender: (val) => `${Math.round(val)}${value.sizing ?? "px"}`,
+            onMarkerRender: (val) => `${val}${value.sizing ?? "px"}`,
+            defaultValue: value.default ? Number(value.default) : 20,
             initialValue: Number(data)
           })
         }
@@ -520,9 +523,19 @@ module.exports = async (React) => {
             value.note ? React.createElement(FormText, {
               type: FormText.Types.DESCRIPTION,
               className: marginBottom8,
-              children: value.note
+              children: value.note,
+              style: type === "color" ? undefined : {
+                width: "calc(50% - 9px)",
+                overflowWrap: "break-word"
+              }
             }) : false,
-            content,
+            React.createElement("div", {
+              style: type === "color" ? undefined : {
+                position: "absolute",
+                right: 10,
+                width: "calc(50% - 9px)"
+              }
+            }, content),
             React.createElement(FormDivider, { className: dividerDefault })
           ]
         }))
