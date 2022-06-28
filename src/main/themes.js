@@ -97,7 +97,7 @@ function parseTheme(contents) {
   meta.settings = _settings
   meta.css = `${contents}\n\n/* Generated CSS Settings */\n:root {\n${Object.entries(_settings).map(([key, value]) => {
     if (value.type.toLowerCase() === "color") return`\t--${key}: #${int(data[key] ?? value.initial)}`
-    if (value.type.toLowerCase() === "text") return`\t--${key}: ${JSON.stringify(data[key] ?? value.text)}`
+    if (value.type.toLowerCase() === "text") return`\t--${key}: ${JSON.stringify(data[key] ?? value.initial ?? "")}`
     if (value.type.toLowerCase() === "switch") return`\t--${key}: ${data[key] ?? JSON.parse(value.initial) ? 1 : 0}`
     if (value.type.toLowerCase() === "slider") return`\t--${key}: ${data[key] ?? value.initial ? 1 : 0}`
   }).join(";\n")}\n}`
@@ -177,8 +177,8 @@ function watchTheme(file) {
   if (!enabledThemes.includes(meta.name)) return
   if (document.readyState === "complete") {
     const style = document.createElement("style")
-    style.setAttribute("dr-theme", theme.name)
-    style.innerHTML = theme.css
+    style.setAttribute("dr-theme", meta.name)
+    style.innerHTML = meta.css
     styles.appendChild(style)
   }
 }
