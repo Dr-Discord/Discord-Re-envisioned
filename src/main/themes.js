@@ -160,7 +160,6 @@ function watchTheme(file) {
     if (index !== -1) enabledThemes.splice(index, 1, meta.name)
   }
 
-  meta.css = themeContent
   meta.filePath = filePath
   _themes[meta.name] = meta
 
@@ -176,7 +175,12 @@ function watchTheme(file) {
   storage.setData("internal", "enabledThemes", enabledThemes)
 
   if (!enabledThemes.includes(meta.name)) return
-  if (document.readyState === "complete") module.exports.toggleTheme(meta.name)
+  if (document.readyState === "complete") {
+    const style = document.createElement("style")
+    style.setAttribute("dr-theme", theme.name)
+    style.innerHTML = theme.css
+    styles.appendChild(style)
+  }
 }
 
 function watchSplash(file) {
