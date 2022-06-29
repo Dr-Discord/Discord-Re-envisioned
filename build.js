@@ -9,7 +9,8 @@
 
   await new Promise(resolve => {
     for (const dependency of Object.keys(dependencies)) {
-      try { require(dependency) } catch (error) {
+      try { require(dependency) } 
+      catch (error) {
         if (error.message.split("\n")[0] !== `Cannot find module '${dependency}'`) continue
         console.log("Installing dependencies")
         return cp.exec(`cd ${__dirname.replace("\\", "/").replace(" ", "\\ ")} && npm install`, () => {
@@ -87,7 +88,7 @@ module.exports = node`
     })
   
     const js = fs.readFileSync(`dist/${file.replace(".js", "")}.js`, "utf-8")
-    fs.writeFileSync(`dist/${file.replace(".js", "")}.js`, `/*\n${license.split("\n\n").map(str => `\t${str}`).join("\n")}\n*/\n\n${js}\n\n//# sourceURL=${encodeURIComponent("Discord Re-envisioned")}`)
+    fs.writeFileSync(`dist/${file.replace(".js", "")}.js`, `/*\n${license.split("\n\n").map(str => `\t${str}`).join("\n")}\n*/\n\n${js}`)
   }
 
   await buildFile("splash")
@@ -97,6 +98,8 @@ module.exports = node`
   await buildFile("storage.js")
   await buildFile("index.js")
   
+  fs.appendFileSync("dist/main.js", `//# sourceURL=${encodeURIComponent("Discord Re-envisioned")}`)
+
   console.log("Copying changelog from 'src/changelog.json' to 'dist/changelog.json'")
   fs.copyFileSync("src/changelog.json", "dist/changelog.json")
 

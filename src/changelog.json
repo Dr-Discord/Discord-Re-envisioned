@@ -6,10 +6,24 @@
       {
         "title": "DEVTOOL EXTENSIONS ",
         "type": "improved",
-        "body": [
+        "content": [
           {
             "title": "RDT",
             "content": "React Developer Tools is now built in!"
+          }
+        ]
+      },
+      {
+        "title": "Building",
+        "type": "improved",
+        "content": [
+          {
+            "title": "Duration",
+            "content": "Now states how long the building process took"
+          },
+          {
+            "title": "Size",
+            "content": "Now states how big the asar is."
           }
         ]
       }
