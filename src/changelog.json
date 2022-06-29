@@ -1,6 +1,22 @@
 [
   {
     "title": "What's New",
+    "subtitle": "Discord Re-envisioned v1.0.8",
+    "body": [
+      {
+        "title": "DEVTOOL EXTENSIONS ",
+        "type": "improved",
+        "body": [
+          {
+            "title": "RDT",
+            "content": "React Developer Tools is now built in!"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "What's New",
     "subtitle": "Discord Re-envisioned v1.0.7",
     "body": [
       {

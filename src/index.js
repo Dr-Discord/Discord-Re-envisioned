@@ -69,7 +69,6 @@ electron.app.once("ready", () => {
   
   const { default: installExtension, REACT_DEVELOPER_TOOLS, JQUERY_DEBUGGER } = require("../node_modules/electron-devtools-installer/")
   installExtension(REACT_DEVELOPER_TOOLS, true)
-  installExtension(JQUERY_DEBUGGER, true)
 })
 
 const basePath = path.join(process.resourcesPath, "app.asar")
