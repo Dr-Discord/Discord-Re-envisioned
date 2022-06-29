@@ -3,7 +3,6 @@ const { ipcRenderer, contextBridge } = electron
 import fs from "fs"
 import path from "path"
 import ofs from "original-fs"
-import sass from "./sass"
 import crypto from "crypto"
 import Module from "module"
 
@@ -48,8 +47,6 @@ for (const key in console)
     value: originalConsole[key]
   })
 
-const sassCache = {}
-
 const Native = {
   require(path) { return require(path) },
   runInNative(code) { return (0, eval)(code) },
@@ -57,19 +54,6 @@ const Native = {
   platform: process.platform,
   package: require(path.join(__dirname, "package.json")),
   changelog: require(path.join(__dirname, "changelog.json")),
-  sass: (content) => {
-    const hash = crypto.createHash("md5").update(content).digest("hex")
-    if (fs.existsSync(path.join(cache, hash))) {
-      if (sassCache[hash]) return sassCache[hash]
-      return sassCache[hash] = fs.readFileSync(path.join(cache, hash), "utf-8")
-    }
-    
-    try {
-      const { css } = sass.compileString(content)
-      fs.writeFileSync(path.join(cache, hash), css)
-      return sassCache[hash] = css
-    } catch (error) { return error }
-  },
   downloadAsar: (id, callback) => require("request")(`https://api.github.com/repos/Dr-Discord/Discord-Re-envisioned/releases/assets/${id}`, {
     encoding: null,
     headers: {

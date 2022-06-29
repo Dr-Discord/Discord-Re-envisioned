@@ -8,7 +8,7 @@ if (!DrApiNative.fileSystem.exists(themesFolder)) DrApiNative.fileSystem.mkdir(t
 
 const readDir = DrApiNative.runInNative("require(\"fs\").readdirSync")
 
-const themes = readDir(themesFolder).filter(theme => theme.endsWith(".splash.css") || theme.endsWith(".splash.scss") || theme.endsWith(".splash.sass"))
+const themes = readDir(themesFolder).filter(theme => theme.endsWith(".splash.css"))
 
 function readMeta(contents) {
   const meta = {}
@@ -40,7 +40,7 @@ for (const themeName of enabledThemes) {
   const theme = _themes[themeName]
   const style = document.createElement("style")
   style.setAttribute("dr-theme", theme.name)
-  style.innerHTML = DrApiNative.sass(theme.css)
+  style.innerHTML = theme.css
   node.append(style)
 }
 

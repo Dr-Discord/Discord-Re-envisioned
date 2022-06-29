@@ -12,12 +12,6 @@ logger.log("Discord Re-invisioned", "Loading...")
 import themes from "./themes"
 import plugins from "./plugins"
 
-import jquery from "https://code.jquery.com/jquery-3.6.0.min.js"
-jquery.onerror = (event) => logger.err("jQuery", "Cannot load jQuery", event)
-jquery.onload = () => {
-  window.$ = window.jQuery
-  logger.log("jQuery", "Loaded jQuery")
-}
 import ace from "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
 ace.onerror = (event) => logger.err("Ace", "Cannot the Ace editor", event)
 ace.onload = () => logger.log("Ace", "Loaded the Ace editor")

@@ -1,4 +1,5 @@
 import storage from "../storage"
+import logger from "./logger"
 import webpack from "./webpack"
 
 const pluginsFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "..", "plugins")
@@ -88,13 +89,18 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (typ
   storage.setData("internal", "enabledPlugins", enabledPlugins)
   
   if (ready) {
-    const res = window.eval(`(function() {\n${meta.js}\n})()\n//# sourceURL=${encodeURIComponent(meta.name)}`)
-      
-    meta.exports = typeof res === "function" ? new res : res
-    meta.exports.onLoad?.()
-  
-    if (!enabledPlugins.includes(meta.name)) return
-    meta.exports.onStart?.()
+    try {
+      const res = window.eval(`(function() {\n${meta.js}\n})()\n//# sourceURL=${encodeURIComponent(meta.name)}`)
+        
+      meta.exports = typeof res === "function" ? new res : res
+      meta.exports.onLoad?.()
+    
+      if (!enabledPlugins.includes(meta.name)) return
+      meta.exports.onStart?.()
+    } catch (error) {
+      logger.error(meta.name, "Cannot start the plugin", error)
+      meta.didError = true
+    }
   }
 })
 
@@ -104,12 +110,17 @@ module.exports = () => {
   const enabledPlugins = storage.getData("internal", "enabledPlugins", [])
   
   for (const plugin of Object.values(_plugins)) {
-    const res = window.eval(`(function() {\n${plugin.js}\n})()\n//# sourceURL=${encodeURIComponent(plugin.name)}`)
-    
-    plugin.exports = typeof res === "function" ? new res : res
-    
-    plugin.exports.onLoad?.()
-    if (enabledPlugins.includes(plugin.name)) plugin.exports.onStart?.()
+    try {
+      const res = window.eval(`(function() {\n${plugin.js}\n})()\n//# sourceURL=${encodeURIComponent(plugin.name)}`)
+      
+      plugin.exports = typeof res === "function" ? new res : res
+      
+      plugin.exports.onLoad?.()
+      if (enabledPlugins.includes(plugin.name)) plugin.exports.onStart?.()
+    } catch (error) {
+      logger.error(plugin.name, "Cannot start the plugin", error)
+      plugin.didError = true
+    }
   }
 }
 

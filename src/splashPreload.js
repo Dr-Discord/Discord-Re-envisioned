@@ -20,21 +20,6 @@ const Native = {
   runInNative(code) { return (0, eval)(code) },
   quit(restart = false) { ipcRenderer.send("@DrApi/quit", restart) },
   platform: process.platform,
-  sass: (content) => {
-    const hash = crypto.createHash("md5").update(content).digest("hex")
-    if (fs.existsSync(path.join(cache, hash))) {
-      if (sassCache[hash]) return sassCache[hash]
-      return sassCache[hash] = fs.readFileSync(path.join(cache, hash), "utf-8")
-    }
-    
-    try {
-      const { css } = sass.compileString(content)
-      fs.writeFileSync(path.join(cache, hash), css)
-      return sassCache[hash] = css
-    } catch (error) {
-      return error
-    }
-  },
   fileSystem: {
     dirName: __dirname,
     join: (...paths) => path.join(...paths),

@@ -3,12 +3,27 @@
   const start = Date.now()
   
   const fs = require("fs")
+  const cp = require("child_process")
+
+  const { version, dependencies } = require("./package.json")
+
+  await new Promise(resolve => {
+    for (const dependency of Object.keys(dependencies)) {
+      try { require(dependency) } catch (error) {
+        if (error.message.split("\n")[0] !== `Cannot find module '${dependency}'`) continue
+        console.log("Installing dependencies")
+        return cp.exec(`cd ${__dirname.replace("\\", "/").replace(" ", "\\ ")} && npm install`, () => {
+          console.log("Installed dependencies")
+          resolve()
+        })
+      }
+    }
+    resolve()
+  })
 
   const esbuild = require("esbuild")
   const asar = require("asar")
   const sass = require("sass")
-  
-  const { version } = require("./package.json")
   
   const production = process.argv.includes("--production")
   
@@ -67,7 +82,7 @@ module.exports = node`
       minify: production,
       platform: file.endsWith(".js") ? "node" : "browser",
       plugins: [httpsPlugin, scssPlugin],
-      external: ["electron", "original-fs", "./sass", "request"],
+      external: ["electron", "original-fs", "request"],
       loader: { ".scss": "text" }
     })
   
@@ -94,15 +109,6 @@ module.exports = node`
     name: "Discord Re-envisioned",
     main: "index.js"
   }))
-
-  console.log("Bundling 'sass.js'")
-  await esbuild.build({
-    entryPoints: ["./node_modules/sass/sass.default.dart.js"],
-    outfile: "dist/sass.js",
-    bundle: true,
-    minify: true,
-    platform: "node"
-  })
   
   function generateTime(num) {
     const { length } = num
@@ -116,18 +122,20 @@ module.exports = node`
   
   await asar.createPackage("dist", "built.asar")
 
-  const size = String(fs.statSync("built.asar").size)
-  let _size
-  if (size.length <= 3) _size = `${size}b`
-  else if (size.length <= 6) {
-    const kb = size.substring(0, size.length - 3)
-    const b = size.substring(size.length - 3, size.length - 1)
-    _size = `${kb}.${Math.round(b / 10)}kb`
-  } else {
-    const mb = size.substring(0, size.length - 6)
-    const kb = size.substring(size.length - 6, size.length - 4)
-    _size = `${mb}.${Math.round(kb / 10)}mb`
+  function getSize(size) {
+    if (size.length <= 3) return `${size}b`
+    else if (size.length <= 6) {
+      const kb = size.substring(0, size.length - 3)
+      const b = size.substring(size.length - 3, size.length - 1)
+      return `${kb}.${Math.round(b / 10)}kb`
+    } else {
+      const mb = size.substring(0, size.length - 6)
+      const kb = size.substring(size.length - 6, size.length - 4)
+      return `${mb}.${Math.round(kb / 10)}mb`
+    }
   }
+  
+  const size = getSize(String(fs.statSync("built.asar").size))
 
-  console.log(`Built completed in ${generateTime(String(Date.now() - start))}! Estimated size is ${_size}`)
+  console.log(`Built completed in ${generateTime(String(Date.now() - start))}! Estimated size is ${size}`)
 })()

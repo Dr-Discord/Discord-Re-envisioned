@@ -92,36 +92,3 @@
   overflow-y: overlay;
   padding: 0 8px 0 0
 }
-
-#dr-sass-error:not(:empty) { 
-  h1 {
-    margin-bottom: 6px;
-    font-size: larger;
-    font-weight: 500
-  }
-  pre {
-    & + h1 { margin-top: 10px }
-    background: var(--background-secondary);
-    padding: 4px;
-    border-radius: 4px
-  }
-  &::before {
-    content: "";
-    background: var(--status-danger-background);
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    opacity: .9;
-    z-index: -1;
-    border-radius: 10px
-  }
-  position: absolute;
-  left: 82px;
-  top: 10px;
-  z-index: 100000000;
-  padding: 10px;
-  color: var(--status-danger-text);
-  pointer-events: none
-}

@@ -638,7 +638,7 @@ module.exports = async (React) => {
               }),
               React.createElement(Flex, {
                 grow: 0,
-                children: addon.didSassError ? React.createElement(Tooltip, {
+                children: addon.didError ? React.createElement(Tooltip, {
                   text: "An error accord",
                   children: (props) => React.createElement(Alert, {
                     width: 24,
