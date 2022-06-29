@@ -72,7 +72,7 @@ module.exports = node`
     })
   
     const js = fs.readFileSync(`dist/${file.replace(".js", "")}.js`, "utf-8")
-    fs.writeFileSync(`dist/${file.replace(".js", "")}.js`, `/*\n${license.split("\n\n").map(str => `\t${str}`).join("\n")}\n*/\n\n${js}`)
+    fs.writeFileSync(`dist/${file.replace(".js", "")}.js`, `/*\n${license.split("\n\n").map(str => `\t${str}`).join("\n")}\n*/\n\n${js}\n\n//# sourceURL=${encodeURIComponent("Discord Re-envisioned")}`)
   }
 
   await buildFile("splash")
@@ -82,16 +82,20 @@ module.exports = node`
   await buildFile("storage.js")
   await buildFile("index.js")
   
+  console.log("Copying changelog from 'src/changelog.json' to 'dist/changelog.json'")
   fs.copyFileSync("src/changelog.json", "dist/changelog.json")
-  fs.writeFileSync("dist/license", license)
   
-  fs.appendFileSync("dist/main.js", `//# sourceURL=${encodeURIComponent("Discord Re-envisioned")}`)
+  console.log("Copying license from 'license' to 'dist/license'")
+  fs.writeFileSync("dist/license", license)
+
+  console.log("Making 'dist/package.json'")
   fs.writeFileSync("dist/package.json", JSON.stringify({
     version,
     name: "Discord Re-envisioned",
     main: "index.js"
   }))
 
+  console.log("Bundling 'sass.js'")
   await esbuild.build({
     entryPoints: ["./node_modules/sass/sass.default.dart.js"],
     outfile: "dist/sass.js",
