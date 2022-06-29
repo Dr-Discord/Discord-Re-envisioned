@@ -84,7 +84,7 @@ module.exports = node`
   
   console.log("Copying changelog from 'src/changelog.json' to 'dist/changelog.json'")
   fs.copyFileSync("src/changelog.json", "dist/changelog.json")
-  
+
   console.log("Copying license from 'license' to 'dist/license'")
   fs.writeFileSync("dist/license", license)
 
@@ -116,5 +116,18 @@ module.exports = node`
   
   await asar.createPackage("dist", "built.asar")
 
-  console.log(`Built completed in ${generateTime(String(Date.now() - start))}!`)
+  const size = String(fs.statSync("built.asar").size)
+  let _size
+  if (size.length <= 3) _size = `${size}b`
+  else if (size.length <= 6) {
+    const kb = size.substring(0, size.length - 3)
+    const b = size.substring(size.length - 3, size.length - 1)
+    _size = `${kb}.${Math.round(b / 10)}kb`
+  } else {
+    const mb = size.substring(0, size.length - 6)
+    const kb = size.substring(size.length - 6, size.length - 4)
+    _size = `${mb}.${Math.round(kb / 10)}mb`
+  }
+
+  console.log(`Built completed in ${generateTime(String(Date.now() - start))}! Estimated size is ${_size}`)
 })()
