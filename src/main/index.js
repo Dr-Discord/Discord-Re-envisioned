@@ -69,11 +69,11 @@ window.DrApi = {
     }
   },
   themes: {
-    getAll: () => themes.getThemes(),
-    get: (id) => themes.getThemes()[id],
-    isEnabled: (id) => storage.getData("internal", "enabledPlugins", []).includes(id),
-    toggle: (id) => {
-      const enabledThemes = storage.getData("internal", "enabledThemes", [])
+    getAll: (splash) => themes.getThemes(splash),
+    get: (id, splash) => themes.getThemes(splash)[id],
+    isEnabled: (id, splash) => storage.getData("internal", splash ? "enabledSplashThemes" : "enabledThemes", []).includes(id),
+    toggle: (id, splash) => {
+      const enabledThemes = storage.getData("internal", splash ? "enabledSplashThemes" : "enabledThemes", [])
       const theme = themes.getThemes()[id]
 
       if (!theme) return
@@ -81,7 +81,9 @@ window.DrApi = {
 
       if (index === -1) {
         theme.exports.onStart?.()
-        storage.setData("internal", "enabledThemes", enabledThemes.concat(id))
+        storage.setData("internal", splash ? "enabledSplashThemes" : "enabledThemes", enabledThemes.concat(id))
+
+        if (splash) return true
 
         const style = document.createElement("style")
         style.setAttribute("dr-theme", id)
@@ -92,8 +94,8 @@ window.DrApi = {
       }
 
       enabledThemes.splice(index, 1)
-      storage.setData("internal", "enabledThemes", enabledThemes)
-      document.querySelector(`[dr-theme=${JSON.stringify(id)}]`).remove()
+      storage.setData("internal", splash ? "enabledSplashThemes" : "enabledThemes", enabledThemes)
+      if (!splash) document.querySelector(`[dr-theme=${JSON.stringify(id)}]`).remove()
 
       return false
     }
