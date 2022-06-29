@@ -1,72 +1,9 @@
-const webpack = require("./webpack")
-const Patcher = require("./patcher")
-const storage = require("../storage")
-const styles = require("./styles")
-const logger = require("./logger")
+import webpack from "./webpack"
+import Patcher from "./patcher"
+import storage from "../storage"
+import logger from "./logger"
 
 module.exports = async (React) => {
-  styles("DrApi-Toasts", `#dr-toasts {
-    position: fixed;
-    z-index: 1000;
-    overflow-y: overlay;
-    padding: 0 8px 0 0;
-  } #dr-toasts[location="bottomLeft"] {
-    display: flex;
-    flex-direction: column-reverse;
-  } #dr-toasts[location="bottomRight"] {
-    display: flex;
-    flex-direction: column-reverse;
-  } #dr-toasts:empty {
-    display: none !important
-  } #dr-toasts .dr-toast[type="info"] .dr-toast-title > :first-child {
-    color: var(--info-help-foreground)
-  }  #dr-toasts .dr-toast[type="success"] .dr-toast-title > :first-child {
-    color: var(--text-positive)
-  } #dr-toasts .dr-toast[type^="warn"] .dr-toast-title > :first-child {
-    color: var(--info-warning-foreground)
-  } #dr-toasts .dr-toast[type="danger"] .dr-toast-title > :first-child,
-  #dr-toasts .dr-toast[type="error"] .dr-toast-title > :first-child {
-    color: var(--status-danger)
-  } #dr-toasts .dr-toast {
-    padding: 10px;
-    margin-top: 6px;
-    min-width: 200px;
-    position: relative;
-  } .dr-toast-background {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--background-tertiary);
-    border-radius: 6px;
-    z-index: -1;
-  } #dr-toasts .dr-toast-title:not(:last-child) {
-    margin-bottom: 6px;
-  } #dr-toasts .dr-toast-icon {
-    width: 24px;
-    height: 24px;
-    color: var(--text-normal);
-  } #dr-toasts .dr-toast-icon + h3 {
-    padding-top: 1px
-  } #dr-toasts .dr-toast-close {
-    color: var(--interactive-normal);
-    padding-top: 2px;
-    cursor: pointer
-  } #dr-toasts .dr-toast-close:hover {
-    color: var(--interactive-hover);
-  } #dr-toasts .dr-toast-close:active {
-    color: var(--interactive-active);
-  } #dr-toasts .dr-toast-content:not(:last-child) {
-    margin-bottom: 6px;
-  } #dr-toasts .dr-toast-content {
-    color: var(--text-normal);
-    padding: 6px;
-    background: var(--background-secondary);
-    border-radius: 4px;
-    user-select: text
-  }`)
-
   const Shakeable = await webpack.getModuleByDisplayNameAsync("Shakeable", true)
   logger.log("Notifications", "Patching 'Shakeable' to add notifications")
 

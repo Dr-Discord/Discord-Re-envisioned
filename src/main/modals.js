@@ -1,5 +1,5 @@
-const logger = require("./logger")
-const webpack = require("./webpack")
+import logger from "./logger"
+import webpack from "./webpack"
 
 module.exports = async (React) => {
   logger.log("Modals", "Initializing Modal api")

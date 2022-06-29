@@ -1,11 +1,10 @@
-const patcher = require("./patcher")
-const webpack = require("./webpack")
-const storage = require("../storage")
-const styles = require("./styles")
-const { getThemes, toggleTheme, parseTheme } = require("./themes")
-const { getPlugins, togglePlugin } = require("./plugins")
-const logger = require("./logger")
-const { readJSON } = require("../storage")
+import patcher from "./patcher"
+import webpack from "./webpack"
+import storage from "../storage"
+import styles from "./styles"
+import { getThemes, toggleTheme, parseTheme, isTheme, isSplash } from "./themes"
+import { getPlugins, togglePlugin } from "./plugins"
+import logger from "./logger"
 
 window.getThemes = getThemes
 
@@ -51,6 +50,8 @@ module.exports = async (React) => {
   const Gear = webpack.getModuleByDisplayName("Gear", true)
   const Pencil = webpack.getModuleByDisplayName("Pencil", true)
   const Monitor = webpack.getModuleByDisplayName("Monitor", true)
+  const [, Alert] = webpack.getAllModulesByDisplayName("Alert", true)
+  const InfoFilled = webpack.getModuleByDisplayName("InfoFilled", true)
   const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
   const Anchor = webpack.getModuleByDisplayName("Anchor", true)
   const FormText = webpack.getModuleByDisplayName("FormText", true)
@@ -78,38 +79,6 @@ module.exports = async (React) => {
 
   const { ROLE_COLORS } = webpack.getModuleByProps("ROLE_COLORS")
   const types = { added, fixed, improved }
-
-  styles("DrApi-settings", `.dr-header:not(:last-child) .dr-catorgory-icon {
-    color: var(--header-primary);
-  } .dr-catorgory-icon {
-    color: var(--header-secondary);
-    margin: 8px
-  } #dr-notification-position {
-    margin-bottom: 8px
-  } #dr-notification-position .dr-wrapper {
-    margin-left: 10%;
-    width: 80%;
-  } .dr-addon-avatar {
-    border-radius: 50%; 
-    cursor: pointer;
-    margin-top: 3px;
-    margin-right: 8px
-  } .dr-addon-avatar + h3 {
-    padding-top: 5px;
-  } .dr-addon-avatar + h3 + div {
-    padding-top: 6px !important
-  } .dr-addon-gear {
-    margin-right: 8px;
-    cursor: pointer;
-    color: var(--interactive-normal)
-  } .dr-addon-gear:hover {
-    color: var(--interactive-hover)
-  } .dr-addon-gear:active {
-    color: var(--interactive-active)
-  } .dr-addon-gear.disabled {
-    cursor: not-allowed;
-    color: var(--interactive-muted)
-  }`)
 
   const demoToastObj = {
     id: "toastDemo",
@@ -462,7 +431,7 @@ module.exports = async (React) => {
 
   let ColorPicker = () => false
   webpack.instance.e("36623").then(() => ColorPicker = webpack.instance("593642").default)
-
+    
   function makeThemeSettings(addon, settings) {
     return React.createElement(() => {
       const result = []
@@ -487,7 +456,11 @@ module.exports = async (React) => {
             size: value.size,
             placeholder: value.placeholder,
             value: data,
-            style: danger ? { border: "1px solid var(--status-danger)" } : { border: "1px solid var(--status-positive)" },
+            style: danger ? {
+              border: "1px solid var(--status-danger)"
+            } : {
+              border: "1px solid var(--status-positive)"
+            },
             onChange: (val) => {
               if (value.regex) setDanger(!value.regex.test(val))
               setData(val)
@@ -517,7 +490,19 @@ module.exports = async (React) => {
         }
 
         result.push(React.createElement(FormItem, {
-          title: value.name,
+          title: [
+            value.regex ? React.createElement(Tooltip, {
+              text: String(value.regex),
+              children: (props) => React.createElement(InfoFilled, {
+                ...props,
+                style: {
+                  marginRight: 4,
+                  transform: "translatey(3px)"
+                }
+              })
+            }) : false,
+            value.name
+          ],
           className: formContainer,
           children: [
             value.note ? React.createElement(FormText, {
@@ -568,7 +553,7 @@ module.exports = async (React) => {
   }
 
   function showAddonSettings(addon, settings, size) {
-    if (addon.filePath.endsWith(".theme.css")) settings = makeThemeSettings(addon, settings)
+    if (isTheme(addon.filePath)) settings = makeThemeSettings(addon, settings)
 
     DrApi.modals.open((props) => React.createElement(ModalRoot, {
       ...props,
@@ -604,13 +589,12 @@ module.exports = async (React) => {
   }
 
   function AddonCard(addon) {
-    const [enabledAddons, setEnabledAddons] = storage.useStorage("internal", addon.filePath.endsWith(".theme.css") ? "enabledThemes" : addon.filePath.endsWith(".splash.css") ? "enabledSplashThemes" : "enabledPlugins", [])
-
+    const [enabledAddons, setEnabledAddons] = storage.useStorage("internal", isTheme(addon.filePath) ? "enabledThemes" : isSplash(addon.filePath) ? "enabledSplashThemes" : "enabledPlugins", [])
     return React.createElement(Card, {
       ...Card.defaultProps,
       editable: true,
       className: card,
-      key: `dr-addon-${addon.name}${addon.filePath.endsWith(".splash.css") ? "-splash" : ""}`,
+      key: `dr-addon-${addon.name}${isSplash(addon.filePath) ? "-splash" : ""}`,
       onContextMenu: (event) => openContextMenu(event, event => React.createElement(AddonContextMenu, { event, addon })),
       children: React.createElement("div", {
         className: header,
@@ -626,8 +610,8 @@ module.exports = async (React) => {
                     style: { marginBottom: 4 },
                     children: [
                       React.createElement(Tooltip, {
-                        text: addon.filePath.endsWith(".theme.css") ? "Theme" : addon.filePath.endsWith(".splash.css") ? "Splash Theme" : "Plugin",
-                        children: (props) => React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode, { className: iconToolbar, style: { marginRight: 8 }, ...props })
+                        text: isTheme(addon.filePath) ? "Theme" : isSplash(addon.filePath) ? "Splash Theme" : "Plugin",
+                        children: (props) => React.createElement(isTheme(addon.filePath) ? Creative : isSplash(addon.filePath) ? DoubleStarIcon : InlineCode, { className: iconToolbar, style: { marginRight: 8 }, ...props })
                       }),
                       React.createElement(LegacyHeader, {
                         children: addon.name,
@@ -654,7 +638,15 @@ module.exports = async (React) => {
               }),
               React.createElement(Flex, {
                 grow: 0,
-                children: [
+                children: addon.didSassError ? React.createElement(Tooltip, {
+                  text: "An error accord",
+                  children: (props) => React.createElement(Alert, {
+                    width: 24,
+                    height: 24,
+                    style: { color: "var(--status-danger)" },
+                    ...props
+                  })
+                }) : [
                   (addon.settings || addon.exports?.onSettings) ? React.createElement(Clickable, {
                     className: `dr-addon-gear${enabledAddons.includes(addon.name) ? "" : " disabled"}`,
                     onClick: () => {
@@ -683,12 +675,12 @@ module.exports = async (React) => {
                       setTimeout(DrApi.toast.show({
                         title: `${val ? "Enabled" : "Disabled"} '${addon.name}'`,
                         type: "info",
-                        icon: React.createElement(addon.filePath.endsWith(".theme.css") ? Creative : addon.filePath.endsWith(".splash.css") ? DoubleStarIcon : InlineCode)
+                        icon: React.createElement(isTheme(addon.filePath) ? Creative : isSplash(addon.filePath) ? DoubleStarIcon : InlineCode)
                       }), 4e3)
     
                       setEnabledAddons([...enabledAddons])
     
-                      if (addon.filePath.endsWith(".theme.css")) toggleTheme(addon.name)
+                      if (isTheme(addon.filePath)) toggleTheme(addon.name)
                       else if (addon.filePath.endsWith(".plugin.js")) togglePlugin(addon.name)
                     }
                   })

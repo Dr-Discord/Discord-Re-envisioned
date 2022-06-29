@@ -1,15 +1,18 @@
-const electron = require("electron")
+import electron from "electron"
 const { ipcRenderer, contextBridge } = electron
-const fs = require("fs")
-const path = require("path")
-const ofs = require("original-fs")
-const sass = require("./sass")
-const crypto = require("crypto")
+import fs from "fs"
+import path from "path"
+import ofs from "original-fs"
+import sass from "./sass"
+import crypto from "crypto"
+import Module from "module"
 
-require("module").globalPaths.push(path.join(process.resourcesPath, "app.asar/node_modules"))
+Module.globalPaths.push(path.join(process.resourcesPath, "app.asar/node_modules"))
 
 const cache = path.join(__dirname, "..", "cache")
 if (!fs.existsSync(cache)) fs.mkdirSync(cache)
+
+window.require = require
 
 // Replace 'electron/renderer' so we can mess with 'DiscordNative'
 delete require.cache.electron.exports
@@ -49,7 +52,7 @@ const sassCache = {}
 
 const Native = {
   require(path) { return require(path) },
-  runInNative(code) { return eval(code) },
+  runInNative(code) { return (0, eval)(code) },
   quit(restart = false) { ipcRenderer.send("@DrApi/quit", restart) },
   platform: process.platform,
   package: require(path.join(__dirname, "package.json")),
@@ -61,9 +64,11 @@ const Native = {
       return sassCache[hash] = fs.readFileSync(path.join(cache, hash), "utf-8")
     }
     
-    const { css } = sass.compileString(content)
-    fs.writeFileSync(path.join(cache, hash), css)
-    return sassCache[hash] = css
+    try {
+      const { css } = sass.compileString(content)
+      fs.writeFileSync(path.join(cache, hash), css)
+      return sassCache[hash] = css
+    } catch (error) { return error }
   },
   downloadAsar: (id, callback) => require("request")(`https://api.github.com/repos/Dr-Discord/Discord-Re-envisioned/releases/assets/${id}`, {
     encoding: null,

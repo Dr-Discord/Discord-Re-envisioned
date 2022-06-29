@@ -1,10 +1,10 @@
 console.log("Welcome to Discord Re-envisioned!\n")
 
-const electron = require("electron")
-const path = require("path")
-const Module = require("module")
+import electron from "electron"
+import path from "path"
+import Module from "module"
 
-const storage = require("./storage")
+import storage from "./storage"
 
 const newMacOS = storage.getData("internal", "newMacOS", true)
 const transparency = storage.getData("internal", "transparency", false)
@@ -50,7 +50,7 @@ require.cache.electron.exports = { ...electron, BrowserWindow }
 electron.ipcMain.on("@DrApi/preload", (event) => event.returnValue = event.sender.DrApi.preload)
 electron.ipcMain.on("@DrApi/newMacOS", (event) => event.returnValue = newMacOS)
 electron.ipcMain.on("@DrApi/dontHideSplash", (event) => event.returnValue = allowSplashToClose = false)
-electron.ipcMain.on("@DrApi/eval", (event, code) => event.returnValue = eval(code))
+electron.ipcMain.on("@DrApi/eval", (event, code) => event.returnValue = (0, eval)(code))
 electron.ipcMain.on("@DrApi/quit", (event, restart = false) => {
   if(restart) electron.app.relaunch()
   electron.app.quit()
@@ -67,11 +67,9 @@ electron.app.once("ready", () => {
     callback({ cancel: url.includes("discord.com/api/webhooks"), responseHeaders })
   })
   
-  try {
-    const { default: installExtension, REACT_DEVELOPER_TOOLS, JQUERY_DEBUGGER } = require("../node_modules/electron-devtools-installer/")
-    installExtension(REACT_DEVELOPER_TOOLS, true)
-    installExtension(JQUERY_DEBUGGER, true)
-  } catch (error) {}
+  const { default: installExtension, REACT_DEVELOPER_TOOLS, JQUERY_DEBUGGER } = require("../node_modules/electron-devtools-installer/")
+  installExtension(REACT_DEVELOPER_TOOLS, true)
+  installExtension(JQUERY_DEBUGGER, true)
 })
 
 const basePath = path.join(process.resourcesPath, "app.asar")

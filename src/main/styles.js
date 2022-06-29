@@ -1,8 +1,8 @@
-const storage = require("../storage")
+import storage from "../storage"
 
 const styles = document.createElement("dr-styles")
 
-const internal = document.createElement("dr-internal")
+const internal = document.createElement("style")
 const themes = document.createElement("dr-themes")
 const plugins = document.createElement("dr-plugins")
 const customCSS = document.createElement("style")
@@ -12,14 +12,13 @@ styles.append(internal, plugins, themes, customCSS)
 customCSS.innerHTML = storage.customCSS()
 
 module.exports = (id, css) => {
-  const isInternal = id.startsWith("DrApi")
+  if (id === "DrApi") return internal.innerHTML = css
 
-  let style = document.querySelector(`[dr-${isInternal ? "internal" : "plugin"}=${JSON.stringify(id)}]`)
+  let style = document.querySelector(`[dr-plugin=${JSON.stringify(id)}]`)
   if (!style) {
     style = document.createElement("style")
-    style.setAttribute(`dr-${internal ? "internal" : "plugin"}`, id)
-    if (isInternal) internal.append(style)
-    else plugins.append(style)
+    style.setAttribute(`dr-plugin`, id)
+    plugins.append(style)
   }
   style.innerHTML = css
   return () => style.remove()

@@ -1,6 +1,6 @@
-const storage = require("../storage")
-const { themes:styles } = require("./styles")
-const webpack = require("./webpack")
+import storage from "../storage"
+import { themes as styles } from "./styles"
+import webpack from "./webpack"
 
 const themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "..", "themes")
 
@@ -9,8 +9,12 @@ if (!DrApiNative.fileSystem.exists(themesFolder)) DrApiNative.fileSystem.mkdir(t
 const readDir = DrApiNative.runInNative("require(\"fs\").readdirSync")
 
 const dir = readDir(themesFolder)
-const themes = dir.filter(theme => theme.endsWith(".theme.css"))
-const splashThemes = dir.filter(theme => theme.endsWith(".splash.css"))
+
+const isTheme = (path) => path.endsWith(".theme.css") || path.endsWith(".theme.scss") || path.endsWith(".theme.sass")
+const isSplash = (path) => path.endsWith(".splash.css") || path.endsWith(".splash.scss") || path.endsWith(".splash.sass")
+
+const themes = dir.filter(isTheme)
+const splashThemes = dir.filter(isSplash)
 
 function readMeta(contents) {
   const meta = {}
@@ -46,8 +50,42 @@ function int(color) {
   return (rgb.red << 16) + (rgb.green << 8) + rgb.blue
 }
 
+let errNode
+function themeSassError(theme, error) {
+  if (!errNode) {
+    errNode = document.createElement("div")
+    errNode.id = "dr-sass-error"
+    if (document.readyState === "complete") document.body.append(errNode)
+    else document.addEventListener("DOMContentLoaded", () => document.body.append(errNode))
+  }
+
+  const head = document.createElement("h1")
+  const body = document.createElement("pre")
+  const code = document.createElement("code")
+
+  error.message.split("\n").map(err => {
+    const span = document.createElement("span")
+    span.innerText = `${err}\n`
+    return code.append(span)
+  })
+  body.append(code)
+  
+  head.innerText = theme
+  errNode.append(head, body)
+  return () => {
+    head.remove()
+    body.remove()
+  }
+}
+
 function parseTheme(contents) {
   const meta = readMeta(contents)
+  const sass = DrApiNative.sass(contents)
+  if (sass instanceof Error) {
+    meta.didSassError = themeSassError(meta.name, sass)
+    return meta
+  }
+  contents = sass.replace("@charset \"UTF-8\";\n", "")
 
   meta.originalCSS = contents
   meta.css = contents
@@ -158,6 +196,7 @@ function watchTheme(file) {
     delete _themes[found.name]
     const index = enabledThemes.indexOf(found.name)
     if (index !== -1) enabledThemes.splice(index, 1, meta.name)
+    found.didSassError?.()
   }
 
   meta.filePath = filePath
@@ -232,8 +271,8 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type
   if (watches[file]) return
   watches[file] = true
   setTimeout(() => watches[file] = false, 200)
-  if (file.endsWith(".theme.css")) return watchTheme(file)
-  if (file.endsWith(".splash.css")) return watchSplash(file)
+  if (isTheme(file)) return watchTheme(file)
+  if (isSplash(file)) return watchSplash(file)
 })
 
 module.exports = () => {
@@ -248,6 +287,8 @@ module.exports = () => {
 module.exports.toggleTheme = (id) => {
   const theme = _themes[id]
 
+  if (theme.didSassError) return 
+
   const isOn = document.querySelector(`[dr-theme=${JSON.stringify(id)}]`)
   if (isOn) return isOn.remove()
 
@@ -260,3 +301,5 @@ module.exports.toggleTheme = (id) => {
 module.exports.getThemes = (splash = false) => splash ? _splashThemes : _themes
 module.exports.int = int
 module.exports.parseTheme = parseTheme
+module.exports.isTheme = isTheme
+module.exports.isSplash = isSplash

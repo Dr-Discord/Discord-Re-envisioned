@@ -1,3 +1,27 @@
+import logger from "./logger"
+import webpack from "./webpack"
+import Patcher from "./patcher"
+import storage from "../storage"
+import settings from "./settings"
+import notifications from "./notifications"
+import styles from "./styles"
+import modals from "./modals"
+
+logger.log("Discord Re-invisioned", "Loading...")
+
+import themes from "./themes"
+import plugins from "./plugins"
+
+import jquery from "https://code.jquery.com/jquery-3.6.0.min.js"
+jquery.onerror = (event) => logger.err("jQuery", "Cannot load jQuery", event)
+jquery.onload = () => {
+  window.$ = window.jQuery
+  logger.log("jQuery", "Loaded jQuery")
+}
+import ace from "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
+ace.onerror = (event) => logger.err("Ace", "Cannot the Ace editor", event)
+ace.onload = () => logger.log("Ace", "Loaded the Ace editor")
+
 const originalConsole = globalThis.console
 for (const key in originalConsole) {
   const e = originalConsole[key]
@@ -6,20 +30,6 @@ for (const key in originalConsole) {
     set: () => e
   })
 }
-
-const logger = require("./logger")
-const webpack = require("./webpack")
-const Patcher = require("./patcher")
-const storage = require("../storage")
-const settings = require("./settings")
-const notifications = require("./notifications")
-const styles = require("./styles")
-const modals = require("./modals")
-
-logger.log("Discord Re-invisioned", "Loading...")
-
-const themes = require("./themes")
-const plugins = require("./plugins")
 
 void function() {  
   function changeClasses(that, classes, old) {
@@ -165,22 +175,10 @@ function documentReady() {
 
   logger.log("Themes", "Adding themes")
   styles.documentReady()
+
+  styles("DrApi", require("./style.scss"))
+
   themes()
-
-  const jquery = document.createElement("script")
-  jquery.src = "https://code.jquery.com/jquery-3.6.0.min.js"
-  jquery.onerror = (event) => logger.err("jQuery", "Cannot load jQuery", event)
-  jquery.onload = () => {
-    window.$ = window.jQuery
-    logger.log("jQuery", "Loaded jQuery")
-  }
-  document.head.append(jquery)
-
-  const ace = document.createElement("script")
-  ace.src = "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
-  ace.onerror = (event) => logger.err("Ace", "Cannot the Ace editor", event)
-  ace.onload = () => logger.log("Ace", "Loaded the Ace editor")
-  document.head.append(ace)
 
   document.documentElement.setAttribute("release", window.GLOBAL_ENV.RELEASE_CHANNEL)
   if (storage.getData("internal", "transparency", false)) document.documentElement.setAttribute("transparent", "")

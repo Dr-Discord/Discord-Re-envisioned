@@ -1,4 +1,4 @@
-const storage = require("../storage")
+import storage from "../storage"
 
 const enabledThemes = storage.getData("internal", "enabledSplashThemes", [])
 
@@ -8,7 +8,7 @@ if (!DrApiNative.fileSystem.exists(themesFolder)) DrApiNative.fileSystem.mkdir(t
 
 const readDir = DrApiNative.runInNative("require(\"fs\").readdirSync")
 
-const themes = readDir(themesFolder).filter(theme => theme.endsWith(".splash.css"))
+const themes = readDir(themesFolder).filter(theme => theme.endsWith(".splash.css") || theme.endsWith(".splash.scss") || theme.endsWith(".splash.sass"))
 
 function readMeta(contents) {
   const meta = {}
@@ -40,7 +40,7 @@ for (const themeName of enabledThemes) {
   const theme = _themes[themeName]
   const style = document.createElement("style")
   style.setAttribute("dr-theme", theme.name)
-  style.innerHTML = theme.css
+  style.innerHTML = DrApiNative.sass(theme.css)
   node.append(style)
 }
 

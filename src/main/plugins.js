@@ -1,5 +1,5 @@
-const storage = require("../storage")
-const webpack = require("./webpack")
+import storage from "../storage"
+import webpack from "./webpack"
 
 const pluginsFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "..", "plugins")
 
@@ -88,7 +88,7 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (typ
   storage.setData("internal", "enabledPlugins", enabledPlugins)
   
   if (ready) {
-    const res = eval(`(function() {\n${meta.js}\n})()\n//# sourceURL=${encodeURIComponent(meta.name)}`)
+    const res = window.eval(`(function() {\n${meta.js}\n})()\n//# sourceURL=${encodeURIComponent(meta.name)}`)
       
     meta.exports = typeof res === "function" ? new res : res
     meta.exports.onLoad?.()
@@ -104,7 +104,7 @@ module.exports = () => {
   const enabledPlugins = storage.getData("internal", "enabledPlugins", [])
   
   for (const plugin of Object.values(_plugins)) {
-    const res = eval(`(function() {\n${plugin.js}\n})()\n//# sourceURL=${encodeURIComponent(plugin.name)}`)
+    const res = window.eval(`(function() {\n${plugin.js}\n})()\n//# sourceURL=${encodeURIComponent(plugin.name)}`)
     
     plugin.exports = typeof res === "function" ? new res : res
     

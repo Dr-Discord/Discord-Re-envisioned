@@ -17,20 +17,20 @@ module.exports = new class rawWebpack {
   
         for (const id in modules) {
           const old = modules[id]
-          modules[id] = function(_, module) {
+          modules[id] = function(module) {
             const res = old.apply(this, arguments)
-            for (const ite of waiting) ite(module, id)
-
-            webpackModules[id] = _.exports
+            for (const ite of waiting) ite(module.exports, id)
             
-            if (_.exports && !_.exports.css) {
-              const m = Object.entries(_.exports)
+            webpackModules[id] = module.exports
+
+            if (module.exports && !module.exports.css) {
+              const m = Object.entries(module.exports)
               m.map(([id, selector]) => {
                 if (typeof selector !== "string") return 
                 if (!selector.includes(`${id}-`)) return 
                 let newSelector = []
                 for (const s of selector.split(" ")) newSelector.push(`${s} dr-${s.split("-")[0]}`)
-                _.exports[id] = newSelector.join(" ")
+                module.exports[id] = newSelector.join(" ")
               })
             }
             
@@ -104,7 +104,7 @@ module.exports = new class rawWebpack {
   }
   getAllModulesByDisplayName(displayName, returnDefault = false) {
     const modules = this.getAllModules(module => module?.default.displayName === displayName)
-    if (returnDefault) modules.map(module => module?.default)
+    if (returnDefault) return modules.map(module => module?.default)
     return modules
   }
   getModuleAsync(filter) {
@@ -118,7 +118,8 @@ module.exports = new class rawWebpack {
           if (filter(module, id)) {
             const i = _this.waiting.indexOf(waiter)
             _this.waiting.splice(i, 1)
-            return resolve(module)
+            resolve(module)
+            return true
           }
         } catch (error) {}
       }
@@ -133,9 +134,15 @@ module.exports = new class rawWebpack {
   getModuleByPropsAsync(...props) {
     return new Promise(resolve => {
       this.getModuleAsync((module) => {
-        if (props.every(prop => typeof module[prop] !== "undefined")) return resolve(module)
+        if (props.every(prop => typeof module[prop] !== "undefined")) {
+          resolve(module)
+          return true
+        }
         if (!module?.default) return
-        if (props.every(prop => typeof module?.default[prop] !== "undefined")) return resolve(module?.default)
+        if (props.every(prop => typeof module.default[prop] !== "undefined")) {
+          resolve(module.default)
+          return true
+        }
       })
     })
   }
