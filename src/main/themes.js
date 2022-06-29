@@ -243,22 +243,24 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type
 module.exports = () => {
   const enabledThemes = storage.getData("internal", "enabledThemes", [])
   
-  for (const theme of Object.keys(_themes)) {
+  for (const theme in _themes) {
     if (!enabledThemes.includes(theme)) continue
-    module.exports.toggleTheme(theme)
+
+    module.exports.toggleTheme(theme, true)
   }
 }
 
-module.exports.toggleTheme = (id) => {
+module.exports.toggleTheme = (id, val) => {
   const theme = _themes[id]
 
-  const isOn = document.querySelector(`[dr-theme=${JSON.stringify(id)}]`)
-  if (isOn) return isOn.remove()
-
-  const style = document.createElement("style")
-  style.setAttribute("dr-theme", theme.name)
-  style.innerHTML = theme.css
-  styles.appendChild(style)
+  if (val) {
+    const style = document.createElement("style")
+    style.setAttribute("dr-theme", theme.name)
+    style.innerHTML = theme.css
+    styles.appendChild(style)
+  } else {
+    document.querySelector(`[dr-theme=${JSON.stringify(id)}]`)?.remove?.()
+  }
 }
 
 module.exports.getThemes = (splash = false) => splash ? _splashThemes : _themes

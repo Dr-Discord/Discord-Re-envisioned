@@ -590,6 +590,9 @@ module.exports = async (React) => {
 
   function AddonCard(addon) {
     const [enabledAddons, setEnabledAddons] = storage.useStorage("internal", isTheme(addon.filePath) ? "enabledThemes" : isSplash(addon.filePath) ? "enabledSplashThemes" : "enabledPlugins", [])
+
+    const isEnabled = storage.getData("internal", isTheme(addon.filePath) ? "enabledThemes" : isSplash(addon.filePath) ? "enabledSplashThemes" : "enabledPlugins", []).includes(addon.name)
+
     return React.createElement(Card, {
       ...Card.defaultProps,
       editable: true,
@@ -648,9 +651,9 @@ module.exports = async (React) => {
                   })
                 }) : [
                   (addon.settings || addon.exports?.onSettings) ? React.createElement(Clickable, {
-                    className: `dr-addon-gear${enabledAddons.includes(addon.name) ? "" : " disabled"}`,
+                    className: `dr-addon-gear${isEnabled ? "" : " disabled"}`,
                     onClick: () => {
-                      if (!enabledAddons.includes(addon.name)) return
+                      if (!isEnabled) return
                       if (addon.exports?.onSettings) {
                         let defValue = "MEDIUM"
                         const settings = addon.exports?.onSettings((size = true) => preventDefault = size)
@@ -663,7 +666,7 @@ module.exports = async (React) => {
                     children: React.createElement(Gear)
                   }) : false,
                   React.createElement(Switch, {
-                    checked: enabledAddons.includes(addon.name),
+                    checked: isEnabled,
                     onChange: (val) => {
                       if (val) enabledAddons.push(addon.name)
                       else {
@@ -680,7 +683,7 @@ module.exports = async (React) => {
     
                       setEnabledAddons([...enabledAddons])
     
-                      if (isTheme(addon.filePath)) toggleTheme(addon.name)
+                      if (isTheme(addon.filePath)) toggleTheme(addon.name, val)
                       else if (addon.filePath.endsWith(".plugin.js")) togglePlugin(addon.name)
                     }
                   })
