@@ -1,37 +1,3 @@
-.dr-catorgory-icon {
-  .dr-header:not(:last-child) & { color: var(--header-primary) } 
-  color: var(--header-secondary);
-  margin: 8px
-} 
-#dr-notification-position {
-  .dr-wrapper {
-    margin-left: 10%;
-    width: 80%
-  } 
-  margin-bottom: 8px
-}
-.dr-addon-avatar {
-  & + h3 {
-    & + div {  padding-top: 6px !important } 
-    padding-top: 5px
-  }
-  border-radius: 50%; 
-  cursor: pointer;
-  margin-top: 3px;
-  margin-right: 8px
-} 
-.dr-addon-gear {
-  &:hover {  color: var(--interactive-hover) }
-  &:active { color: var(--interactive-active) }
-  &.disabled {
-    cursor: not-allowed;
-    color: var(--interactive-muted)
-  }
-  margin-right: 8px;
-  cursor: pointer;
-  color: var(--interactive-normal)
-}
-
 #dr-toasts {
   &[location="bottomLeft"] {
     display: flex;

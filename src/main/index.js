@@ -159,7 +159,6 @@ void async function() {
     dispatcher.unsubscribe("CONNECTION_OPEN", onOpen)
   }
 
-
   dispatcher.subscribe("CONNECTION_OPEN", onOpen)
   dispatcher.subscribe("CONNECTION_OPEN", ({ user }) => document.documentElement.setAttribute("user-id", user.id))
   dispatcher.subscribe("LOGOUT", () => document.documentElement.removeAttribute("user-id"))
@@ -172,7 +171,7 @@ function documentReady() {
   logger.log("Themes", "Adding themes")
   styles.documentReady()
 
-  styles("DrApi", require("./style.scss"))
+  styles("DrApi", require("../styling/index.scss"))
 
   themes()
 

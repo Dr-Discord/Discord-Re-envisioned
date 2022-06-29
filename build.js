@@ -35,45 +35,10 @@ node.src = ${JSON.stringify(src)}
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => document.head.append(node))
 else document.head.append(node)
 module.exports = node`
-  
-  const scssPlugin = {
-    name: "scss",
-    setup: (build) => {
-      build.onResolve({ filter: /\.scss$/ }, args => ({
-        path: require.resolve(args.path, { paths: [args.resolveDir] }),
-        namespace: "sass-file",
-      }))
-  
-      build.onResolve({ filter: /\.scss$/, namespace: "sass-file" }, args => ({
-        path: args.path,
-        namespace: "sass-file",
-      }))
-  
-      build.onLoad({ filter: /.*/, namespace: "sass-file" }, async (args) => {
-        const { css } = await sass.compileAsync(args.path)
-        return { contents: `module.exports = ${JSON.stringify(css)}` }
-      })
-    }
-  }
-  const httpsPlugin = {
-    name: "https",
-    setup: (build) => {
-      build.onResolve({ filter: /^https?:\/\// }, args => ({
-        path: args.path,
-        namespace: "http-file",
-      }))
-
-      build.onResolve({ filter: /.*/, namespace: "http-file" }, args => ({
-        path: new URL(args.path, args.importer).toString(),
-        namespace: "http-file",
-      }))
-
-      build.onLoad({ filter: /.*/, namespace: "http-file" }, (args) => ({ contents: makeHttpRequire(args.path) }))
-    }
-  }
-
 
   async function buildFile(file) {
+    const start = Date.now()
+
     console.log(`${file.endsWith(".js") ? "Building" : "Bundling"} '${file.endsWith(".js") ? `src/${file}` : `src/${file}/index.js`}'`)
 
     await esbuild.build({
@@ -82,13 +47,39 @@ module.exports = node`
       bundle: true,
       minify: production,
       platform: file.endsWith(".js") ? "node" : "browser",
-      plugins: [httpsPlugin, scssPlugin],
+      plugins: [{
+        name: "https",
+        setup: (build) => {
+          build.onResolve({ filter: /^https?:\/\// }, args => ({
+            path: args.path,
+            namespace: "http-file",
+          }))
+
+          build.onLoad({ filter: /.*/, namespace: "http-file" }, (args) => ({ contents: makeHttpRequire(args.path) }))
+        }
+      }, {
+        name: "scss",
+        setup: (build) => {
+          build.onResolve({ filter: /\.scss$/ }, args => {
+            return ({
+              path: require.resolve(args.path, { paths: [args.resolveDir] }),
+              namespace: "sass-file",
+            })
+          })
+      
+          build.onLoad({ filter: /.*/, namespace: "sass-file" }, async (args) => {
+            const { css } = await sass.compileAsync(args.path)
+            return { contents: `module.exports = ${JSON.stringify(css)}` }
+          })
+        }
+      }],
       external: ["electron", "original-fs", "request"],
       loader: { ".scss": "text" }
     })
   
     const js = fs.readFileSync(`dist/${file.replace(".js", "")}.js`, "utf-8")
     fs.writeFileSync(`dist/${file.replace(".js", "")}.js`, `/*\n${license.split("\n\n").map(str => `\t${str}`).join("\n")}\n*/\n\n${js}`)
+    console.log(`${file.endsWith(".js") ? "Built" : "Bundled"} '${file.endsWith(".js") ? `src/${file}` : `src/${file}/index.js`}' in ${Date.now() - start}ms`)
   }
 
   await buildFile("splash")
