@@ -10,7 +10,7 @@ window.getThemes = getThemes
 
 const shell = DrApiNative.runInNative(`require("electron").shell`)
 
-module.exports = async (React) => {
+export default async (React) => {
   const sectionsModule = await webpack.getModuleByPropsAsync("getUserSettingsSections")
   logger.log("Settings", "Patching 'getUserSettingsSections' to add settings")
 
@@ -104,7 +104,7 @@ module.exports = async (React) => {
 
     React.useEffect(() => {
       if (id === "notifications" && isOpen) DrApi.toast.show(demoToastObj)
-      return () => DrApi.toast.delete(demoToastObj.id)
+      return () => (id === "notifications" && !isOpen) && DrApi.toast.delete(demoToastObj.id)
     })
     
     return React.createElement(Card, {
@@ -314,7 +314,8 @@ module.exports = async (React) => {
                 React.createElement(Tooltip, {
                   text: "Restarting is needed",
                   children: (props) => React.createElement(Retry, {
-                    ...props, 
+                    onMouseEnter: props.onMouseEnter,
+                    onMouseLeave: props.onMouseLeave,
                     width: 18, 
                     height: 18,
                     style: {
@@ -344,7 +345,8 @@ module.exports = async (React) => {
                 React.createElement(Tooltip, {
                   text: "MacOS only",
                   children: (props) => React.createElement(OsMac, {
-                    ...props, 
+                    onMouseEnter: props.onMouseEnter,
+                    onMouseLeave: props.onMouseLeave,
                     width: 18, 
                     height: 18,
                     style: {
@@ -357,7 +359,8 @@ module.exports = async (React) => {
                 React.createElement(Tooltip, {
                   text: "Restarting is needed",
                   children: (props) => React.createElement(Retry, {
-                    ...props, 
+                    onMouseEnter: props.onMouseEnter,
+                    onMouseLeave: props.onMouseLeave,
                     width: 18, 
                     height: 18,
                     style: {
@@ -494,7 +497,8 @@ module.exports = async (React) => {
             value.regex ? React.createElement(Tooltip, {
               text: String(value.regex),
               children: (props) => React.createElement(InfoFilled, {
-                ...props,
+                onMouseEnter: props.onMouseEnter,
+                onMouseLeave: props.onMouseLeave,
                 style: {
                   marginRight: 4,
                   transform: "translatey(3px)"
@@ -614,7 +618,12 @@ module.exports = async (React) => {
                     children: [
                       React.createElement(Tooltip, {
                         text: isTheme(addon.filePath) ? "Theme" : isSplash(addon.filePath) ? "Splash Theme" : "Plugin",
-                        children: (props) => React.createElement(isTheme(addon.filePath) ? Creative : isSplash(addon.filePath) ? DoubleStarIcon : InlineCode, { className: iconToolbar, style: { marginRight: 8 }, ...props })
+                        children: (props) => React.createElement(isTheme(addon.filePath) ? Creative : isSplash(addon.filePath) ? DoubleStarIcon : InlineCode, { 
+                          className: iconToolbar, 
+                          style: { marginRight: 8 }, 
+                          onMouseEnter: props.onMouseEnter,
+                          onMouseLeave: props.onMouseLeave
+                        })
                       }),
                       React.createElement(LegacyHeader, {
                         children: addon.name,
@@ -647,7 +656,8 @@ module.exports = async (React) => {
                     width: 24,
                     height: 24,
                     style: { color: "var(--status-danger)" },
-                    ...props
+                    onMouseEnter: props.onMouseEnter,
+                    onMouseLeave: props.onMouseLeave
                   })
                 }) : [
                   (addon.settings || addon.exports?.onSettings) ? React.createElement(Clickable, {
@@ -1058,7 +1068,7 @@ module.exports = async (React) => {
       section: "HEADER"
     },
     {
-      element: () => React.createElement(Settings),
+      element: () => React.createElement(React.memo(Settings)),
       icon: React.createElement(Gear, { width: 20, height: 20 }),
       label: "Settings",
       section: "Discord Re-envisioned"

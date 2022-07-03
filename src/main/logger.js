@@ -2,7 +2,7 @@ function getIcon(color) { return btoa(`<svg xmlns="http://www.w3.org/2000/svg" v
 
 const isDark = matchMedia("(prefers-color-scheme: dark)").matches
 
-module.exports = new class rawLogger {
+export default new class rawLogger {
   log(title, ...messages) {
     console.log(
       `%cDR%c${title}%c\n`, 

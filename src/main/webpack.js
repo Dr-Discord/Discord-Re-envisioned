@@ -1,4 +1,4 @@
-module.exports = new class rawWebpack {
+export default new class rawWebpack {
   constructor() {
     let waiting = []
     let webpackModules = {}

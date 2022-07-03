@@ -10,9 +10,6 @@ try {
   console.error(error)
 }
 
-const cache = path.join(__dirname, "..", "cache")
-if (!fs.existsSync(cache)) fs.mkdirSync(cache)
-
 window.require = require
 
 const Native = {

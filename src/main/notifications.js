@@ -3,7 +3,7 @@ import Patcher from "./patcher"
 import storage from "../storage"
 import logger from "./logger"
 
-module.exports = async (React) => {
+export default async (React) => {
   const Shakeable = await webpack.getModuleByDisplayNameAsync("Shakeable", true)
   logger.log("Notifications", "Patching 'Shakeable' to add notifications")
 

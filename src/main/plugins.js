@@ -104,7 +104,7 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (typ
   }
 })
 
-module.exports = () => {
+export default () => {
   ready = true
 
   const enabledPlugins = storage.getData("internal", "enabledPlugins", [])
@@ -124,8 +124,8 @@ module.exports = () => {
   }
 }
 
-module.exports.getPlugins = () => _plugins
-module.exports.togglePlugin = (name) => {
+export const getPlugins = () => _plugins
+export const togglePlugin = (name) => {
   const enabledPlugins = storage.getData("internal", "enabledPlugins", [])
 
   const plugin = _plugins[name]

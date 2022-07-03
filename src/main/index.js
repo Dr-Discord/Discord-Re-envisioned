@@ -4,7 +4,7 @@ import Patcher from "./patcher"
 import storage from "../storage"
 import settings from "./settings"
 import notifications from "./notifications"
-import styles from "./styles"
+import styles, { documentReady } from "./styles"
 import modals from "./modals"
 
 logger.log("Discord Re-invisioned", "Loading...")
@@ -117,7 +117,7 @@ window.DrApi = {
 
 void async function() {
   const React = await webpack.getModuleByPropsAsync("memo", "createElement")
-  
+
   window.DrApi.React = React
 
   settings(React)
@@ -165,11 +165,11 @@ void async function() {
 }()
 
 
-function documentReady() {
+function onDocumentLoad() {
   globalThis.console = { ...globalThis.console }
 
   logger.log("Themes", "Adding themes")
-  styles.documentReady()
+  documentReady()
 
   styles("DrApi", require("../styling/index.scss"))
 
@@ -179,5 +179,5 @@ function documentReady() {
   if (storage.getData("internal", "transparency", false)) document.documentElement.setAttribute("transparent", "")
 }
 
-if (document.readyState === "complete") documentReady()
-else document.addEventListener("DOMContentLoaded", documentReady)
+if (document.readyState === "complete") onDocumentLoad()
+else document.addEventListener("DOMContentLoaded", onDocumentLoad)

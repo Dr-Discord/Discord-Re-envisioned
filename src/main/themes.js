@@ -10,8 +10,8 @@ const readDir = DrApiNative.runInNative("require(\"fs\").readdirSync")
 
 const dir = readDir(themesFolder)
 
-const isTheme = (path) => path.endsWith(".theme.css")
-const isSplash = (path) => path.endsWith(".splash.css")
+export const isTheme = (path) => path.endsWith(".theme.css")
+export const isSplash = (path) => path.endsWith(".splash.css")
 
 const themes = dir.filter(isTheme)
 const splashThemes = dir.filter(isSplash)
@@ -50,7 +50,7 @@ function int(color) {
   return (rgb.red << 16) + (rgb.green << 8) + rgb.blue
 }
 
-function parseTheme(contents) {
+export function parseTheme(contents) {
   const meta = readMeta(contents)
 
   meta.originalCSS = contents
@@ -240,17 +240,17 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type
   if (isSplash(file)) return watchSplash(file)
 })
 
-module.exports = () => {
+export default function() {
   const enabledThemes = storage.getData("internal", "enabledThemes", [])
   
   for (const theme in _themes) {
     if (!enabledThemes.includes(theme)) continue
 
-    module.exports.toggleTheme(theme, true)
+    toggleTheme(theme, true)
   }
 }
 
-module.exports.toggleTheme = (id, val) => {
+export const toggleTheme = (id, val) => {
   const theme = _themes[id]
 
   if (val) {
@@ -263,8 +263,4 @@ module.exports.toggleTheme = (id, val) => {
   }
 }
 
-module.exports.getThemes = (splash = false) => splash ? _splashThemes : _themes
-module.exports.int = int
-module.exports.parseTheme = parseTheme
-module.exports.isTheme = isTheme
-module.exports.isSplash = isSplash
+export const getThemes = (splash = false) => splash ? _splashThemes : _themes

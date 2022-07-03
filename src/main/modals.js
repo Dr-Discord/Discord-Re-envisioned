@@ -1,7 +1,7 @@
 import logger from "./logger"
 import webpack from "./webpack"
 
-module.exports = async (React) => {
+export default async (React) => {
   logger.log("Modals", "Initializing Modal api")
 
   let _id = 0

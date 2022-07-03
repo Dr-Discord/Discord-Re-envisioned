@@ -1,4 +1,4 @@
-module.exports = new class rawPatcher {
+export default new class rawPatcher {
   Symbol = Symbol("DrApi")
   patches = {}
   hook(module, fn) {

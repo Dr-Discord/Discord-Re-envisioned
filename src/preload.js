@@ -8,9 +8,6 @@ import Module from "module"
 
 Module.globalPaths.push(path.join(process.resourcesPath, "app.asar/node_modules"))
 
-const cache = path.join(__dirname, "..", "cache")
-if (!fs.existsSync(cache)) fs.mkdirSync(cache)
-
 window.require = require
 
 // Replace 'electron/renderer' so we can mess with 'DiscordNative'
