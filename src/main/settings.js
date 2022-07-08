@@ -1,7 +1,7 @@
 import patcher from "./patcher"
 import webpack from "./webpack"
 import storage from "../storage"
-import styles from "./styles"
+import { customCSS } from "./styles"
 import { getThemes, toggleTheme, parseTheme, isTheme, isSplash } from "./themes"
 import { getPlugins, togglePlugin } from "./plugins"
 import logger from "./logger"
@@ -76,6 +76,7 @@ export default async (React) => {
   const { macDragRegion } = webpack.getModuleByProps("macDragRegion")
   const { marginBottom8 } = webpack.getModuleByProps("marginBottom8", "marginBottom4")
   const { container:formContainer, dividerDefault } = webpack.getModuleByProps("container", "dividerDefault")
+  const { emptyResultsText, noResultsImage, emptyResultsWrap, emptyResultsContent, alt } = webpack.getModuleByProps("stillIndexing", "noResults")
 
   const { ROLE_COLORS } = webpack.getModuleByProps("ROLE_COLORS")
   const types = { added, fixed, improved }
@@ -104,7 +105,7 @@ export default async (React) => {
 
     React.useEffect(() => {
       if (id === "notifications" && isOpen) DrApi.toast.show(demoToastObj)
-      return () => (id === "notifications" && !isOpen) && DrApi.toast.delete(demoToastObj.id)
+      return () => id === "notifications" && DrApi.toast.delete(demoToastObj.id)
     })
     
     return React.createElement(Card, {
@@ -188,6 +189,7 @@ export default async (React) => {
     const [maxHeight, setMaxHeight] = storage.useStorage("internal", "notificationMaxHeight", 30)
     const [blur, setBlur] = storage.useStorage("internal", "notificationBlur", 0)
     const [opacity, setOpacity] = storage.useStorage("internal", "notificationOpacity", 80)
+    const [showAlert, setShowAlert] = storage.useStorage("internal", "notificationShowAlert", false)
 
     return React.createElement(FormSection, {
       title: "Settings",
@@ -297,7 +299,20 @@ export default async (React) => {
                 onValueChange: (val) => setBlur(Math.round(val)),
                 onValueRender: (val) => `${Math.round(val)}px`,
                 initialValue: blur
-              }),
+              })
+            }),
+            React.createElement(FormDivider, {
+              className: topDivider
+            }),
+            React.createElement(FormItem, {
+              disabled: position === "disabled",
+              children: React.createElement(SwitchItem, {
+                children: "Alert on close all",
+                note: "Creates a prompt when closing all notifications.",
+                disabled: position === "disabled",
+                onChange: (val) => setShowAlert(val),
+                value: showAlert
+              })
             })
           ]
         }),
@@ -832,7 +847,8 @@ export default async (React) => {
     const [splashThemes, setSplashThemes] = React.useState(getThemes(true))
     const [isConfigOpen, setConfigOpen] = React.useState(false)
 
-    const _themes = filter === 0 ? Object.values(themes).concat(...Object.values(splashThemes)) : filter === 1 ? Object.values(themes) : Object.values(splashThemes)
+    const _themes = Object.values(filter === 0 ? Object.values(themes).concat(...Object.values(splashThemes)) : filter === 1 ? Object.values(themes) : Object.values(splashThemes)).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
+    const content = _themes.length ? _themes : !(query || tags.length) ? React.createElement(NoAddons, { type: "theme" }) : React.createElement(NoResults)
 
     return React.createElement(FormSection, {
       title: React.createElement(Flex, {
@@ -921,7 +937,7 @@ export default async (React) => {
       children: [
         React.createElement("div", {
           id: "dr-addon-list",
-          children: _themes.sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
+          children: content
         })
       ]
     })
@@ -947,7 +963,7 @@ export default async (React) => {
       editor.on("change", () => {
         const value = editor.getValue()
         storage.customCSS(value)
-        styles.customCSS.innerHTML = value
+        customCSS.innerHTML = value
       })
 
       windowInstance.document.head.appendChild(Object.assign(document.createElement("style"), {
@@ -964,6 +980,57 @@ export default async (React) => {
     })
   }
 
+  function NoResults() {
+    return React.createElement("div", {
+      className: emptyResultsWrap,
+      style: {
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "fit-content",
+        pointerEvents: "none"
+      },
+      children: React.createElement("div", {
+        className: emptyResultsContent,
+        children: [
+          React.createElement("div", {
+            className: `${noResultsImage}${Math.floor(Math.random() * 10) === 9 ? ` ${alt}` : ""}`
+          }),
+          React.createElement("div", {
+            className: emptyResultsText,
+            children: "We searched far and wide. Unfortunately, no results were found."
+          })
+        ]
+      })
+    })
+  }
+  function NoAddons({ type }) {
+    return React.createElement("div", {
+      className: emptyResultsWrap,
+      style: {
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        transform: "translate(-50%, -50%)",
+        width: "fit-content",
+        pointerEvents: "none"
+      },
+      children: React.createElement("div", {
+        className: emptyResultsContent,
+        children: [
+          React.createElement("img", {
+            src: "/assets/b5eb2f7d6b3f8cc9b60be4a5dcf28015.svg"
+          }),
+          React.createElement("div", {
+            className: emptyResultsText,
+            children: `No ${type}s found.`
+          })
+        ]
+      })
+    })
+  }
+
   function Plugins() {
     storage.useStorage("internal", "enabledPlugins", [])
 
@@ -973,7 +1040,8 @@ export default async (React) => {
     const [plugins, setPlugins] = React.useState(getPlugins())
     const [isConfigOpen, setConfigOpen] = React.useState(false)
 
-    const _plugins = Object.values(plugins)
+    const _plugins = Object.values(plugins).sort(sortBy(sortByWhat)).map((plugin) => React.createElement(AddonCard, plugin))
+    const content = _plugins.length ? _plugins : !(query || tags.length) ? React.createElement(NoAddons, { type: "plugin" }) : React.createElement(NoResults)
 
     return React.createElement(FormSection, {
       title: React.createElement(Flex, {
@@ -1055,7 +1123,7 @@ export default async (React) => {
       children: [
         React.createElement("div", {
           id: "dr-addon-list",
-          children: _plugins.sort(sortBy(sortByWhat)).map((plugin) => React.createElement(AddonCard, plugin))
+          children: content
         })
       ]
     })
@@ -1068,7 +1136,7 @@ export default async (React) => {
       section: "HEADER"
     },
     {
-      element: () => React.createElement(React.memo(Settings)),
+      element: () => React.createElement(Settings),
       icon: React.createElement(Gear, { width: 20, height: 20 }),
       label: "Settings",
       section: "Discord Re-envisioned"
@@ -1101,11 +1169,13 @@ export default async (React) => {
   patcher.after("DrApi", sectionsModule.default, "render", (that, args, res) => {
     const { sections } = res.props.children.props.children.props
         
-    const index = sections.indexOf(sections.find(s => s.section === "Connections")) + 1
-    if (!index) return
+    const connections = sections.indexOf(sections.find(s => s.section === "Connections")) + 1
+    const friendRequests = sections.indexOf(sections.find(s => s.section === "Friend Requests")) + 1
+
+    if (!connections) return
     if (sections.find(s => s.section === "Discord Re-envisioned")) return
     
-    sections.splice(index, 0, ...settings)
+    sections.splice(friendRequests ? friendRequests : connections, 0, ...settings)
   })
 
   const latestChangelog = DrApiNative.changelog[0]

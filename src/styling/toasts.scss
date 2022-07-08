@@ -20,6 +20,7 @@
     padding: 10px;
     margin-top: 6px;
     min-width: 200px;
+    pointer-events: all;
     position: relative
   } 
   .dr-toast-background {
@@ -53,6 +54,7 @@
     border-radius: 4px;
     user-select: text
   }
+  pointer-events: none;
   position: fixed;
   z-index: 1000;
   overflow-y: overlay;

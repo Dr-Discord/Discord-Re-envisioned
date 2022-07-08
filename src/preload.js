@@ -3,12 +3,9 @@ const { ipcRenderer, contextBridge } = electron
 import fs from "fs"
 import path from "path"
 import ofs from "original-fs"
-import crypto from "crypto"
 import Module from "module"
 
 Module.globalPaths.push(path.join(process.resourcesPath, "app.asar/node_modules"))
-
-window.require = require
 
 // Replace 'electron/renderer' so we can mess with 'DiscordNative'
 delete require.cache.electron.exports
@@ -44,9 +41,11 @@ for (const key in console)
     value: originalConsole[key]
   })
 
+const generateEval = (code) => new Function("require", `return ${code}`)
+
 const Native = {
   require(path) { return require(path) },
-  runInNative(code) { return (0, eval)(code) },
+  runInNative(code) { return generateEval(code)(require) },
   quit(restart = false) { ipcRenderer.send("@DrApi/quit", restart) },
   platform: process.platform,
   package: require(path.join(__dirname, "package.json")),

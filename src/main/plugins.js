@@ -40,6 +40,8 @@ let ready = false
 let InlineCode
 const watches = {}
 DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (type, file) => {
+  if (!file.endsWith(".plugin.js")) return
+
   if (watches[file]) return
   watches[file] = true
   setTimeout(() => watches[file] = false, 200)

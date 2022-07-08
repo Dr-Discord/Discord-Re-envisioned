@@ -9,8 +9,12 @@ import modals from "./modals"
 
 logger.log("Discord Re-invisioned", "Loading...")
 
-import themes from "./themes"
-import plugins from "./plugins"
+document.addEventListener("keydown", (event) => {
+  if (event.key.toLowerCase() === "f8") debugger
+}, true)
+
+import themes, { getThemes } from "./themes"
+import plugins, { getPlugins } from "./plugins"
 
 import ace from "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
 ace.onerror = (event) => logger.err("Ace", "Cannot the Ace editor", event)
@@ -27,7 +31,9 @@ for (const key in originalConsole) {
 
 void function() {  
   function changeClasses(that, classes, old) {
-    return old.apply(that, classes.map(c => c.includes(" dr-") ? c.split(" ")[0] : c))
+    let newClasses = []
+    classes.map(c => c.includes(" dr-") ? newClasses.push(...c.split(" ")) : newClasses.push(c))
+    return old.apply(that, newClasses)
   }
 
   Patcher.instead("DrApi", DOMTokenList.prototype, "add", changeClasses)
@@ -45,12 +51,12 @@ window.DrApi = {
     setData: (pluginName, key, value) => storage.setData(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, value)
   },
   plugins: {
-    getAll: () => plugins.getPlugins(),
-    get: (id) => plugins.getPlugins()[id],
+    getAll: () => getPlugins(),
+    get: (id) => getPlugins()[id],
     isEnabled: (id) => storage.getData("internal", "enabledPlugins", []).includes(id),
     toggle: (id) => {
       const enabledPlugins = storage.getData("internal", "enabledPlugins", [])
-      const plugin = plugins.getPlugins()[id]
+      const plugin = getPlugins()[id]
 
       if (!plugin) return
       const index = enabledPlugins.indexOf(id)
@@ -69,12 +75,12 @@ window.DrApi = {
     }
   },
   themes: {
-    getAll: (splash) => themes.getThemes(splash),
-    get: (id, splash) => themes.getThemes(splash)[id],
+    getAll: (splash) => getThemes(splash),
+    get: (id, splash) => getThemes(splash)[id],
     isEnabled: (id, splash) => storage.getData("internal", splash ? "enabledSplashThemes" : "enabledThemes", []).includes(id),
     toggle: (id, splash) => {
       const enabledThemes = storage.getData("internal", splash ? "enabledSplashThemes" : "enabledThemes", [])
-      const theme = themes.getThemes()[id]
+      const theme = getThemes()[id]
 
       if (!theme) return
       const index = enabledThemes.indexOf(id)

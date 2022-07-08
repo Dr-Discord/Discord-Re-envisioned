@@ -1,7 +1,6 @@
 import { ipcRenderer, contextBridge } from "electron"
 import fs from "fs"
 import path from "path"
-import crypto from "crypto"
 
 try {
   const preload = ipcRenderer.sendSync("@DrApi/preload")
@@ -10,11 +9,11 @@ try {
   console.error(error)
 }
 
-window.require = require
+const generateEval = (code) => new Function("require", `return ${code}`)
 
 const Native = {
   require(path) { return require(path) },
-  runInNative(code) { return (0, eval)(code) },
+  runInNative(code) { return generateEval(code)(require) },
   quit(restart = false) { ipcRenderer.send("@DrApi/quit", restart) },
   platform: process.platform,
   fileSystem: {
@@ -31,7 +30,8 @@ const Native = {
 
 document.addEventListener("keydown", event => {
   if (event.key.toLowerCase() === "s" && event.shiftKey && (event.metaKey || event.ctrlKey)) ipcRenderer.send("@DrApi/dontHideSplash")
-})
+  else if (event.key.toLowerCase() === "f8") debugger
+}, true)
 contextBridge.exposeInMainWorld("DrApiNative", Native)
 
 const node = document.createElement("script")

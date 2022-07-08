@@ -47,10 +47,12 @@ class BrowserWindow extends electron.BrowserWindow {
 delete require.cache.electron.exports
 require.cache.electron.exports = { ...electron, BrowserWindow }
 
+const generateEval = (code) => new Function("require", `return ${code}`)
+
 electron.ipcMain.on("@DrApi/preload", (event) => event.returnValue = event.sender.DrApi.preload)
 electron.ipcMain.on("@DrApi/newMacOS", (event) => event.returnValue = newMacOS)
 electron.ipcMain.on("@DrApi/dontHideSplash", (event) => event.returnValue = allowSplashToClose = false)
-electron.ipcMain.on("@DrApi/eval", (event, code) => event.returnValue = (0, eval)(code))
+electron.ipcMain.on("@DrApi/eval", (event, code) => event.returnValue = generateEval(code)(require))
 electron.ipcMain.on("@DrApi/quit", (event, restart = false) => {
   if(restart) electron.app.relaunch()
   electron.app.quit()

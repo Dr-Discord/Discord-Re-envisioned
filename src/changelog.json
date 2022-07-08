@@ -1,6 +1,66 @@
 [
   {
     "title": "What's New",
+    "subtitle": "Discord Re-envisioned v1.0.9",
+    "body": [
+      {
+        "title": "Addon Pages ",
+        "type": "added",
+        "content": [
+          {
+            "title": "No Results",
+            "content": "Now adds the results icon and text from the search panel."
+          },
+          {
+            "title": "No Addons",
+            "content": "Now adds a icon for no addons are found."
+          }
+        ]
+      },
+      {
+        "title": "F8 ",
+        "type": "added",
+        "content": [
+          {
+            "title": "Debugger",
+            "content": "Added back devtools debugger (F8)"
+          }
+        ]
+      },
+      {
+        "title": "SETTINGS ",
+        "type": "fixed",
+        "content": [
+          {
+            "title": "Friend Requests",
+            "content": "Made it so the 'Friend Requests' tab isn't with Discord Re-invisioned settings panel."
+          }
+        ]
+      },
+      {
+        "title": "PLUGINS HOTLOADING ",
+        "type": "fixed",
+        "content": [
+          {
+            "title": "Fixed loading other file types",
+            "content": "Now only supports '.plugin.js' instead of every type."
+          }
+        ]
+      },
+      {
+        "title": "EVAL ",
+        "type": "improved",
+        "content": [
+          {
+            "title": "Adds require",
+            "content": "Adds require when working in the the main context and native."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "What's New",
     "subtitle": "Discord Re-envisioned v1.0.8",
     "body": [
       {
@@ -19,7 +79,7 @@
         "content": [
           {
             "title": "Duration",
-            "content": "Now states how long the building process took"
+            "content": "Now states how long the building process took."
           },
           {
             "title": "Size",
