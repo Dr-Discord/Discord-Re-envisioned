@@ -5,7 +5,6 @@ export function readMeta(contents) {
     const jsdoc = contents.match(/\/\*\*([\s\S]*?)\*\//)
     if (!jsdoc?.[1]) return meta
     for (let ite of jsdoc[1].match(/\*(\s|)([^\n]*)/g)) {
-      console.log(ite);
       ite = ite.replace(/\*(\s|)@/, "")
       const split = ite.split(" ")
       meta[split[0]] = split.slice(1).join(" ").trim()

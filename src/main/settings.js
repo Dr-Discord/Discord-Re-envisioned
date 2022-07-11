@@ -327,7 +327,7 @@ export default async (React) => {
               children: [
                 "Transparency",
                 React.createElement(Tooltip, {
-                  text: "Restarting is needed",
+                  text: "Reloading is needed",
                   children: (props) => React.createElement(Retry, {
                     onMouseEnter: props.onMouseEnter,
                     onMouseLeave: props.onMouseLeave,
@@ -366,13 +366,13 @@ export default async (React) => {
                     height: 18,
                     style: {
                       marginRight: 4,
-                      transform: "translateY(2px)"
+                      transform: "translateY(3px)"
                     }
                   })
                 }),
                 "New MacOS Titlebar Style",
                 React.createElement(Tooltip, {
-                  text: "Restarting is needed",
+                  text: "Reloading is needed",
                   children: (props) => React.createElement(Retry, {
                     onMouseEnter: props.onMouseEnter,
                     onMouseLeave: props.onMouseLeave,
@@ -380,7 +380,7 @@ export default async (React) => {
                     height: 18,
                     style: {
                       marginLeft: 4,
-                      transform: "translateY(2px) rotate(180deg)"
+                      transform: "translateY(3px) rotate(180deg)"
                     }
                   })
                 })
