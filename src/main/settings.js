@@ -420,7 +420,7 @@ export default async (React) => {
         const spl = author.split("#")
         const found = findByTag(spl[0], spl[1])
         if (found) setUser(found)
-        else setUser({ name: spl[0], discriminator: spl[1] })
+        else setUser({ username: spl[0], discriminator: spl[1] })
       }()
     })
     
@@ -433,7 +433,7 @@ export default async (React) => {
         onClick: () => openUserProfileModal({ userId: userId }),
       }) : false,
       React.createElement(LegacyHeader, {
-        children: user?.name ?? author,
+        children: user?.username ?? author,
         className: secondaryHeader,
         size: size16,
         style: authorLink ? { cursor: "pointer" } : undefined,
