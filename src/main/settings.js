@@ -692,11 +692,19 @@ export default async (React) => {
                     onClick: () => {
                       if (!isEnabled) return
                       if (addon.exports?.onSettings) {
-                        let defValue = "MEDIUM"
-                        const settings = addon.exports?.onSettings((size = true) => defValue = size)
-                        if (!defValue) defValue = "MEDIUM"
-                        if (defValue === true) return
-                        return showAddonSettings(addon, settings, defValue)
+                        const data = {
+                          defaultPrevented: false,
+                          preventDefault: () => data.defaultPrevented = true,
+                          progressDefault: () => data.defaultPrevented = false,
+                          size: "MEDIUM",
+                          setSize: (size = "MEDIUM") => data.size = size,
+                          showAddonSettings: () => showAddonSettings(addon, settings, data.size)
+                        }
+
+                        const settings = addon.exports?.onSettings(data)
+                        if (data.defaultPrevented) return
+
+                        return data.showAddonSettings()
                       }
                       showAddonSettings(addon, addon.settings, "MEDIUM")
                     },
