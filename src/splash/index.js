@@ -1,4 +1,5 @@
 import storage from "../storage"
+import { readMeta } from "../util"
 
 const enabledThemes = storage.getData("internal", "enabledSplashThemes", [])
 
@@ -9,18 +10,6 @@ if (!DrApiNative.fileSystem.exists(themesFolder)) DrApiNative.fileSystem.mkdir(t
 const readDir = DrApiNative.runInNative("require(\"fs\").readdirSync")
 
 const themes = readDir(themesFolder).filter(theme => theme.endsWith(".splash.css"))
-
-function readMeta(contents) {
-  const meta = {}
-  const jsdoc = contents.match(/\/\*\*([\s\S]*?)\*\//)
-  if (!jsdoc?.[1]) return meta
-  for (let ite of jsdoc[1].match(/\*\s([^\n]*)/g)) {
-    ite = ite.replace(/\*( +|)@/, "")
-    const split = ite.split(" ")
-    meta[split[0]] = split.slice(1).join(" ").trim()
-  }
-  return meta
-}
 
 const _themes = {}
 

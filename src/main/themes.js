@@ -1,6 +1,7 @@
 import storage from "../storage"
 import { themes as styles } from "./styles"
 import webpack from "./webpack"
+import { readMeta } from "../util"
 
 const themesFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "..", "themes")
 
@@ -15,22 +16,6 @@ export const isSplash = (path) => path.endsWith(".splash.css")
 
 const themes = dir.filter(isTheme)
 const splashThemes = dir.filter(isSplash)
-
-function readMeta(contents) {
-  const meta = {}
-  const jsdoc = contents.match(/\/\*\*([\s\S]*?)\*\//)
-  if (!jsdoc?.[1]) return meta
-  for (let ite of jsdoc[1].match(/\*\s([^\n]*)/g)) {
-    ite = ite.replace(/\*( +|)@/, "")
-    const split = ite.split(" ")
-    meta[split[0]] = split.slice(1).join(" ").trim()
-  }
-
-  meta.alpha = "alpha" in meta
-  meta.beta = "beta" in meta
-
-  return meta
-}
 
 function int(color) {
   if (typeof color === "number") return color.toString(16)

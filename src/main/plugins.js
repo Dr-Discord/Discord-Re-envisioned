@@ -1,6 +1,7 @@
 import storage from "../storage"
 import logger from "./logger"
 import webpack from "./webpack"
+import { readMeta } from "../util"
 
 const pluginsFolder = DrApiNative.fileSystem.join(DrApiNative.fileSystem.dirName, "..", "plugins")
 
@@ -10,22 +11,6 @@ const readDir = DrApiNative.runInNative("require(\"fs\").readdirSync")
 
 const dir = readDir(pluginsFolder)
 const plugins = dir.filter(plugin => plugin.endsWith(".plugin.js"))
-
-function readMeta(contents) {
-  const meta = {}
-  const jsdoc = contents.match(/\/\*\*([\s\S]*?)\*\//)
-  if (!jsdoc?.[1]) return meta
-  for (let ite of jsdoc[1].match(/\*\s([^\n]*)/g)) {
-    ite = ite.replace(/\*( +|)@/, "")
-    const split = ite.split(" ")
-    meta[split[0]] = split.slice(1).join(" ").trim()
-  }
-
-  meta.alpha = "alpha" in meta
-  meta.beta = "beta" in meta
-  
-  return meta
-}
 
 const _plugins = {}
 
