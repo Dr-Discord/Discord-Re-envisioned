@@ -654,7 +654,19 @@ export default async (React) => {
                         children: ["v", addon.version ?? "???"],
                         color: "header-secondary",
                         variant: "text-sm/normal"
-                      })
+                      }),
+                      addon.beta ? React.createElement("span", {
+                        className: "dr-addon-version-beta",
+                        children: React.createElement("span", {
+                          children: "beta"
+                        })
+                      }) : false,
+                      addon.alpha ? React.createElement("span", {
+                        className: "dr-addon-version-alpha",
+                        children: React.createElement("span", {
+                          children: "alpha"
+                        })
+                      }) : false
                     ]
                   }),
                   React.createElement(Flex, {

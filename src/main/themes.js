@@ -25,6 +25,10 @@ function readMeta(contents) {
     const split = ite.split(" ")
     meta[split[0]] = split.slice(1).join(" ").trim()
   }
+
+  meta.alpha = "alpha" in meta
+  meta.beta = "beta" in meta
+
   return meta
 }
 

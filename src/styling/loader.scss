@@ -1,0 +1,21 @@
+.dr-titlebar-loading-icon {
+  &:hover {
+    filter: brightness(1.2);
+    animation: none
+  }
+  position: relative;
+  top: -4px;
+  width: 28px;
+  height: 22px;
+  pointer-events: auto;
+  -webkit-app-region: no-drag;
+  color: #F52590;
+  transition: filter .2s;
+  animation: loadingIconAnimation 2s infinite
+}
+
+@keyframes loadingIconAnimation {
+  0% { opacity: 1 }
+  50% { opacity: .8 }
+  100% { opacity: 1 }
+}
