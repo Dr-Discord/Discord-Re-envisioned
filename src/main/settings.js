@@ -60,6 +60,9 @@ export default async (React) => {
   const { ModalRoot, ModalHeader, ModalCloseButton, ModalContent, ModalFooter, ModalSize } = webpack.getModuleByProps("ModalRoot", "ModalContent")
   const { Heading } = webpack.getModule(m => m.Heading.displayName)
   const Button = webpack.getModuleByProps("ButtonColors", "ButtonSizes").default
+  const { openUserProfileModal } = webpack.getModuleByProps("openUserProfileModal")
+  const renderMessageMarkup = webpack.getModuleByProps("renderMessageMarkupToAST").default
+  const [{ getUser: fetchUser }, { getUser, findByTag }] = webpack.getAllModulesByProps("getUser")
 
   const { date, container, footer, added, fixed, improved, marginTop, socialLink } = webpack.getModuleByProps("date", "premiumIcon", "improved")
   const { content, modal } = webpack.getModuleByProps("content", "modal", "maxModalWidth")
@@ -406,21 +409,23 @@ export default async (React) => {
     })
   }
 
-  const { openUserProfileModal } = webpack.getModuleByProps("openUserProfileModal")
-  const renderMessageMarkup = webpack.getModuleByProps("renderMessageMarkupToAST").default
-  const [{ getUser: fetchUser }, { getUser }] = webpack.getAllModulesByProps("getUser")
-
-  function Avatar({ author, userId, authorLink }) {
+  function AddonAuthor({ author, userId, authorLink }) {
     const [user, setUser] = React.useState(getUser(userId))
 
     React.useEffect(() => {
       void async function() {
-        if (typeof userId === "string") setUser(await fetchUser(userId))
+        if (!author) return
+        if (user) return
+        if (typeof userId === "string") return setUser(await fetchUser(userId))
+        const spl = author.split("#")
+        const found = findByTag(spl[0], spl[1])
+        if (found) setUser(found)
+        else setUser({ name: spl[0], discriminator: spl[1] })
       }()
     })
     
     return [
-      user ? React.createElement("img", {
+      user?.getAvatarURL ? React.createElement("img", {
         src: user.getAvatarURL(false, undefined, true),
         width: 24,
         height: 24,
@@ -435,9 +440,9 @@ export default async (React) => {
         onClick: authorLink ? () => shell.openExternal(authorLink) : undefined,
         tag: "h3"
       }),
-      user ? React.createElement(Text, {
+      user?.discriminator ? React.createElement(Text, {
         style: {
-          paddingTop: 4,
+          paddingTop: user?.getAvatarURL ? 4 : 1,
           marginLeft: 4
         },
         children: ["#", user.discriminator],
@@ -671,7 +676,7 @@ export default async (React) => {
                   }),
                   React.createElement(Flex, {
                     style: { marginBottom: 6 },
-                    children: React.createElement(Avatar, { userId: addon.authorId, author: addon.author, authorLink: addon.authorLink })
+                    children: React.createElement(AddonAuthor, { userId: addon.authorId, author: addon.author, authorLink: addon.authorLink })
                   })
                 ]
               }),
