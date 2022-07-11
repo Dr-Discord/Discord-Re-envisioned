@@ -693,7 +693,7 @@ export default async (React) => {
                       if (!isEnabled) return
                       if (addon.exports?.onSettings) {
                         let defValue = "MEDIUM"
-                        const settings = addon.exports?.onSettings((size = true) => preventDefault = size)
+                        const settings = addon.exports?.onSettings((size = true) => defValue = size)
                         if (!defValue) defValue = "MEDIUM"
                         if (defValue === true) return
                         return showAddonSettings(addon, settings, defValue)
