@@ -430,7 +430,7 @@ export default async (React) => {
         width: 24,
         height: 24,
         className: "dr-addon-avatar",
-        onClick: () => openUserProfileModal({ userId: userId }),
+        onClick: () => openUserProfileModal({ userId: user?.id }),
       }) : false,
       React.createElement(LegacyHeader, {
         children: user?.username ?? author,
