@@ -581,6 +581,7 @@ export default async (React) => {
 
     DrApi.modals.open((props) => React.createElement(ModalRoot, {
       ...props,
+      [`dr-${isTheme(addon.filePath) ? "theme" : "plugin"}`]: addon.name,
       size: ModalSize[size.toUpperCase()],
       children: [
         React.createElement(ModalHeader, {

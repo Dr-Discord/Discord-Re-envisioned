@@ -84,6 +84,7 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (typ
       const res = window.eval(`(function() {\n${meta.js}\n})()\n//# sourceURL=${encodeURIComponent(meta.name)}`)
         
       meta.exports = typeof res === "function" ? new res : res
+      if (!meta.exports) return meta.didError = true
       meta.exports.onLoad?.()
     
       if (!enabledPlugins.includes(meta.name)) return
@@ -105,8 +106,9 @@ export default () => {
       const res = window.eval(`(function() {\n${plugin.js}\n})()\n//# sourceURL=${encodeURIComponent(plugin.name)}`)
       
       plugin.exports = typeof res === "function" ? new res : res
-      
+      if (!plugin.exports) return plugin.didError = true
       plugin.exports.onLoad?.()
+
       if (enabledPlugins.includes(plugin.name)) plugin.exports.onStart?.()
     } catch (error) {
       logger.error(plugin.name, "Cannot start the plugin", error)
