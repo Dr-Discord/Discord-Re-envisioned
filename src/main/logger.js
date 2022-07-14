@@ -15,8 +15,8 @@ export default new class rawLogger {
   warn(title, ...messages) {
     console.warn(
       `%cDR%c${title}%c\n`, 
-      `background-image:url(data:image/svg+xml;base64,${getIcon(isDark ? "#202124" : "#fff")}); color: transparent; background-size: 24px; background-repeat: no-repeat; padding: 5px; background-color: #ed4245; border-radius: 4px`, 
-      `background: #ed4245; margin-left: 5px; margin-bottom: 9px; padding: 2px; border-radius: 4px; color: ${isDark ? "#202124" : "#fff"}`, 
+      `background-image:url(data:image/svg+xml;base64,${getIcon(isDark ? "#202124" : "#fff")}); color: transparent; background-size: 24px; background-repeat: no-repeat; padding: 5px; background-color: #faa81a; border-radius: 4px`, 
+      `background: #faa81a; margin-left: 5px; margin-bottom: 9px; padding: 2px; border-radius: 4px; color: ${isDark ? "#202124" : "#fff"}`, 
       "padding-left: 3px",
       ...messages
     )
@@ -24,8 +24,8 @@ export default new class rawLogger {
   error(title, ...messages) {
     console.error(
       `%cDR%c${title}%c\n`, 
-      `background-image:url(data:image/svg+xml;base64,${getIcon(isDark ? "#202124" : "#fff")}); color: transparent; background-size: 24px; background-repeat: no-repeat; padding: 5px; background-color: #faa81a; border-radius: 4px`, 
-      `background: #faa81a; margin-left: 5px; margin-bottom: 9px; padding: 2px; border-radius: 4px; color: ${isDark ? "#202124" : "#fff"}`, 
+      `background-image:url(data:image/svg+xml;base64,${getIcon(isDark ? "#202124" : "#fff")}); color: transparent; background-size: 24px; background-repeat: no-repeat; padding: 5px; background-color: #ed4245; border-radius: 4px`, 
+      `background: #ed4245; margin-left: 5px; margin-bottom: 9px; padding: 2px; border-radius: 4px; color: ${isDark ? "#202124" : "#fff"}`, 
       "padding-left: 3px",
       ...messages
     )
