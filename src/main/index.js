@@ -4,7 +4,7 @@ import Patcher from "./patcher"
 import storage from "../storage"
 import settings from "./settings"
 import notifications from "./notifications"
-import styles, { documentReady } from "./styles"
+import styles, { documentReady, plugins as pluginStyleNode } from "./styles"
 import modals from "./modals"
 
 logger.log("Discord Re-invisioned", `Loading version '${DrApiNative.package.version}'...`)
@@ -112,7 +112,7 @@ window.DrApi = {
       if (!node) {
         node = document.createElement("style")
         node.setAttribute("dr-plugin", id)
-        styles.plugins.appendChild(node)
+        pluginStyleNode.appendChild(node)
       }
       node.innerHTML = css
       return (css) => typeof css === "string" ? DrApi.styling.insert(id, css) : node.remove()

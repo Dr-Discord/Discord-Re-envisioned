@@ -4,20 +4,39 @@ export default new class rawPatcher {
   hook(module, fn) {
     if (!module[fn]) module[fn] = () => {}
     const original = module[fn]
-
-    if (String(original).startsWith("class")) throw new Error("Classes cannot be patched")
-
     let hook = module[fn][this.Symbol]
 
     if (!(this.Symbol in module[fn])) {
-
       hook = module[fn][this.Symbol] = {
         before: new Set(),
         instead: new Set(),
         after: new Set()
       }
 
-      module[fn] = function() {
+      if (String(original).startsWith("class")) module[fn] = class extends original {
+        constructor() {
+          let args = Array.from(arguments)
+          
+          const that = Object.create(new.target.prototype)
+
+          for (const { callback } of [...hook.before]) {
+            const result = callback(that, args)
+            if (Array.isArray(result)) args = result
+          }
+  
+          let res
+          if (!hook.instead.size) res = Reflect.construct(original, args, new.target)
+          else for (const { callback } of [...hook.instead]) res = callback(that, args, original)
+          
+          for (const { callback } of [...hook.after]) {
+            const result = callback(that, args, res)
+            if (typeof result !== "undefined") res = result
+          }
+  
+          return res
+        }
+      }
+      else module[fn] = function() {
         let args = Array.from(arguments)
         for (const { callback } of [...hook.before]) {
           const result = callback(this, args)
