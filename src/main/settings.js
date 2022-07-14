@@ -409,20 +409,30 @@ export default async (React) => {
     })
   }
 
-  function AddonAuthor({ author, userId, authorLink }) {
+  const promisedUsers = {}
+  function useUser(author, userId) {
     const [user, setUser] = React.useState(getUser(userId))
 
     React.useEffect(() => {
       void async function() {
-        if (!author) return
-        if (user) return
-        if (typeof userId === "string") return setUser(await fetchUser(userId))
+        if (user || !author) return
+        if (typeof userId === "string") {
+          if (promisedUsers[userId]) return setUser(await promisedUsers[userId])
+          promisedUsers[userId] = fetchUser(userId)
+          return setUser(await promisedUsers[userId])
+        }
         const spl = author.split("#")
         const found = findByTag(spl[0], spl[1])
         if (found) setUser(found)
         else setUser({ username: spl[0], discriminator: spl[1] })
       }()
     })
+
+    return user
+  }
+
+  function AddonAuthor({ author, userId, authorLink }) {
+    const user = useUser(author, userId)
     
     return [
       user?.getAvatarURL ? React.createElement("img", {
@@ -617,7 +627,7 @@ export default async (React) => {
     const [enabledAddons, setEnabledAddons] = storage.useStorage("internal", isTheme(addon.filePath) ? "enabledThemes" : isSplash(addon.filePath) ? "enabledSplashThemes" : "enabledPlugins", [])
 
     const isEnabled = storage.getData("internal", isTheme(addon.filePath) ? "enabledThemes" : isSplash(addon.filePath) ? "enabledSplashThemes" : "enabledPlugins", []).includes(addon.name)
-
+    
     return React.createElement(Card, {
       ...Card.defaultProps,
       editable: true,
@@ -677,7 +687,7 @@ export default async (React) => {
                   }),
                   React.createElement(Flex, {
                     style: { marginBottom: 6 },
-                    children: React.createElement(AddonAuthor, { userId: addon.authorId, author: addon.author, authorLink: addon.authorLink })
+                    children: React.createElement(AddonAuthor, { userId: addon.authorid, author: addon.author, authorLink: addon.authorlink })
                   })
                 ]
               }),

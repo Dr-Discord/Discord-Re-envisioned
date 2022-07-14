@@ -7,7 +7,7 @@ export function readMeta(contents) {
     for (let ite of jsdoc[1].match(/\*(\s|)([^\n]*)/g)) {
       ite = ite.replace(/\*(\s|)@/, "")
       const split = ite.split(" ")
-      meta[split[0]] = split.slice(1).join(" ").trim()
+      meta[split[0].toLowerCase()] = split.slice(1).join(" ").trim()
     }
   
   } catch (error) { return meta }
