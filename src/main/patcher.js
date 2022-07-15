@@ -10,7 +10,8 @@ export default new class rawPatcher {
       hook = module[fn][this.Symbol] = {
         before: new Set(),
         instead: new Set(),
-        after: new Set()
+        after: new Set(),
+        original
       }
 
       if (String(original).startsWith("class")) module[fn] = class extends original {
