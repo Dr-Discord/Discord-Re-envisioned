@@ -68,18 +68,18 @@ export default async (React) => {
     })
   })
 
-  webpack.getModuleAsync(m => m.type.displayName === "ChannelApplicationIcon").then((ChannelApplicationIcon) => patcher.after("DrApi", ChannelApplicationIcon.default, "type", console.log))
+  webpack.getModuleAsync(m => m.type.displayName === "ChannelApplicationIcon").then((ChannelApplicationIcon) => patcher.after("DrApi", ChannelApplicationIcon.default, "type", (_, [props]) => !props.section && props.command.isDrCommand ? void (props.section = section) : undefined))
   webpack.getModuleByDisplayNameAsync("ApplicationCommandItem").then((ApplicationCommandItem) => patcher.before("DrApi", ApplicationCommandItem, "default", (_, [props]) => !props.section && props.command.isDrCommand ? void (props.section = section) : undefined))
 
   void async function() {
     const Classes = await webpack.getModuleAsync(m => !m.mask && m.icon && m.selectable && m.wrapper)
     const SectionIcon = await webpack.getModuleByDisplayNameAsync("ApplicationCommandDiscoverySectionIcon")
 
-    patcher.after("DrApi", SectionIcon, "default", (that, [props]) => {
+    patcher.after("DrApi", SectionIcon, "default", (that, [props], res) => {
       if (props.section.id !== section.id) return
 
       const isSmall = props.selectable === undefined
-    
+
       return React.createElement("div", {
         className: [Classes?.wrapper, props.selectable && Classes?.selectable, props.selectable && props.isSelected && Classes?.selected].filter(e => e).join(" "),
         children: React.createElement("svg", {
