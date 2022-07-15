@@ -123,13 +123,4 @@ export default async (React) => {
     },
     unregister: (id) => DrApi.commands.commands.delete([...DrApi.commands.commands].find(c => c.id === id))
   }
-
-  window.DrApi.commands.register({
-    name: "testertot",
-    execute: console.log
-  })
-  window.DrApi.commands.register({
-    name: "tatertot",
-    execute: console.log
-  })
 }
