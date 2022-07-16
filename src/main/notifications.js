@@ -14,6 +14,8 @@ export default async (React) => {
   const Clickable = webpack.getModuleByDisplayName("Clickable", true)
   const renderMessageMarkup = webpack.getModuleByProps("renderMessageMarkupToAST").default
 
+  const { useSpring, animated } = webpack.getModuleByProps("useSpring", "animated")
+
   const { thin, fade } = webpack.getModuleByProps("thin", "fade")
   const { scroller } = webpack.getModuleByProps("scroller")
 
@@ -27,10 +29,18 @@ export default async (React) => {
     })() : con)
   }
 
-  function Toast({ title, content, icon, buttons = [], hideToast, id, type = "" }) {
+  function Toast({ title, content, icon, buttons = [], hideToast, id, type = "", duration = Infinity }) {
     const [blur] = storage.useStorage("internal", "notificationBlur", 0)
     const [opacity] = storage.useStorage("internal", "notificationOpacity", 80)
     const [showAlert] = storage.useStorage("internal", "notificationShowAlert", false)
+
+    const Ref = React.useRef()
+
+    const { width } = useSpring({
+      from: { width: 0 },
+      width: 0, 
+      config: { duration: isFinite(duration) ? duration : undefined }
+    })
 
     buttons = buttons.map(button => {
       return React.createElement(Flex.Child, {
@@ -48,9 +58,18 @@ export default async (React) => {
       })
     })
 
+    React.useEffect(() => {
+      if (!isFinite(duration)) return
+      width.start({
+        to: Ref.current.offsetWidth,
+        onRest: () => hideToast(true)
+      })
+    })
+
     return React.createElement("div", {
       className: "dr-toast",
       id,
+      ref: Ref,
       type: type.toLowerCase(),
       children: [
         React.createElement("div", {
@@ -108,7 +127,11 @@ export default async (React) => {
         buttons.length ? React.createElement(Flex, {
           className: "dr-toast-buttons",
           children: buttons 
-        }) : false
+        }) : false,
+        React.createElement(animated.div, { 
+          className: "dr-toast-slider", 
+          style: { width } 
+        })
       ]
     })
   }

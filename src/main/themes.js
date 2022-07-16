@@ -158,11 +158,12 @@ function watchTheme(file) {
 
   if (DrApi.toast) {
     if (!Creative) Creative = webpack.getModuleByDisplayName("Creative", true)
-    setTimeout(DrApi.toast.show({
+    DrApi.toast.show({
       title: `'${meta.name}' updated`,
       type: "info",
-      icon: DrApi.React.createElement(Creative)
-    }), 4e3)
+      icon: DrApi.React.createElement(Creative),
+      duration: 4000
+    })
   }
 
   storage.setData("internal", "enabledThemes", enabledThemes)
@@ -210,11 +211,12 @@ function watchSplash(file) {
 
   if (DrApi.toast) {
     if (!DoubleStarIcon) DoubleStarIcon = webpack.getModuleByDisplayName("DoubleStarIcon", true)
-    setTimeout(DrApi.toast.show({
+    DrApi.toast.show({
       title: `'${meta.name}' updated`,
       type: "info",
-      icon: DrApi.React.createElement(DoubleStarIcon)
-    }), 4e3)
+      icon: DrApi.React.createElement(DoubleStarIcon),
+      duration: 4000
+    })
   }
 
   storage.setData("internal", "enabledSplashThemes", enabledThemes)

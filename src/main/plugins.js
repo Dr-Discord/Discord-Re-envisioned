@@ -70,11 +70,12 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (typ
 
   if (DrApi.toast) {
     if (!InlineCode) InlineCode = webpack.getModuleByDisplayName("InlineCode", true)
-    setTimeout(DrApi.toast.show({
+    DrApi.toast.show({
       title: `'${meta.name}' updated`,
       type: "info",
-      icon: DrApi.React.createElement(InlineCode)
-    }), 4e3)
+      icon: DrApi.React.createElement(InlineCode),
+      duration: 4000
+    })
   }
 
   storage.setData("internal", "enabledPlugins", enabledPlugins)

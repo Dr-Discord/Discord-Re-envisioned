@@ -89,7 +89,8 @@ export default async (React) => {
     title: "Demo",
     icon: React.createElement(Mail),
     content: "This is a demo Toast.",
-    onClose: () => setTimeout(DrApi.toast.show.bind(null, demoToastObj), 500),
+    onClose: () => setTimeout(() => DrApi.toast.show(demoToastObj), 500),
+    duration: 5e3,
     buttons: [{
       content: "Button",
       onClick: () => {}
@@ -736,11 +737,12 @@ export default async (React) => {
                         enabledAddons.splice(i, 1)
                       }
     
-                      setTimeout(DrApi.toast.show({
+                      DrApi.toast.show({
                         title: `${val ? "Enabled" : "Disabled"} '${addon.name}'`,
                         type: "info",
-                        icon: React.createElement(isTheme(addon.filePath) ? Creative : isSplash(addon.filePath) ? DoubleStarIcon : InlineCode)
-                      }), 4e3)
+                        icon: React.createElement(isTheme(addon.filePath) ? Creative : isSplash(addon.filePath) ? DoubleStarIcon : InlineCode),
+                        duration: 4000
+                      })
     
                       setEnabledAddons([...enabledAddons])
     
