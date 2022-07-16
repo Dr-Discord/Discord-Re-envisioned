@@ -27,7 +27,7 @@ export default async (React) => {
       res = [].concat(...(res ?? []))
 
       for (const command of [...window.DrApi.commands.commands]) {
-        if (!command.name.includes(query)) continue
+        if (!command.name.toLowerCase().includes(query.toLowerCase())) continue
         if (res.some(e => e.isDrCommand && e.id === command.id)) continue
         res.unshift(command)
       }
@@ -84,7 +84,7 @@ export default async (React) => {
         className: [Classes?.wrapper, props.selectable && Classes?.selectable, props.selectable && props.isSelected && Classes?.selected].filter(e => e).join(" "),
         children: React.createElement("svg", {
           width: props.width,
-          height:props.height,
+          height: props.height,
           viewBox: "0 0 22 22",
           className: [Classes?.icon, props.className].filter(e => e).join(" "),
           style: {
@@ -110,6 +110,7 @@ export default async (React) => {
         name,
         options,
         execute,
+        displayName: name,
         type: 0,
         target: 1,
         applicationId: section.id,
@@ -124,3 +125,4 @@ export default async (React) => {
     unregister: (id) => DrApi.commands.commands.delete([...DrApi.commands.commands].find(c => c.id === id))
   }
 }
+

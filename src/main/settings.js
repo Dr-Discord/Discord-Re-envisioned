@@ -1205,13 +1205,12 @@ export default async (React) => {
   patcher.after("DrApi", sectionsModule.default, "render", (that, args, res) => {
     const { sections } = res.props.children.props.children.props
         
-    const connections = sections.indexOf(sections.find(s => s.section === "Connections")) + 1
     const friendRequests = sections.indexOf(sections.find(s => s.section === "Friend Requests")) + 1
 
-    if (!connections) return
+    if (!friendRequests) return
     if (sections.find(s => s.section === "Discord Re-envisioned")) return
     
-    sections.splice(friendRequests ? friendRequests : connections, 0, ...settings)
+    sections.splice(friendRequests, 0, ...settings)
   })
 
   const latestChangelog = DrApiNative.changelog[0]
