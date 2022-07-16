@@ -27,6 +27,8 @@
   const sass = require("sass")
   
   const production = process.argv.includes("--production")
+
+  if (production) console.log("Production mode enabled!")
   
   const license = fs.readFileSync("license", "utf-8")
   
@@ -68,7 +70,7 @@ module.exports = node`
           })
       
           build.onLoad({ filter: /.*/, namespace: "sass-file" }, async (args) => {
-            const { css } = await sass.compileAsync(args.path)
+            const { css } = await sass.compileAsync(args.path, { style: "compressed" })
             return { contents: `module.exports = ${JSON.stringify(css)}` }
           })
         }
