@@ -131,7 +131,7 @@ async function windowsLoadingIcon(React) {
   const dispatcher = webpack.getModuleByProps("dirtyDispatch", "dispatch")
 
   DrApi.Patcher.after("DrApi", titlebar, "default", (that, args, res) => {
-    const [isLoaded, setLoaded] = React.useState(loaded)
+    const [ isLoaded, setLoaded ] = React.useState(loaded)
 
     React.useEffect(() => {
       function onOpen() {
