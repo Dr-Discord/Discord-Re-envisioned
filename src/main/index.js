@@ -4,7 +4,7 @@ import Patcher from "./patcher"
 import storage from "../storage"
 import settings from "./settings"
 import notifications from "./notifications"
-import styles, { documentReady, plugins as pluginStyleNode } from "./styles"
+import styles, { documentReady, plugins as pluginStyleNode, themes as themeStyleNode } from "./styles"
 import modals from "./modals"
 import commands from "./commands"
 
@@ -87,7 +87,6 @@ window.DrApi = {
       const index = enabledThemes.indexOf(id)
 
       if (index === -1) {
-        theme.exports.onStart?.()
         storage.setData("internal", splash ? "enabledSplashThemes" : "enabledThemes", enabledThemes.concat(id))
 
         if (splash) return true
@@ -95,7 +94,7 @@ window.DrApi = {
         const style = document.createElement("style")
         style.setAttribute("dr-theme", id)
         style.innerHTML = theme.css
-        styles.appendChild(style)
+        themeStyleNode.appendChild(style)
 
         return true
       }

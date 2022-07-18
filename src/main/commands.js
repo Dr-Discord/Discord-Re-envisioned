@@ -110,7 +110,6 @@ export default async (React) => {
         name,
         options,
         execute,
-        displayName: name,
         type: 0,
         target: 1,
         applicationId: section.id,
