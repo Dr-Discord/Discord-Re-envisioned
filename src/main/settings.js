@@ -820,10 +820,16 @@ export default async (React) => {
             onConfirm: () => DrApiNative.fileSystem.rm(addon.filePath),
             danger: true
           })
+        }),
+        React.createElement(MenuItem, {
+          id: "edit-addon",
+          label: `edit ${addon.filePath.endsWith(".plugin.js") ? "Plugin" : "Theme"}`,
+          color: "header-secondary",
+          icon: () => React.createElement(Pencil, { className: iconMenu }),
+          action: () => DrApiNative.require('child_process').execFile(addon.filePath)
         })
       ]
     })
-  }
 
   function AddonConfiguration({ event, filter:showFilter }) {
     const [sortByWhat, setSortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
