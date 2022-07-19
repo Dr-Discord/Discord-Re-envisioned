@@ -826,7 +826,7 @@ export default async (React) => {
           label: `edit ${addon.filePath.endsWith(".plugin.js") ? "Plugin" : "Theme"}`,
           color: "header-secondary",
           icon: () => React.createElement(Pencil, { className: iconMenu }),
-          action: () => DrApiNative.require('child_process').execFile(addon.filePath)
+          action: () => shell.openPath(addon.filePath)
         })
       ]
     })
