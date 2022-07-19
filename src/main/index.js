@@ -8,6 +8,8 @@ import styles, { documentReady, plugins as pluginStyleNode, themes as themeStyle
 import modals from "./modals"
 import commands from "./commands"
 
+import styling from "styles"
+
 logger.log("Discord Re-invisioned", `Loading version '${DrApiNative.package.version}'...`)
 
 document.addEventListener("keydown", (event) => {
@@ -17,9 +19,9 @@ document.addEventListener("keydown", (event) => {
 import themes, { getThemes } from "./themes"
 import plugins, { getPlugins } from "./plugins"
 
-import ace from "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
-ace.onerror = (event) => logger.err("Ace", "Cannot the Ace editor", event)
-ace.onload = () => logger.log("Ace", "Loaded the Ace editor")
+import ace from "ace"
+ace("error", (event) => logger.err("Ace", "Cannot the Ace editor", event))
+ace("load", () => logger.log("Ace", "Loaded the Ace editor"))
 
 const originalConsole = globalThis.console
 for (const key in originalConsole) {
@@ -226,7 +228,7 @@ function onDocumentLoad() {
   logger.log("Themes", "Adding themes")
   documentReady()
 
-  styles("DrApi", require("../styling/index.scss"))
+  styles("DrApi", styling)
 
   themes()
 

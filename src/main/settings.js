@@ -823,7 +823,7 @@ export default async (React) => {
         }),
         React.createElement(MenuItem, {
           id: "edit-addon",
-          label: `edit ${addon.filePath.endsWith(".plugin.js") ? "Plugin" : "Theme"}`,
+          label: `Edit ${addon.filePath.endsWith(".plugin.js") ? "Plugin" : "Theme"}`,
           color: "header-secondary",
           icon: () => React.createElement(Pencil, { className: iconMenu }),
           action: () => shell.openPath(addon.filePath)

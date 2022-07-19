@@ -31,12 +31,6 @@
   if (production) console.log("Production mode enabled!")
   
   const license = fs.readFileSync("license", "utf-8")
-  
-  const makeHttpRequire = (src) => `const node = document.createElement("script")
-node.src = ${JSON.stringify(src)}
-if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => document.head.append(node))
-else document.head.append(node)
-module.exports = node`
 
   async function buildFile(file) {
     const start = Date.now()
@@ -50,32 +44,41 @@ module.exports = node`
       minify: production,
       platform: file.endsWith(".js") ? "node" : "browser",
       plugins: [{
-        name: "https",
-        setup: (build) => {
-          build.onResolve({ filter: /^https?:\/\// }, args => ({
-            path: args.path,
-            namespace: "http-file",
-          }))
+          name: "external-ace",
+          setup: (build) => {
+            // Allow *importing* ace
+            build.onResolve({ filter: /^ace$/ }, () => ({ path: "ace.js", namespace: "ace" }))
 
-          build.onLoad({ filter: /.*/, namespace: "http-file" }, (args) => ({ contents: makeHttpRequire(args.path) }))
-        }
-      }, {
-        name: "scss",
+            build.onLoad({ filter: /.*/, namespace: "ace" }, () => ({
+              contents: `const node = document.createElement("script")
+node.src = "https://ajaxorg.github.io/ace-builds/src-min-noconflict/ace.js"
+if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", () => document.head.append(node))
+else document.head.append(node)
+module.exports = (event, callback) => node.addEventListener(event, callback)`
+            }))
+          }
+        }, {
+        name: "styles",
         setup: (build) => {
-          build.onResolve({ filter: /\.scss$/ }, args => {
-            return ({
-              path: require.resolve(args.path, { paths: [args.resolveDir] }),
-              namespace: "sass-file",
-            })
-          })
-      
-          build.onLoad({ filter: /.*/, namespace: "sass-file" }, async (args) => {
-            const { css } = await sass.compileAsync(args.path, { style: "compressed" })
+          // allow 'styles' be the compiled version of 'src/styling/index.scss'
+          build.onResolve({ filter: /^styles$/ }, () => ({ path: "styling/index.scss", namespace: "styles", }))
+          build.onLoad({ filter: /.*/, namespace: "styles" }, async () => {
+            const { css } = await sass.compileAsync("src/styling/index.scss", { style: "compressed" })
             return { contents: `module.exports = ${JSON.stringify(css)}` }
           })
         }
+      }, {
+        name: "node-module",
+        setup: (build) => {
+          // All external node modules to not bundle
+          build.onResolve({ filter: /^electron$/ }, () => ({ path: "electron", namespace: "external:node-module" }))
+          build.onResolve({ filter: /^original-fs$/ }, () => ({ path: "original-fs", namespace: "external:node-module" }))
+          build.onResolve({ filter: /^request$/ }, () => ({ path: "request", namespace: "external:node-module" }))
+          // To prevent it from requiring itself make it require a const instead of a string
+          build.onLoad({ filter: /.*/, namespace: "external:node-module" }, (args) => ({ contents: `const path = ${JSON.stringify(args.path)}
+module.exports = require(path)` }))
+        }
       }],
-      external: ["electron", "original-fs", "request"],
       loader: { ".scss": "text" }
     })
   
@@ -94,7 +97,7 @@ module.exports = node`
   fs.appendFileSync("dist/main.js", `//# sourceURL=${encodeURIComponent("Discord Re-envisioned")}`)
 
   console.log("Copying changelog from 'src/changelog.json' to 'dist/changelog.json'")
-  fs.copyFileSync("src/changelog.json", "dist/changelog.json")
+  fs.writeFileSync("dist/changelog.json", JSON.stringify(require("./src/changelog.json")))
 
   console.log("Copying license from 'license' to 'dist/license'")
   fs.writeFileSync("dist/license", license)
