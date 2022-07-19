@@ -830,6 +830,7 @@ export default async (React) => {
         })
       ]
     })
+  }
 
   function AddonConfiguration({ event, filter:showFilter }) {
     const [sortByWhat, setSortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
