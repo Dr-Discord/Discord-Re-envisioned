@@ -811,6 +811,13 @@ export default async (React) => {
           React.createElement(MenuSeparator)
         ] : false,
         React.createElement(MenuItem, {
+          id: "edit-addon",
+          label: `Edit ${addon.filePath.endsWith(".plugin.js") ? "Plugin" : "Theme"}`,
+          icon: () => React.createElement(Pencil, { className: iconMenu }),
+          action: () => shell.openPath(addon.filePath)
+        }),
+        React.createElement(MenuSeparator),
+        React.createElement(MenuItem, {
           id: "uninstall-addon",
           label: `Uninstall ${addon.filePath.endsWith(".plugin.js") ? "Plugin" : "Theme"}`,
           color: "colorDanger",
@@ -820,13 +827,6 @@ export default async (React) => {
             onConfirm: () => DrApiNative.fileSystem.rm(addon.filePath),
             danger: true
           })
-        }),
-        React.createElement(MenuItem, {
-          id: "edit-addon",
-          label: `Edit ${addon.filePath.endsWith(".plugin.js") ? "Plugin" : "Theme"}`,
-          color: "header-secondary",
-          icon: () => React.createElement(Pencil, { className: iconMenu }),
-          action: () => shell.openPath(addon.filePath)
         })
       ]
     })
