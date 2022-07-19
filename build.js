@@ -1,7 +1,7 @@
 (async function() {
   console.log("Starting build...")
   const start = Date.now()
-  
+
   const fs = require("fs")
   const cp = require("child_process")
 
@@ -25,11 +25,10 @@
   const esbuild = require("esbuild")
   const asar = require("asar")
   const sass = require("sass")
-  
-  const production = process.argv.includes("--production")
 
+  const production = process.argv.includes("--production")
   if (production) console.log("Production mode enabled!")
-  
+
   const license = fs.readFileSync("license", "utf-8")
 
   async function buildFile(file) {

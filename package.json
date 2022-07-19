@@ -9,12 +9,7 @@
   },
   "scripts": {
     "build": "node build.js",
-    "build:production": "node build.js --production",
-    "legacy:build": "npm run build:splash && npm run build:main",
-    "legacy:build:splash": "esbuild src/splash/index.js --bundle --outfile=dist/splash.js --platform=browser",
-    "legacy:build:splash:watch": "esbuild src/splash/index.js --bundle --watch --outfile=dist/splash.js --platform=browser",
-    "legacy:build:main": "esbuild src/main/index.js --bundle --outfile=dist/main.js --platform=browser",
-    "legacy:build:main:watch": "esbuild src/main/index.js --bundle --watch --outfile=dist/main.js --platform=browser"
+    "build:production": "node build.js --production"
   },
   "description": "A simple client mod for discord",
   "main": "build.js",
