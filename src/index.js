@@ -68,9 +68,8 @@ electron.app.once("ready", () => {
     
     callback({ cancel: url.includes("discord.com/api/webhooks"), responseHeaders })
   })
-  
-  const { default: installExtension, REACT_DEVELOPER_TOOLS } = require("../node_modules/electron-devtools-installer/")
-  installExtension(REACT_DEVELOPER_TOOLS, true)
+
+  electron.session.defaultSession.loadExtension(path.join(__dirname, "rdt"))
 })
 
 const basePath = path.join(process.resourcesPath, "app.asar")

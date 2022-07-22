@@ -11,7 +11,7 @@ window.getThemes = getThemes
 const shell = DrApiNative.runInNative(`require("electron").shell`)
 
 export default async (React) => {
-  const sectionsModule = await webpack.getModuleByPropsAsync("getUserSettingsSections")
+  const SettingsView = await webpack.getModuleByDisplayNameAsync("SettingsView", true)
   logger.log("Settings", "Patching 'getUserSettingsSections' to add settings")
 
   const NotificationSettings = webpack.getModuleByDisplayName("NotificationSettings", true)
@@ -1211,15 +1211,13 @@ export default async (React) => {
     }
   ]
 
-  patcher.after("DrApi", sectionsModule.default, "render", (that, args, res) => {
-    const { sections } = res.props.children.props.children.props
-        
-    const friendRequests = sections.indexOf(sections.find(s => s.section === "Friend Requests")) + 1
+  patcher.after("DrApi", SettingsView.prototype, "getPredicateSections", (that, args, res) => {
+    const friendRequests = res.indexOf(res.find(s => s.section === "Friend Requests")) + 1
 
     if (!friendRequests) return
-    if (sections.find(s => s.section === "Discord Re-envisioned")) return
+    if (res.find(s => s.section === "Discord Re-envisioned")) return
     
-    sections.splice(friendRequests, 0, ...settings)
+    res.splice(friendRequests, 0, ...settings)
   })
 
   const latestChangelog = DrApiNative.changelog[0]

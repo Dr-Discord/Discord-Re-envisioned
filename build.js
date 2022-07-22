@@ -4,12 +4,15 @@
 
   const fs = require("fs")
   const cp = require("child_process")
+  const https = require("https")
+  const path = require("path")
 
   const { version, dependencies } = require("./package.json")
 
   await new Promise(resolve => {
     for (const dependency of Object.keys(dependencies)) {
       try { require(dependency) } 
+
       catch (error) {
         if (error.message.split("\n")[0] !== `Cannot find module '${dependency}'`) continue
         console.log("Installing dependencies")
@@ -25,9 +28,41 @@
   const esbuild = require("esbuild")
   const asar = require("asar")
   const sass = require("sass")
+  const unzip = require("unzip-crx-3")
 
   const production = process.argv.includes("--production")
   if (production) console.log("Production mode enabled!")
+
+  const changePermissions = (dir, mode) => {
+    const files = fs.readdirSync(dir)
+    files.forEach((file) => {
+      const filePath = path.join(dir, file)
+      fs.chmodSync(filePath, parseInt(`${mode}`, 8))
+      if (fs.statSync(filePath).isDirectory()) {
+        changePermissions(filePath, mode)
+      }
+    })
+  }
+  const downloadFile = (from, to) => {
+    return new Promise((resolve, reject) => {
+      const req = https.get(from)
+      req.on("response", (res) => {
+        if (res.statusCode && res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) {
+          return downloadFile(res.headers.location, to).then(resolve).catch(reject)
+        }
+        res.pipe(fs.createWriteStream(to)).on("close", resolve)
+        res.on("error", reject)
+      })
+      req.on("error", reject)
+      req.end()
+    })
+  }
+
+  console.log("Downloading rdt...")
+  await downloadFile("https://clients2.google.com/service/update2/crx?response=redirect&acceptformat=crx2,crx3&x=id%3Dfmkadmapgofadopljbjfkapdkoienihi%26uc&prodversion=32", "rdt.crx")
+  await unzip("rdt.crx", "dist/rdt")
+  changePermissions("dist/rdt", 755)
+  console.log("Downloaded rdt")
 
   const license = fs.readFileSync("license", "utf-8")
 
@@ -86,7 +121,6 @@ module.exports = require(path)` }))
     console.log(`${file.endsWith(".js") ? "Built" : "Bundled"} '${file.endsWith(".js") ? `src/${file}` : `src/${file}/index.js`}' in ${Date.now() - start}ms`)
   }
 
-  await buildFile("splash")
   await buildFile("main")
   await buildFile("preload.js")
   await buildFile("splashPreload.js")
