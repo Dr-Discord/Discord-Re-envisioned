@@ -6,7 +6,7 @@ import Module from "module"
 
 import storage from "./storage"
 
-const newMacOS = storage.getData("internal", "newMacOS", true)
+const newMacOS = storage.getData("internal", "newMacOS", process.platform === "darwin")
 const transparency = storage.getData("internal", "transparency", false)
 
 let allowSplashToClose = true

@@ -4,6 +4,22 @@
     "subtitle": "Discord Re-envisioned v1.1.0",
     "body": [
       {
+        "title": "CRASHING ",
+        "type": "fixed",
+        "content": [
+          {
+            "title": "Fixed crashing.",
+            "content": "Crashes are now fixed after discord changed somestuff"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "What's New",
+    "subtitle": "Discord Re-envisioned v1.1.0",
+    "body": [
+      {
         "title": "Slash Commands",
         "type": "added",
         "content": [

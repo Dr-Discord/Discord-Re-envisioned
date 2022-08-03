@@ -14,7 +14,9 @@ export function readMeta(contents) {
   
   meta.alpha = typeof meta.alpha === "string"
   meta.beta = typeof meta.beta === "string"
-  if (meta.name) meta.didError = false
+
+  if (!meta.name) meta.didError = false
+  if (!(meta.exports && meta.filepath.endsWith(".plugin.js"))) meta.didError = false
 
   return meta
 }

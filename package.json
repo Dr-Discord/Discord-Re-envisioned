@@ -1,6 +1,6 @@
 {
   "name": "drdiscord",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "dependencies": {
     "asar": "^3.1.0",
     "esbuild": "^0.14.47",

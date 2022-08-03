@@ -9,7 +9,7 @@ const section = {
   id: "drdiscord",
   type: 0,
   name: "Discord Re-invisioned",
-  icon: "https://github.com//Dr-Discord.png"
+  icon: "https://github.com/Dr-Discord.png"
 }
 
 export default async (React) => {

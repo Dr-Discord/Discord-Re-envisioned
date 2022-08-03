@@ -46,7 +46,7 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (typ
     const index = enabledPlugins.indexOf(found.name)
     if (index !== -1) {
       enabledPlugins.splice(index, 1)
-      if (ready) found.exports.onStop?.()
+      if (ready && found.exports) found.exports.onStop?.()
     }
 
     return storage.setData("internal", "enabledPlugins", [...enabledPlugins])
@@ -60,7 +60,7 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (typ
     const index = enabledPlugins.indexOf(found.name)
     if (index !== -1) {
       enabledPlugins.splice(index, 1, meta.name)
-      if (ready) found.exports.onStop?.()
+      if (ready && found.exports) found.exports.onStop?.()
     }
   }
 

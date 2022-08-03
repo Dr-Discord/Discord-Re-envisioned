@@ -10,8 +10,8 @@ export default async (React) => {
     openModal, closeModal
   } = webpack.getModuleByProps("openModalLazy", "openModal")
 
-  const Alert = webpack.getModuleByDisplayName("Alert", true)
-  const ConfirmModal = webpack.getModuleByDisplayName("ConfirmModal", true)
+  const Alert = await webpack.getModuleByDisplayNameAsync("Alert", true)
+  const ConfirmModal = await webpack.getModuleByDisplayNameAsync("ConfirmModal", true)
   const { Messages } = webpack.getAllModulesByProps("Messages")[1]
   const Button = webpack.getModuleByProps("ButtonColors", "ButtonSizes").default
 
@@ -55,7 +55,6 @@ export default async (React) => {
     },
     confirmModal(title, content, opts = {}) {
       const { cancelText = Messages.CANCEL, confirmText = Messages.OKAY, danger = false, onConfirm, onCancel } = opts
-
       this.open((props) => React.createElement(ConfirmModal, {
         ...props,
         header: title,

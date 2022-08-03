@@ -12,7 +12,7 @@ const shell = DrApiNative.runInNative(`require("electron").shell`)
 
 export default async (React) => {
   const SettingsView = await webpack.getModuleByDisplayNameAsync("SettingsView", true)
-  logger.log("Settings", "Patching 'getUserSettingsSections' to add settings")
+  logger.log("Settings", "Patching 'getPredicateSections' to add settings")
 
   const NotificationSettings = webpack.getModuleByDisplayName("NotificationSettings", true)
   const FormSection = webpack.getModuleByDisplayName("FormSection", true)
@@ -989,7 +989,7 @@ export default async (React) => {
   }
 
   const PopoutWindow = webpack.getModule(e => e.default.toString().indexOf("DndProvider") > -1 && React.isValidElement(e.default())).default
-  const dispatcher = webpack.getModuleByProps("dirtyDispatch", "dispatch")
+  const dispatcher = webpack.getModuleByProps("subscribe", "dispatch")
   const PopoutWindowStore = webpack.getModuleByProps("getWindow", "getName", "getIsAlwaysOnTop")
   const { useStateFromStores } = webpack.getModuleByProps("useStateFromStores") 
 
@@ -1193,7 +1193,7 @@ export default async (React) => {
       section: "Discord Re-envisioned Themes"
     },
     {
-      onClick: () => window.ace ? dispatcher.dirtyDispatch({
+      onClick: () => window.ace ? dispatcher.dispatch({
         type: "POPOUT_WINDOW_OPEN",
         key: "DISCORD_CUSTOM_CSS",
         render: () => React.createElement(CustomCSS),

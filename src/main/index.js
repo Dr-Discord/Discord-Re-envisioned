@@ -7,6 +7,7 @@ import notifications from "./notifications"
 import styles, { documentReady, plugins as pluginStyleNode, themes as themeStyleNode } from "./styles"
 import modals from "./modals"
 import commands from "./commands"
+import update from "./update"
 
 import styling from "styles"
 
@@ -130,7 +131,7 @@ async function windowsLoadingIcon(React) {
     return stringed.includes("windowKey:") && stringed.includes("themeOverride") && stringed.includes(".macOSFrame")
   })
   
-  const dispatcher = webpack.getModuleByProps("dirtyDispatch", "dispatch")
+  const dispatcher = webpack.getModuleByProps("subscribe", "dispatch")
 
   DrApi.Patcher.after("DrApi", titlebar, "default", (that, args, res) => {
     const [ isLoaded, setLoaded ] = React.useState(loaded)
@@ -173,46 +174,21 @@ void async function() {
 
   window.DrApi.React = React
 
-  settings(React)
-  notifications(React)
-  modals(React)
-  windowsLoadingIcon(React)
-  commands(React)
+  settings(React).catch((error) => logger.error("Settings", error))
+  notifications(React).catch((error) => logger.error("Notifications", error))
+  modals(React).catch((error) => logger.error("Modals", error))
+  windowsLoadingIcon(React).catch((error) => logger.error("WindowsLoadingIcon", error))
+  commands(React).catch((error) => logger.error("Commands", error))
 
-  const dispatcher = await webpack.getModuleByPropsAsync("dirtyDispatch", "dispatch")
+  const dispatcher = await webpack.getModuleByPropsAsync("subscribe", "dispatch")
   function onOpen() {
     loaded = true
     
     logger.log("Plugins", "Initializing all plugins")
     plugins()
 
-    logger.log("Updater", "Checking for new update")
-    DrApi.request("https://api.github.com/repos/Dr-Discord/Discord-Re-envisioned/releases", async request => {
-      const json = (await request.json()).shift()
+    update(React)
 
-      if (DrApiNative.package.version >= json.tag_name) return
-      
-      const CloudDownload = webpack.getModuleByDisplayName("CloudDownload", true)
-      DrApi.modals.confirmModal([
-        React.createElement(CloudDownload, {
-          style: {
-            transform: "translateY(4px)",
-            marginRight: 8
-          }
-        }),
-        "You version is out of date!"
-      ], [
-        "Do you want to update Discord Re-envisioned",
-        `You version is '${DrApiNative.package.version}' and the latest is '${json.tag_name}'`
-      ], {
-        confirmText: "Update",
-        onConfirm: () => {
-          const hash = json.assets.find(a => a.name.endsWith(".asar")).url.split("/").pop()
-          DrApiNative.downloadAsar(hash, (err) => err ? null : DrApiNative.quit(true))
-        }
-      })
-    })
-    
     dispatcher.unsubscribe("CONNECTION_OPEN", onOpen)
   }
 
@@ -220,7 +196,6 @@ void async function() {
   dispatcher.subscribe("CONNECTION_OPEN", ({ user }) => document.documentElement.setAttribute("user-id", user.id))
   dispatcher.subscribe("LOGOUT", () => document.documentElement.removeAttribute("user-id"))
 }()
-
 
 function onDocumentLoad() {
   globalThis.console = { ...globalThis.console }
