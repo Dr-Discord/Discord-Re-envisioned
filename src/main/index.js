@@ -8,6 +8,7 @@ import styles, { documentReady, plugins as pluginStyleNode, themes as themeStyle
 import modals from "./modals"
 import commands from "./commands"
 import update from "./update"
+import keybind from "./keybind"
 
 import styling from "styles"
 
@@ -43,12 +44,22 @@ void function() {
   Patcher.instead("DrApi", DOMTokenList.prototype, "add", changeClasses)
   Patcher.instead("DrApi", DOMTokenList.prototype, "remove", changeClasses)
   Patcher.instead("DrApi", DOMTokenList.prototype, "contains", changeClasses)
+
+  function querySelector(that, [ selector ], old) {
+    return old.apply(that, [ selector.replace(/( |\.)dr-/g, ".dr-") ])
+  }
+
+  Patcher.instead("DrApi", document, "querySelector", querySelector)
+  Patcher.instead("DrApi", document, "querySelectorAll", querySelector)
+  Patcher.instead("DrApi", Element.prototype, "querySelector", querySelector)
+  Patcher.instead("DrApi", Element.prototype, "querySelectorAll", querySelector)
 }()
 
 window.DrApi = {
   request: (url, then) => fetch(url).then(then),
   webpack,
   Patcher,
+  keybind,
   storage: {
     useStorage: (pluginName, key, defaultValue) => storage.useStorage(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, defaultValue),
     getData: (pluginName, key, defaultValue) => storage.getData(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, defaultValue),

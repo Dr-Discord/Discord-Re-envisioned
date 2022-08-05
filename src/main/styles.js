@@ -7,7 +7,6 @@ export const themes = document.createElement("dr-themes")
 export const plugins = document.createElement("dr-plugins")
 export const customCSS = document.createElement("style")
 
-
 styles.append(internal, plugins, themes, customCSS)
 
 customCSS.innerHTML = storage.customCSS()

@@ -79,3 +79,29 @@ contextBridge.exposeInMainWorld("DrApiNative", Native)
 const node = document.createElement("script")
 node.innerHTML = fs.readFileSync(path.join(__dirname, "main.js"), "utf-8")
 document.append(node)
+
+const replace = (item, fun, callback) => {
+  const old = item[fun]
+  item[fun] = function() {
+    return callback(this, arguments, old)
+  }
+}
+
+function querySelector(that, [ selector ], old) {
+  return old.apply(that, [ selector.replace(/( |\.)dr-/g, ".dr-") ])
+}
+
+function changeClasses(that, classes, old) {
+  let newClasses = []
+  classes.map(c => c.includes(" dr-") ? newClasses.push(...c.split(" ")) : newClasses.push(c))
+  return old.apply(that, newClasses)
+}
+
+replace(DOMTokenList.prototype, "add", changeClasses)
+replace(DOMTokenList.prototype, "remove", changeClasses)
+replace(DOMTokenList.prototype, "contains", changeClasses)
+
+replace(document, "querySelector", querySelector)
+replace(document, "querySelectorAll", querySelector)
+replace(Element.prototype, "querySelector", querySelector)
+replace(Element.prototype, "querySelectorAll", querySelector)

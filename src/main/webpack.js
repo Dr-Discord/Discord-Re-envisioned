@@ -1,13 +1,13 @@
-export default new class rawWebpack {
+export default new class Webpack {
   constructor() {
     let waiting = []
     let webpackModules = {}
-    window.webpackChunkdiscord_app ??= []
     
-    window.webpackChunkdiscord_app.push([[Symbol("DrApi")], {}, instance => {
-      window.webpackChunkdiscord_app.pop()
-      this.instance = instance
-    }])
+    window.webpackChunkdiscord_app.push([
+      [ Symbol("DrApi") ], 
+      {}, 
+      instance => this.instance = instance
+    ])
 
     let old = window.webpackChunkdiscord_app.push
   

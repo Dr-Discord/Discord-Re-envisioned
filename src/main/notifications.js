@@ -30,9 +30,9 @@ export default async (React) => {
   }
 
   function Toast({ title, content, icon, buttons = [], hideToast, id, type = "", duration = Infinity }) {
-    const [blur] = storage.useStorage("internal", "notificationBlur", 0)
-    const [opacity] = storage.useStorage("internal", "notificationOpacity", 80)
-    const [showAlert] = storage.useStorage("internal", "notificationShowAlert", false)
+    const [ blur ] = storage.useStorage("internal", "notificationBlur", 0)
+    const [ opacity ] = storage.useStorage("internal", "notificationOpacity", 80)
+    const [ showAlert ] = storage.useStorage("internal", "notificationShowAlert", false)
 
     const Ref = React.useRef()
 
@@ -99,7 +99,9 @@ export default async (React) => {
               children: React.createElement(Clickable, {
                 className: "dr-toast-close",
                 onContextMenu: (event) => {
-                  if (showAlert) return DrApi.modals.confirmModal("Close all toasts", ["Are you sure you want to close every toast?"], {
+                  if (showAlert) return DrApi.modals.confirmModal("Close all toasts", [
+                    "Are you sure you want to close every toast?"
+                  ], {
                     danger: true,
                     confirmText: "Close All",
                     onConfirm: () => {

@@ -464,14 +464,15 @@ export default async (React) => {
   }
 
   let ColorPicker = () => false
-  webpack.instance.e("36623").then(() => ColorPicker = webpack.instance("593642").default)
+  // Weird bug
+  if (webpack.instance) webpack.instance.e("36623").then(() => ColorPicker = webpack.instance("593642").default)
     
   function makeThemeSettings(addon, settings) {
     return React.createElement(() => {
       const result = []
       
-      for (const [key, value] of Object.entries(settings)) {
-        const [data, setData] = storage.useStorage(`${addon.name}.theme`, key, value.initial)
+      for (const [ key, value ] of Object.entries(settings)) {
+        const [ data, setData ] = storage.useStorage(`${addon.name}.theme`, key, value.initial)
 
         let content = React.createElement("div", { style: { color: "var(--text-danger)" } }, `ERROR: UNKNOWN TYPE '${value.type}'`)
         const type = value.type.toLowerCase()
@@ -1216,7 +1217,7 @@ export default async (React) => {
 
     if (!friendRequests) return
     if (res.find(s => s.section === "Discord Re-envisioned")) return
-    
+
     res.splice(friendRequests, 0, ...settings)
   })
 

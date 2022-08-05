@@ -1,5 +1,5 @@
-export default new class rawPatcher {
-  Symbol = Symbol("DrApi")
+export default new class Patcher {
+  Symbol = Symbol("DrApi:Patcher")
   patches = {}
   hook(module, fn) {
     if (!module[fn]) module[fn] = () => {}
