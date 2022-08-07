@@ -8,7 +8,6 @@ import styles, { documentReady, plugins as pluginStyleNode, themes as themeStyle
 import modals from "./modals"
 import commands from "./commands"
 import update from "./update"
-import keybind from "./keybind"
 
 import styling from "styles"
 
@@ -59,7 +58,6 @@ window.DrApi = {
   request: (url, then) => fetch(url).then(then),
   webpack,
   Patcher,
-  keybind,
   storage: {
     useStorage: (pluginName, key, defaultValue) => storage.useStorage(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, defaultValue),
     getData: (pluginName, key, defaultValue) => storage.getData(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, defaultValue),

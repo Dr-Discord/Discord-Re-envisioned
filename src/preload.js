@@ -85,6 +85,7 @@ const replace = (item, fun, callback) => {
   item[fun] = function() {
     return callback(this, arguments, old)
   }
+  item[fun].toString = () => old.toString()
 }
 
 function querySelector(that, [ selector ], old) {

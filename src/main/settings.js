@@ -995,7 +995,7 @@ export default async (React) => {
   const { useStateFromStores } = webpack.getModuleByProps("useStateFromStores") 
 
   function CustomCSS() {
-    const windowInstance = useStateFromStores([PopoutWindowStore], () => PopoutWindowStore.getWindow("DISCORD_CUSTOM_CSS"))
+    const windowInstance = useStateFromStores([ PopoutWindowStore ], () => PopoutWindowStore.getWindow("DISCORD_CUSTOM_CSS"))
 
     const ref = React.useRef()
 
