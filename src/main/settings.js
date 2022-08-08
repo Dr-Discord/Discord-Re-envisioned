@@ -366,6 +366,7 @@ export default async (React) => {
             React.createElement(FormItem, {
               title: "Theme",
               children: React.createElement(SingleSelect, {
+                className: marginBottom8,
                 onChange: (theme) => setAceTheme(theme),
                 options: editorThemes.map(theme => ({ label: window._ ? window._.startCase(theme) : theme, value: theme })),
                 value: aceTheme
