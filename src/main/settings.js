@@ -1059,15 +1059,17 @@ export default async (React) => {
     const ref = React.useRef()
 
     React.useEffect(() => {
-      const editor = ace.edit(ref.current)
-      editor.setTheme(`ace/theme/${theme}`)
-      editor.getSession().setMode("ace/mode/css")
-      editor.setValue(storage.customCSS())
-      editor.on("change", () => {
-        const value = editor.getValue()
-        storage.customCSS(value)
-        customCSS.innerHTML = value
-      })
+      if (!Array.from(ref.current.children).length) {
+        const editor = ace.edit(ref.current)
+        editor.setTheme(`ace/theme/${theme}`)
+        editor.getSession().setMode("ace/mode/css")
+        editor.setValue(storage.customCSS())
+        editor.on("change", () => {
+          const value = editor.getValue()
+          storage.customCSS(value)
+          customCSS.innerHTML = value
+        })
+      }
       
       const style = Object.assign(document.createElement("style"), {
         textContent: `${[...document.querySelectorAll("style")].filter(e => e.innerHTML.includes("sourceURL=ace/")).reduce((styles, style) => styles += style.textContent, "")}.${macDragRegion},.ace_print-margin-layer{ display: none }${aceDetect ? `html { background: ${getComputedStyle(document.documentElement).getPropertyValue("--background-tertiary")} }` : ""}`,
