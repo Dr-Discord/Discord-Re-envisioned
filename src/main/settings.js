@@ -63,6 +63,11 @@ export default async (React) => {
   const { openUserProfileModal } = webpack.getModuleByProps("openUserProfileModal")
   const renderMessageMarkup = webpack.getModuleByProps("renderMessageMarkupToAST").default
   const [{ getUser: fetchUser }, { getUser, findByTag }] = webpack.getAllModulesByProps("getUser")
+  const PopoutWindow = webpack.getModule(e => e.default.toString().indexOf("DndProvider") > -1 && React.isValidElement(e.default())).default
+  const dispatcher = webpack.getModuleByProps("subscribe", "dispatch")
+  const PopoutWindowStore = webpack.getModuleByProps("getWindow", "getName", "getIsAlwaysOnTop")
+  const { useStateFromStores } = webpack.getModuleByProps("useStateFromStores") 
+  const { SingleSelect } = webpack.getModuleByProps("SingleSelect")
 
   const { date, container, footer, added, fixed, improved, marginTop, socialLink } = webpack.getModuleByProps("date", "premiumIcon", "improved")
   const { content, modal } = webpack.getModuleByProps("content", "modal", "maxModalWidth")
@@ -83,6 +88,36 @@ export default async (React) => {
 
   const { ROLE_COLORS } = webpack.getModuleByProps("ROLE_COLORS")
   const types = { added, fixed, improved }
+
+  const editorThemes = [
+    "ambiance",
+    "chaos",
+    "chrome",
+    "clouds",
+    "clouds_midnight",
+    "cobalt",
+    "crimson_editor",
+    "dawn",
+    "dracula",
+    "dreamweaver",
+    "eclipse",
+    "github",
+    "gob",
+    "gruvbox",
+    "monokai",
+    "nord_dark",
+    "one_dark",
+    "pastel_on_dark",
+    "solarized_dark",
+    "solarized_light",
+    "sqlserver",
+    "terminal",
+    "textmate",
+    "tomorrow",
+    "twilight",
+    "vibrant_ink",
+    "xcode"
+  ]
 
   const demoToastObj = {
     id: "toastDemo",
@@ -194,6 +229,8 @@ export default async (React) => {
     const [blur, setBlur] = storage.useStorage("internal", "notificationBlur", 0)
     const [opacity, setOpacity] = storage.useStorage("internal", "notificationOpacity", 80)
     const [showAlert, setShowAlert] = storage.useStorage("internal", "notificationShowAlert", false)
+    const [aceTheme, setAceTheme] = storage.useStorage("internal", "aceTheme", "monokai")
+    const [aceDetect, setAceDetect] = storage.useStorage("internal", "aceDetectTitlebarColor", true)
 
     return React.createElement(FormSection, {
       title: "Settings",
@@ -317,6 +354,31 @@ export default async (React) => {
                 onChange: (val) => setShowAlert(val),
                 value: showAlert
               })
+            })
+          ]
+        }),
+        React.createElement(Category, {
+          title: "Custom CSS",
+          subTitle: "Customize the custom css editor",
+          id: "customCSS",
+          icon: (props) => React.createElement(Pencil, props),
+          content: [
+            React.createElement(FormItem, {
+              title: "Theme",
+              children: React.createElement(SingleSelect, {
+                onChange: (theme) => setAceTheme(theme),
+                options: editorThemes.map(theme => ({ label: window._ ? window._.startCase(theme) : theme, value: theme })),
+                value: aceTheme
+              })
+            }),
+            React.createElement(FormDivider, {
+              className: topDivider
+            }),
+            React.createElement(SwitchItem, {
+              value: aceDetect,
+              children: "Detect app titlebar color",
+              note: "Detects the apps titlebar color and applies it to the custom css titlebar.",
+              onChange: (val) => setAceDetect(val)
             })
           ]
         }),
@@ -629,7 +691,7 @@ export default async (React) => {
     const [enabledAddons, setEnabledAddons] = storage.useStorage("internal", isTheme(addon.filePath) ? "enabledThemes" : isSplash(addon.filePath) ? "enabledSplashThemes" : "enabledPlugins", [])
 
     const isEnabled = storage.getData("internal", isTheme(addon.filePath) ? "enabledThemes" : isSplash(addon.filePath) ? "enabledSplashThemes" : "enabledPlugins", []).includes(addon.name)
-    
+
     return React.createElement(Card, {
       ...Card.defaultProps,
       editable: true,
@@ -989,21 +1051,16 @@ export default async (React) => {
     })
   }
 
-  const PopoutWindow = webpack.getModule(e => e.default.toString().indexOf("DndProvider") > -1 && React.isValidElement(e.default())).default
-  const dispatcher = webpack.getModuleByProps("subscribe", "dispatch")
-  const PopoutWindowStore = webpack.getModuleByProps("getWindow", "getName", "getIsAlwaysOnTop")
-  const { useStateFromStores } = webpack.getModuleByProps("useStateFromStores") 
-
   function CustomCSS() {
+    const [ aceDetect ] = storage.useStorage("internal", "aceDetectTitlebarColor", true)
+    const [ theme ] = storage.useStorage("internal", "aceTheme", "monokai")
     const windowInstance = useStateFromStores([ PopoutWindowStore ], () => PopoutWindowStore.getWindow("DISCORD_CUSTOM_CSS"))
 
     const ref = React.useRef()
 
     React.useEffect(() => {
-      window.windowInstance = windowInstance
-      
       const editor = ace.edit(ref.current)
-      editor.setTheme("ace/theme/monokai")
+      editor.setTheme(`ace/theme/${theme}`)
       editor.getSession().setMode("ace/mode/css")
       editor.setValue(storage.customCSS())
       editor.on("change", () => {
@@ -1011,11 +1068,13 @@ export default async (React) => {
         storage.customCSS(value)
         customCSS.innerHTML = value
       })
-
-      windowInstance.document.head.appendChild(Object.assign(document.createElement("style"), {
-        textContent: `${[...document.querySelectorAll("style")].filter(e => e.innerHTML.includes("sourceURL=ace/")).reduce((styles, style) => styles += style.textContent, "")}.${macDragRegion},.ace_print-margin-layer{ display: none }`,
+      
+      const style = Object.assign(document.createElement("style"), {
+        textContent: `${[...document.querySelectorAll("style")].filter(e => e.innerHTML.includes("sourceURL=ace/")).reduce((styles, style) => styles += style.textContent, "")}.${macDragRegion},.ace_print-margin-layer{ display: none }${aceDetect ? `html { background: ${getComputedStyle(document.documentElement).getPropertyValue("--background-tertiary")} }` : ""}`,
         id: "dr-custom-css-popout-style"
-      }))
+      })
+      windowInstance.document.head.appendChild(style)
+      return () => style.remove()
     })
 
     return React.createElement(PopoutWindow, {
