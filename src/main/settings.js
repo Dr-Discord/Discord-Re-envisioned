@@ -1054,6 +1054,7 @@ export default async (React) => {
   function CustomCSS() {
     const [ aceDetect ] = storage.useStorage("internal", "aceDetectTitlebarColor", true)
     const [ theme ] = storage.useStorage("internal", "aceTheme", "monokai")
+    const [ editor, setEditor ] = React.useState()
     const windowInstance = useStateFromStores([ PopoutWindowStore ], () => PopoutWindowStore.getWindow("DISCORD_CUSTOM_CSS"))
 
     const ref = React.useRef()
@@ -1061,7 +1062,6 @@ export default async (React) => {
     React.useEffect(() => {
       if (!Array.from(ref.current.children).length) {
         const editor = ace.edit(ref.current)
-        editor.setTheme(`ace/theme/${theme}`)
         editor.getSession().setMode("ace/mode/css")
         editor.setValue(storage.customCSS())
         editor.on("change", () => {
@@ -1069,7 +1069,10 @@ export default async (React) => {
           storage.customCSS(value)
           customCSS.innerHTML = value
         })
+        setEditor(editor)
       }
+
+      if (editor) editor.setTheme(`ace/theme/${theme}`)
       
       const style = Object.assign(document.createElement("style"), {
         textContent: `${[...document.querySelectorAll("style")].filter(e => e.innerHTML.includes("sourceURL=ace/")).reduce((styles, style) => styles += style.textContent, "")}.${macDragRegion},.ace_print-margin-layer{ display: none }${aceDetect ? `html { background: ${getComputedStyle(document.documentElement).getPropertyValue("--background-tertiary")} }` : ""}`,
