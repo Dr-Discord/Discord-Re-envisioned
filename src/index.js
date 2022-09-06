@@ -69,7 +69,7 @@ electron.app.once("ready", () => {
     callback({ cancel: url.includes("discord.com/api/webhooks"), responseHeaders })
   })
 
-  electron.session.defaultSession.loadExtension(path.join(__dirname, "rdt"))
+  electron.session.defaultSession.loadExtension(path.join(__dirname, "rdt")).catch(() => false)
 })
 
 const basePath = path.join(process.resourcesPath, "app.asar")

@@ -6,12 +6,11 @@ export default async (React) => {
 
   let _id = 0
 
-  const { 
-    openModal, closeModal
-  } = webpack.getModuleByProps("openModalLazy", "openModal")
+  const { openModal, closeModal } = webpack.getModuleByProps("openModalLazy", "openModal")
 
   const Alert = await webpack.getModuleByDisplayNameAsync("Alert", true)
   const ConfirmModal = await webpack.getModuleByDisplayNameAsync("ConfirmModal", true)
+  
   const { Messages } = webpack.getAllModulesByProps("Messages")[1]
   const Button = webpack.getModuleByProps("ButtonColors", "ButtonSizes").default
 
@@ -33,8 +32,7 @@ export default async (React) => {
 
   window.DrApi.modals = {
     open(content, id) {
-      id ??= `DrApi-Modal-${_id}`
-      _id++
+      id ??= `DrApi-Modal-${_id++}`
 
       openModal(typeof content === "function" ? content : () => content, {
         modalKey: id

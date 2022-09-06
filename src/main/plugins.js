@@ -10,7 +10,7 @@ if (!DrApiNative.fileSystem.exists(pluginsFolder)) DrApiNative.fileSystem.mkdir(
 const readDir = DrApiNative.runInNative("require(\"fs\").readdirSync")
 
 const dir = readDir(pluginsFolder)
-const plugins = dir.filter(plugin => plugin.endsWith(".plugin.js"))
+const plugins = dir.filter(plugin => plugin.endsWith(".script.js"))
 
 const _plugins = {}
 
@@ -29,7 +29,7 @@ let ready = false
 let InlineCode
 const watches = {}
 DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (type, file) => {
-  if (!file.endsWith(".plugin.js")) return
+  if (!file.endsWith(".script.js")) return
 
   if (watches[file]) return
   watches[file] = true

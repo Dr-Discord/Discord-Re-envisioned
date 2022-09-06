@@ -1,13 +1,13 @@
 export default new class Webpack {
   constructor() {
-    let waiting = []
+    let waiting = new Set()
     let webpackModules = {}
     
     window.webpackChunkdiscord_app ??= []
 
     window.webpackChunkdiscord_app.push([
       [ Symbol("DrApi") ], 
-      {}, 
+      { }, 
       instance => this.instance = instance
     ])
 
@@ -21,20 +21,9 @@ export default new class Webpack {
           const old = modules[id]
           modules[id] = function(module) {
             const res = old.apply(this, arguments)
-            for (const ite of waiting) ite(module.exports, id)
+            for (const ite of [...waiting]) ite(module.exports, id)
             
             webpackModules[id] = module.exports
-
-            if (module.exports && !module.exports.css) {
-              const m = Object.entries(module.exports)
-              m.map(([id, selector]) => {
-                if (typeof selector !== "string") return 
-                if (!selector.includes(`${id}-`)) return 
-                let newSelector = []
-                for (const s of selector.split(" ")) newSelector.push(`${s} dr-${s.split("-")[0]}`)
-                module.exports[id] = newSelector.join(" ")
-              })
-            }
             
             return res
           }
@@ -60,13 +49,32 @@ export default new class Webpack {
     this.webpackModules = webpackModules
     this.waiting = waiting
   }
-  getModule(filter) {
+  #ensureQuery(query) {
+    if (!query) query = () => true
+    if (typeof query === "function") query = { filter: query }
+
+    query.defaultExport ??= false
+
+    if (query.filters) {
+      query.filters = query.filters.map(filter => this.#ensureQuery(filter))
+      query.filter = (module, id) => query.filters.every(query => query.filter(module, id))
+    }
+
+    const old = query.filter
+    query.filter = (module, id) => {
+      try { return old(query.searchInDefault ? module.default : module, id) }
+      catch (error) {}
+    }
+
+    return query
+  }
+  getModule(query) {
+    query = this.#ensureQuery(query)
+
     for (const id in this.webpackModules) {
-      try {
-        const module = this.webpackModules[id]
-        if (!module) continue
-        if (filter(module, id)) return module
-      } catch (error) {}
+      const module = this.webpackModules[id]
+      if (!module) continue
+      if (query.filter(module, id)) return query.defaultExport ? module.default : module
     }
   }
   getModuleById(id) { return this.webpackModules[id] }
@@ -80,19 +88,33 @@ export default new class Webpack {
     return _module
   }
   getModuleByDisplayName(displayName, returnDefault = false) {
-    const module = this.getModule(module => module?.default.displayName === displayName)
-    if (returnDefault) return module?.default
-    return module
+    return this.getModule({
+      filter: module => module.displayName === displayName,
+      searchInDefault: true,
+      defaultExport: returnDefault
+    })
   }
-  getAllModules(filter) {
-    let modules = []
-    for (const id in this.webpackModules) {
-      try {
+  getBulk(...queries) {
+    queries = queries.map(query => this.#ensureQuery(query))
+
+    return queries.map(query => {
+      for (const id in this.webpackModules) {
         const module = this.webpackModules[id]
-        if (!module) continue
-        if (filter(module)) modules.push(module)
-      } catch (error) {}
+        if (query.filter(module, id)) return query.defaultExport ? module.default : module
+      }
+    })
+  }
+  getAllModules(query) {
+    query = this.#ensureQuery(query)
+
+    let modules = []
+    
+    for (const id in this.webpackModules) {
+      const module = this.webpackModules[id]
+      if (!module) continue
+      if (query.filter(module, id)) modules.push(query.defaultExport ? module.default : module)
     }
+
     return modules
   }
   getAllModulesByProps(...props) {
@@ -105,27 +127,34 @@ export default new class Webpack {
     return modules
   }
   getAllModulesByDisplayName(displayName, returnDefault = false) {
-    const modules = this.getAllModules(module => module?.default.displayName === displayName)
-    if (returnDefault) return modules.map(module => module?.default)
-    return modules
+    return this.getAllModules({
+      filter: module => module.displayName === displayName,
+      searchInDefault: true,
+      defaultExport: returnDefault
+    })
   }
-  getModuleAsync(filter) {
+  getModuleAsync(query) {
+    query = this.#ensureQuery(query)
+    
     let _this = this
     return new Promise(resolve => {
-      const cached = _this.getModule(filter)
+      const cached = this.getModule(query)
       if (cached) return resolve(cached)
+
       function waiter(module, id) {
         try {
           if (!module) return
-          if (filter(module, id)) {
-            const i = _this.waiting.indexOf(waiter)
-            _this.waiting.splice(i, 1)
-            resolve(module)
+          
+          if (query.filter(module, id)) {
+            _this.waiting.delete(waiter)
+            resolve(query.defaultExport ? module.default : module)
             return true
           }
+          
         } catch (error) {}
       }
-      this.waiting.push(waiter)
+
+      this.waiting.add(waiter)
     })
   }
   getModuleByIdAsync(moduleId) {

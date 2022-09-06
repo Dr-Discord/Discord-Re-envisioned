@@ -4,7 +4,7 @@
   margin: 8px
 } 
 #dr-notification-position {
-  .dr-wrapper {
+  & > div > div {
     margin-left: 10%;
     width: 80%
   } 

@@ -1,6 +1,32 @@
 [
   {
     "title": "What's New",
+    "subtitle": "Discord Re-envisioned v1.1.2",
+    "body": [
+      {
+        "title": "PLUGINS ",
+        "type": "improved",
+        "content": [
+          {
+            "title": "Plugin files.",
+            "content": "Plugin files now end with '.script.js' instead of '.plugin.js'"
+          }
+        ]
+      },
+      {
+        "title": "MAGIC CLASSES ",
+        "type": "improved",
+        "content": [
+          {
+            "title": "Magic classes are removed.",
+            "content": "Remove the 'dr-' magic classes they where to buggy and caused conflicts in client mods"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "What's New",
     "subtitle": "Discord Re-envisioned v1.1.0",
     "body": [
       {

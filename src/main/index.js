@@ -33,27 +33,6 @@ for (const key in originalConsole) {
   })
 }
 
-void function() {  
-  function changeClasses(that, classes, old) {
-    let newClasses = []
-    classes.map(c => c.includes(" dr-") ? newClasses.push(...c.split(" ")) : newClasses.push(c))
-    return old.apply(that, newClasses)
-  }
-
-  Patcher.instead("DrApi", DOMTokenList.prototype, "add", changeClasses)
-  Patcher.instead("DrApi", DOMTokenList.prototype, "remove", changeClasses)
-  Patcher.instead("DrApi", DOMTokenList.prototype, "contains", changeClasses)
-
-  function querySelector(that, [ selector ], old) {
-    return old.apply(that, [ selector.replace(/( |\.)dr-/g, ".dr-") ])
-  }
-
-  Patcher.instead("DrApi", document, "querySelector", querySelector)
-  Patcher.instead("DrApi", document, "querySelectorAll", querySelector)
-  Patcher.instead("DrApi", Element.prototype, "querySelector", querySelector)
-  Patcher.instead("DrApi", Element.prototype, "querySelectorAll", querySelector)
-}()
-
 window.DrApi = {
   request: (url, then) => fetch(url).then(then),
   webpack,
@@ -154,6 +133,7 @@ async function windowsLoadingIcon(React) {
       return () => dispatcher.unsubscribe("CONNECTION_OPEN", onOpen)
     })
 
+    if (!res) return
     if (isLoaded) return
     if (res.type.displayName !== "Windows") return
 

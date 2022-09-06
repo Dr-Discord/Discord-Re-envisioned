@@ -6,87 +6,324 @@ import { getThemes, toggleTheme, parseTheme, isTheme, isSplash } from "./themes"
 import { getPlugins, togglePlugin } from "./plugins"
 import logger from "./logger"
 
-window.getThemes = getThemes
-
 const shell = DrApiNative.runInNative(`require("electron").shell`)
 
 export default async (React) => {
   const SettingsView = await webpack.getModuleByDisplayNameAsync("SettingsView", true)
   logger.log("Settings", "Patching 'getPredicateSections' to add settings")
 
-  const NotificationSettings = webpack.getModuleByDisplayName("NotificationSettings", true)
-  const FormSection = webpack.getModuleByDisplayName("FormSection", true)
-  const SwitchItem = webpack.getModuleByDisplayName("SwitchItem", true)
-  const Card = webpack.getModuleByDisplayName("Card", true)
-  const Flex = webpack.getModuleByDisplayName("Flex", true)
-  const Clickable = webpack.getModuleByDisplayName("Clickable", true)
-  const FormDivider = webpack.getModuleByDisplayName("FormDivider", true)
-  const Caret = webpack.getModuleByDisplayName("Caret", true)
-  const Mail = webpack.getModuleByDisplayName("Mail", true)
-  const LegacyHeader = webpack.getModuleByDisplayName("LegacyHeader", true)
-  const FormItem = webpack.getModuleByDisplayName("FormItem", true)
-  const Slider = webpack.getModuleByDisplayName("Slider", true)
-  const { Text } = webpack.getModule(m => m.Text.displayName)
-  const { Messages } = webpack.getAllModulesByProps("Messages")[1]
-  const Switch = webpack.getModuleByDisplayName("Switch", true)
-  const SearchBar = webpack.getModuleByDisplayName("SearchBar", true)
-  const Folder = webpack.getModuleByDisplayName("Folder", true)
-  const OverflowMenu = webpack.getModuleByDisplayName("OverflowMenu", true)
-  const { Icon } = webpack.getModuleByProps("Icon", "default")
-  const { default: Menu, MenuItem, MenuSeparator } = webpack.getModuleByDisplayName("Menu")
-  const Popout = webpack.getModuleByDisplayName("Popout", true)
-  const Filter = webpack.getModuleByDisplayName("Filter", true)
-  const Trash = webpack.getModuleByDisplayName("Trash", true)
-  const Globe = webpack.getModuleByDisplayName("Globe", true)
-  const Discord = webpack.getModuleByDisplayName("Discord", true)
-  const InlineCode = webpack.getModuleByDisplayName("InlineCode", true)
-  const WalletIcon = webpack.getModuleByDisplayName("WalletIcon", true)
-  const Ticket = webpack.getModuleByDisplayName("Ticket", true)
-  const DoubleStarIcon = webpack.getModuleByDisplayName("DoubleStarIcon", true)
-  const Creative = webpack.getModuleByDisplayName("Creative", true)
-  const SortIcon = webpack.getModuleByDisplayName("SortIcon", true)
-  const OsMac = webpack.getModuleByDisplayName("OsMac", true)
-  const Retry = webpack.getModuleByDisplayName("Retry", true)
-  const Gear = webpack.getModuleByDisplayName("Gear", true)
-  const Pencil = webpack.getModuleByDisplayName("Pencil", true)
-  const Monitor = webpack.getModuleByDisplayName("Monitor", true)
-  const [, Alert] = webpack.getAllModulesByDisplayName("Alert", true)
-  const InfoFilled = webpack.getModuleByDisplayName("InfoFilled", true)
-  const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
-  const Anchor = webpack.getModuleByDisplayName("Anchor", true)
-  const FormText = webpack.getModuleByDisplayName("FormText", true)
-  const TextInput = webpack.getModuleByDisplayName("TextInput", true)
-  const { openContextMenu, closeContextMenu } = webpack.getModuleByProps("openContextMenuLazy")
-  const { ModalRoot, ModalHeader, ModalCloseButton, ModalContent, ModalFooter, ModalSize } = webpack.getModuleByProps("ModalRoot", "ModalContent")
-  const { Heading } = webpack.getModule(m => m.Heading.displayName)
-  const Button = webpack.getModuleByProps("ButtonColors", "ButtonSizes").default
-  const { openUserProfileModal } = webpack.getModuleByProps("openUserProfileModal")
-  const renderMessageMarkup = webpack.getModuleByProps("renderMessageMarkupToAST").default
-  const [{ getUser: fetchUser }, { getUser, findByTag }] = webpack.getAllModulesByProps("getUser")
-  const PopoutWindow = webpack.getModule(e => e.default.toString().indexOf("DndProvider") > -1 && React.isValidElement(e.default())).default
-  const dispatcher = webpack.getModuleByProps("subscribe", "dispatch")
-  const PopoutWindowStore = webpack.getModuleByProps("getWindow", "getName", "getIsAlwaysOnTop")
-  const { useStateFromStores } = webpack.getModuleByProps("useStateFromStores") 
-  const { SingleSelect } = webpack.getModuleByProps("SingleSelect")
+  const [
+    NotificationSettings,
+    FormSection,
+    SwitchItem,
+    Card,
+    Flex,
+    Clickable,
+    FormDivider,
+    Caret,
+    Mail,
+    LegacyHeader,
+    FormItem,
+    Slider,
+    { Text },
+    { Messages },
+    Switch,
+    SearchBar,
+    Folder,
+    OverflowMenu,
+    { Icon },
+    { default: Menu, MenuItem, MenuSeparator },
+    Popout,
+    Filter,
+    Trash,
+    Globe,
+    Discord,
+    InlineCode,
+    WalletIcon,
+    Ticket,
+    DoubleStarIcon,
+    Creative,
+    SortIcon,
+    OsMac,
+    Retry,
+    Gear,
+    Pencil,
+    Monitor,
+    Alert,
+    InfoFilled,
+    Tooltip,
+    Anchor,
+    FormText,
+    TextInput,
+    { openContextMenu, closeContextMenu },
+    { ModalRoot, ModalHeader, ModalCloseButton, ModalContent, ModalFooter, ModalSize },
+    { Heading },
+    Button,
+    { openUserProfileModal },
+    renderMessageMarkup,
+    { getUser: fetchUser },
+    { getUser, findByTag },
+    PopoutWindow,
+    dispatcher,
+    PopoutWindowStore,
+    { useStateFromStores },
+    { SingleSelect },
+    isWhat,
+    { date, container, footer, added, fixed, improved, marginTop, socialLink },
+    { content, modal },
+    { horizontal },
+    { header, topDivider, body, expandIcon },
+    { iconWrapper, wrapper, secondaryHeader },
+    { justifyCenter, alignCenter, justifyBetween, justifyEnd },
+    { card },
+    { size16, size20 },
+    { icon:iconToolbar },
+    { icon:iconMenu },
+    { line },
+    { search },
+    { macDragRegion },
+    { marginBottom8 },
+    { container:formContainer, dividerDefault },
+    { emptyResultsText, noResultsImage, emptyResultsWrap, emptyResultsContent, alt },
+    { ROLE_COLORS }
+  ] = DrApi.webpack.getBulk({
+    filter: (m) => m.displayName === "NotificationSettings", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "FormSection", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "SwitchItem", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Card", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Flex", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Clickable", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "FormDivider", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Caret", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Mail", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "LegacyHeader", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "FormItem", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Slider", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.Text.displayName
+  }, {
+    filter: (m) => m._events.locale instanceof Array,
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Switch", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "SearchBar", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Folder", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "OverflowMenu", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: m => m.Icon && m.displayName === "HeaderBar",
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Menu", 
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Popout", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Filter", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Trash", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Globe", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Discord", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "InlineCode", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "WalletIcon", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Ticket", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "DoubleStarIcon", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Creative", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "SortIcon", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "OsMac", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Retry", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Gear", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Pencil", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Monitor", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Alert" && m.toString().includes(".cancelText"), 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "InfoFilled", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Tooltip", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Anchor", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "FormText", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "TextInput", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.openContextMenuLazy
+  }, {
+    filter: (m) => m.ModalRoot && m.ModalContent
+  }, {
+    filter: (m) => m.Heading.displayName
+  }, {
+    filter: (m) => m.ButtonColors && m.ButtonSizes, 
+    defaultExport: true
+  }, {
+    filter: (m) => m.openUserProfileModal
+  }, {
+    filter: (m) => m.renderMessageMarkupToAST,
+    defaultExport: true
+  }, {
+    filter: (m) => m.getUser
+  }, {
+    filter: (m) => m.getUser && m.findByTag,
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.toString().indexOf("DndProvider") > -1 && DrApi.React.isValidElement(m()),
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.subscribe && m.dispatch,
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.getIsAlwaysOnTop && m.getWindow,
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.useStateFromStores
+  }, {
+    filter: (m) => m.SingleSelect
+  }, {
+    filter: (m) => m.isWindows && m.isOSX
+  }, {
+    filter: (m) => m.date && m.premiumIcon && m.improved
+  }, {
+    filter: (m) => m.content && m.modal && m.maxModalWidth
+  }, {
+    filter: (m) => m.flexChild && m.horizontal
+  }, {
+    filter: (m) => m.header && m.topDivider
+  }, {
+    filter: (m) => m.detailsWrapper && m.icon && m.iconWrapper
+  }, {
+    filter: (m) => m.justifyCenter && m.alignCenter
+  }, {
+    filter: (m) => m.card && m.pulse && m.topDivider
+  }, {
+    filter: (m) => m.size20 && m.size16
+  }, {
+    filter: (m) => m.icon && m.transparent && m.iconWrapper
+  }, {
+    filter: (m) => m.colorPremium && m.icon
+  }, {
+    filter: (m) => m.line && m.versionHash
+  }, {
+    filter: (m) => m.search && m.toolbar
+  }, {
+    filter: (m) => m.macDragRegion
+  }, {
+    filter: (m) => m.marginBottom8 && m.marginBottom4
+  }, {
+    filter: (m) => m.container && m.dividerDefault
+  }, {
+    filter: (m) => m.stillIndexing && m.noResults
+  }, {
+    filter: (m) => m.ROLE_COLORS
+  })
 
-  const { date, container, footer, added, fixed, improved, marginTop, socialLink } = webpack.getModuleByProps("date", "premiumIcon", "improved")
-  const { content, modal } = webpack.getModuleByProps("content", "modal", "maxModalWidth")
-  const { horizontal } = webpack.getModuleByProps("flexChild", "horizontal")
-  const { header, topDivider, body, expandIcon } = webpack.getModuleByProps("header", "topDivider")
-  const { iconWrapper, wrapper, secondaryHeader } = webpack.getModuleByProps("detailsWrapper", "icon", "iconWrapper")
-  const { justifyCenter, alignCenter, justifyBetween, justifyEnd } = webpack.getModuleByProps("justifyCenter", "alignCenter")
-  const { card } = webpack.getModuleByProps("card", "pulse", "topDivider")
-  const { size16, size20 } = webpack.getModuleByProps("size20", "size16")
-  const { icon:iconToolbar } = webpack.getModuleByProps("icon", "transparent", "iconWrapper")
-  const { icon:iconMenu } = webpack.getModuleByProps("colorPremium", "icon")
-  const { line } = webpack.getModuleByProps("line", "versionHash")
-  const { search } = webpack.getModuleByProps("search", "toolbar")
-  const { macDragRegion } = webpack.getModuleByProps("macDragRegion")
-  const { marginBottom8 } = webpack.getModuleByProps("marginBottom8", "marginBottom4")
-  const { container:formContainer, dividerDefault } = webpack.getModuleByProps("container", "dividerDefault")
-  const { emptyResultsText, noResultsImage, emptyResultsWrap, emptyResultsContent, alt } = webpack.getModuleByProps("stillIndexing", "noResults")
-
-  const { ROLE_COLORS } = webpack.getModuleByProps("ROLE_COLORS")
   const types = { added, fixed, improved }
 
   const editorThemes = [
@@ -140,7 +377,7 @@ export default async (React) => {
     icon,
     open = false
   }) {
-    const [isOpen, setOpen] = React.useState(open)
+    const [ isOpen, setOpen ] = React.useState(open)
 
     React.useEffect(() => {
       if (id === "notifications" && isOpen) DrApi.toast.show(demoToastObj)
@@ -220,17 +457,17 @@ export default async (React) => {
   }
 
   function Settings() {
-    const [newMacOS, setNewMacOS] = storage.useStorage("internal", "newMacOS", true)
-    const [transparency, setTransparency] = storage.useStorage("internal", "transparency", false)
-    const [position, setPosition] = storage.useStorage("internal", "notificationLocation", NotificationSettings.Positions.TOP_RIGHT)
-    const [positionX, setPositionX] = storage.useStorage("internal", "notificationPositionX", 20)
-    const [positionY, setPositionY] = storage.useStorage("internal", "notificationPositionY", 20)
-    const [maxHeight, setMaxHeight] = storage.useStorage("internal", "notificationMaxHeight", 30)
-    const [blur, setBlur] = storage.useStorage("internal", "notificationBlur", 0)
-    const [opacity, setOpacity] = storage.useStorage("internal", "notificationOpacity", 80)
-    const [showAlert, setShowAlert] = storage.useStorage("internal", "notificationShowAlert", false)
-    const [aceTheme, setAceTheme] = storage.useStorage("internal", "aceTheme", "monokai")
-    const [aceDetect, setAceDetect] = storage.useStorage("internal", "aceDetectTitlebarColor", true)
+    const [ newMacOS, setNewMacOS ] = storage.useStorage("internal", "newMacOS", true)
+    const [ transparency, setTransparency ] = storage.useStorage("internal", "transparency", false)
+    const [ position, setPosition ] = storage.useStorage("internal", "notificationLocation", NotificationSettings.Positions.TOP_RIGHT)
+    const [ positionX, setPositionX ] = storage.useStorage("internal", "notificationPositionX", 20)
+    const [ positionY, setPositionY ] = storage.useStorage("internal", "notificationPositionY", 20)
+    const [ maxHeight, setMaxHeight ] = storage.useStorage("internal", "notificationMaxHeight", 30)
+    const [ blur, setBlur ] = storage.useStorage("internal", "notificationBlur", 0)
+    const [ opacity, setOpacity ] = storage.useStorage("internal", "notificationOpacity", 80)
+    const [ showAlert, setShowAlert ] = storage.useStorage("internal", "notificationShowAlert", false)
+    const [ aceTheme, setAceTheme ] = storage.useStorage("internal", "aceTheme", "monokai")
+    const [ aceDetect, setAceDetect ] = storage.useStorage("internal", "aceDetectTitlebarColor", true)
 
     return React.createElement(FormSection, {
       title: "Settings",
@@ -475,7 +712,7 @@ export default async (React) => {
 
   const promisedUsers = {}
   function useUser(author, userId) {
-    const [user, setUser] = React.useState(getUser(userId))
+    const [ user, setUser ] = React.useState(getUser(userId))
 
     React.useEffect(() => {
       void async function() {
@@ -547,7 +784,7 @@ export default async (React) => {
           value: data
         })
         else if (type === "text") {
-          const [danger, setDanger] = React.useState(false)
+          const [ danger, setDanger] = React.useState(false)
           React.useEffect(() => value.regex && setDanger(!value.regex.test(data)))
 
           content = React.createElement(TextInput, {
@@ -689,7 +926,7 @@ export default async (React) => {
   }
 
   function AddonCard(addon) {
-    const [enabledAddons, setEnabledAddons] = storage.useStorage("internal", isTheme(addon.filePath) ? "enabledThemes" : isSplash(addon.filePath) ? "enabledSplashThemes" : "enabledPlugins", [])
+    const [ enabledAddons, setEnabledAddons ] = storage.useStorage("internal", isTheme(addon.filePath) ? "enabledThemes" : isSplash(addon.filePath) ? "enabledSplashThemes" : "enabledPlugins", [])
 
     const isEnabled = storage.getData("internal", isTheme(addon.filePath) ? "enabledThemes" : isSplash(addon.filePath) ? "enabledSplashThemes" : "enabledPlugins", []).includes(addon.name)
 
@@ -776,7 +1013,6 @@ export default async (React) => {
                         const data = {
                           defaultPrevented: false,
                           preventDefault: () => data.defaultPrevented = true,
-                          progressDefault: () => data.defaultPrevented = false,
                           size: "MEDIUM",
                           setSize: (size = "MEDIUM") => data.size = size,
                           showAddonSettings: () => showAddonSettings(addon, settings, data.size)
@@ -811,7 +1047,7 @@ export default async (React) => {
                       setEnabledAddons([...enabledAddons])
     
                       if (isTheme(addon.filePath)) toggleTheme(addon.name, val)
-                      else if (addon.filePath.endsWith(".plugin.js")) togglePlugin(addon.name)
+                      else if (addon.filePath.endsWith(".script.js")) togglePlugin(addon.name)
                     }
                   })
                 ]
@@ -876,14 +1112,14 @@ export default async (React) => {
         ] : false,
         React.createElement(MenuItem, {
           id: "edit-addon",
-          label: `Edit ${addon.filePath.endsWith(".plugin.js") ? "Plugin" : "Theme"}`,
+          label: `Edit ${addon.filePath.endsWith(".script.js") ? "Plugin" : "Theme"}`,
           icon: () => React.createElement(Pencil, { className: iconMenu }),
           action: () => shell.openPath(addon.filePath)
         }),
         React.createElement(MenuSeparator),
         React.createElement(MenuItem, {
           id: "uninstall-addon",
-          label: `Uninstall ${addon.filePath.endsWith(".plugin.js") ? "Plugin" : "Theme"}`,
+          label: `Uninstall ${addon.filePath.endsWith(".script.js") ? "Plugin" : "Theme"}`,
           color: "colorDanger",
           icon: () => React.createElement(Trash, { className: iconMenu }),
           action: () => DrApi.modals.confirmModal(`Uninstall ${addon.name}`, `Are you sure you want to uninstall '${addon.name}'?`, {
@@ -897,8 +1133,8 @@ export default async (React) => {
   }
 
   function AddonConfiguration({ event, filter:showFilter }) {
-    const [sortByWhat, setSortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
-    const [filter, setFilter] = storage.useStorage("internal", "addonFilterBy", 0)
+    const [ sortByWhat, setSortByWhat ] = storage.useStorage("internal", "addonSortBy", "name")
+    const [ filter, setFilter ] = storage.useStorage("internal", "addonFilterBy", 0)
 
     return React.createElement(Menu, {
       ...event,
@@ -942,19 +1178,22 @@ export default async (React) => {
     return 0
   }
 
-  const filterAddons = (val, [addon, { author }]) => val.map(v => addon.toLowerCase().includes(v.toLowerCase()) || author.toLowerCase().includes(v.toLowerCase())).filter(l => l).length
+  const filterAddons = (val, [addonName, addon]) => val.map(v => {
+    if (addonName.toLowerCase().includes(v.toLowerCase())) return true
+    if (addon.author) return addon.author.toLowerCase().includes(v.toLowerCase())
+  }).filter(l => l).length
 
   function Themes() {
     storage.useStorage("internal", "enabledThemes", [])
     storage.useStorage("internal", "enabledSplashThemes", [])
 
-    const [sortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
-    const [filter] = storage.useStorage("internal", "addonFilterBy", 0)
-    const [query, setQuery] = React.useState("")
-    const [tags, setTags] = React.useState([])
-    const [themes, setThemes] = React.useState(getThemes())
-    const [splashThemes, setSplashThemes] = React.useState(getThemes(true))
-    const [isConfigOpen, setConfigOpen] = React.useState(false)
+    const [ sortByWhat ] = storage.useStorage("internal", "addonSortBy", "name")
+    const [ filter ] = storage.useStorage("internal", "addonFilterBy", 0)
+    const [ query, setQuery ] = React.useState("")
+    const [ tags, setTags ] = React.useState([])
+    const [ themes, setThemes ] = React.useState(getThemes())
+    const [ splashThemes, setSplashThemes ] = React.useState(getThemes(true))
+    const [ isConfigOpen, setConfigOpen ] = React.useState(false)
 
     const _themes = Object.values(filter === 0 ? Object.values(themes).concat(...Object.values(splashThemes)) : filter === 1 ? Object.values(themes) : Object.values(splashThemes)).sort(sortBy(sortByWhat)).map((theme) => React.createElement(AddonCard, theme))
     const content = _themes.length ? _themes : !(query || tags.length) ? React.createElement(NoAddons, { type: "theme" }) : React.createElement(NoResults)
@@ -1087,7 +1326,7 @@ export default async (React) => {
       windowKey: "DISCORD_CUSTOM_CSS",
       withTitleBar: true,
       title: "Custom CSS",
-      children: React.createElement("div", { ref, style: { width: "100vw", height: "calc(100vh - 22px)" } })
+      children: React.createElement("div", { ref, style: { width: "100vw", height: isWhat.isLinux() ? "100vh" : "calc(100vh - 22px)" } })
     })
   }
 
@@ -1145,11 +1384,11 @@ export default async (React) => {
   function Plugins() {
     storage.useStorage("internal", "enabledPlugins", [])
 
-    const [sortByWhat] = storage.useStorage("internal", "addonSortBy", "name")
-    const [query, setQuery] = React.useState("")
-    const [tags, setTags] = React.useState([])
-    const [plugins, setPlugins] = React.useState(getPlugins())
-    const [isConfigOpen, setConfigOpen] = React.useState(false)
+    const [ sortByWhat ] = storage.useStorage("internal", "addonSortBy", "name")
+    const [ query, setQuery ] = React.useState("")
+    const [ tags, setTags ] = React.useState([])
+    const [ plugins, setPlugins ] = React.useState(getPlugins())
+    const [ isConfigOpen, setConfigOpen ] = React.useState(false)
 
     const _plugins = Object.values(plugins).sort(sortBy(sortByWhat)).map((plugin) => React.createElement(AddonCard, plugin))
     const content = _plugins.length ? _plugins : !(query || tags.length) ? React.createElement(NoAddons, { type: "plugin" }) : React.createElement(NoResults)

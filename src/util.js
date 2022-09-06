@@ -4,7 +4,8 @@ export function readMeta(contents) {
   try {
     const jsdoc = contents.match(/\/\*\*([\s\S]*?)\*\//)
     if (!jsdoc?.[1]) return meta
-    for (let ite of jsdoc[1].match(/\*(\s|)([^\n]*)/g)) {
+    meta.rawMeta = jsdoc[1].match(/\*(\s|)([^\n(\r|)]*)/g)
+    for (let ite of jsdoc[1].match(/\*(\s|)([^\n(\r|)]*)/g)) {
       ite = ite.replace(/\*(\s|)@/, "")
       const split = ite.split(" ")
       meta[split[0].toLowerCase()] = split.slice(1).join(" ").trim()
@@ -16,7 +17,7 @@ export function readMeta(contents) {
   meta.beta = typeof meta.beta === "string"
 
   if (!meta.name) meta.didError = false
-  if (!(meta.exports && meta.filepath.endsWith(".plugin.js"))) meta.didError = false
+  if (!(meta.exports && meta.filepath.endsWith(".script.js"))) meta.didError = false
 
   return meta
 }

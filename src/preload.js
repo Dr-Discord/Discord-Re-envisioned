@@ -87,22 +87,3 @@ const replace = (item, fun, callback) => {
   }
   item[fun].toString = () => old.toString()
 }
-
-function querySelector(that, [ selector ], old) {
-  return old.apply(that, [ selector.replace(/( |\.)dr-/g, ".dr-") ])
-}
-
-function changeClasses(that, classes, old) {
-  let newClasses = []
-  classes.map(c => c.includes(" dr-") ? newClasses.push(...c.split(" ")) : newClasses.push(c))
-  return old.apply(that, newClasses)
-}
-
-replace(DOMTokenList.prototype, "add", changeClasses)
-replace(DOMTokenList.prototype, "remove", changeClasses)
-replace(DOMTokenList.prototype, "contains", changeClasses)
-
-replace(document, "querySelector", querySelector)
-replace(document, "querySelectorAll", querySelector)
-replace(Element.prototype, "querySelector", querySelector)
-replace(Element.prototype, "querySelectorAll", querySelector)

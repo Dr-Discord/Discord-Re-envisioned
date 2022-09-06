@@ -46,7 +46,7 @@ module.exports = new class rawStorage {
   useStorage(name, key, defaultValue) {
     if (!isTopWindow) throw new Error()
 
-    const [state, setState] = DrApi.React.useState(this.getData(name, key, defaultValue))
+    const [ state, setState ] = DrApi.React.useState(this.getData(name, key, defaultValue))
 
     DrApi.React.useEffect(() => {
       if (!listeners[name]) listeners[name] = {}

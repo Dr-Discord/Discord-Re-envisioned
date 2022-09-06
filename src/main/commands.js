@@ -15,7 +15,7 @@ const section = {
 export default async (React) => {
   logger.log("Commands", "Initializing Command api")
 
-  webpack.getModuleAsync("getBuiltInCommands", "BUILT_IN_SECTIONS").then((CommandsStore) => CommandsStore.BUILT_IN_SECTIONS[section.id] = section)
+  webpack.getModuleByPropsAsync("getBuiltInCommands", "BUILT_IN_SECTIONS").then((CommandsStore) => CommandsStore.BUILT_IN_SECTIONS[section.id] = section)
 
   webpack.getModuleByPropsAsync("getApplicationIconURL").then((Icons) => patcher.after("DrApi", Icons, "getApplicationIconURL", (that, [props]) => props?.id === section.id ? section.icon : undefined))
 
@@ -68,11 +68,11 @@ export default async (React) => {
     })
   })
 
-  webpack.getModuleAsync(m => m.type.displayName === "ChannelApplicationIcon").then((ChannelApplicationIcon) => patcher.after("DrApi", ChannelApplicationIcon.default, "type", (_, [props]) => !props.section && props.command.isDrCommand ? void (props.section = section) : undefined))
-  webpack.getModuleByDisplayNameAsync("ApplicationCommandItem").then((ApplicationCommandItem) => patcher.before("DrApi", ApplicationCommandItem, "default", (_, [props]) => !props.section && props.command.isDrCommand ? void (props.section = section) : undefined))
+  webpack.getModuleAsync(m => m.type.displayName === "ChannelApplicationIcon").then((ChannelApplicationIcon) => patcher.after("DrApi", ChannelApplicationIcon.default, "type", (_, [ props ]) => !props.section && props.command.isDrCommand ? void (props.section = section) : undefined))
+  webpack.getModuleByDisplayNameAsync("ApplicationCommandItem").then((ApplicationCommandItem) => patcher.before("DrApi", ApplicationCommandItem, "default", (_, [ props ]) => !props.section && props.command.isDrCommand ? void (props.section = section) : undefined))
 
   void async function() {
-    const Classes = await webpack.getModuleAsync(m => !m.mask && m.icon && m.selectable && m.wrapper)
+    const classes = await webpack.getModuleAsync(m => !m.mask && m.icon && m.selectable && m.wrapper)
     const SectionIcon = await webpack.getModuleByDisplayNameAsync("ApplicationCommandDiscoverySectionIcon")
 
     patcher.after("DrApi", SectionIcon, "default", (that, [props], res) => {
@@ -81,12 +81,16 @@ export default async (React) => {
       const isSmall = props.selectable === undefined
 
       return React.createElement("div", {
-        className: [Classes?.wrapper, props.selectable && Classes?.selectable, props.selectable && props.isSelected && Classes?.selected].filter(e => e).join(" "),
+        className: [
+          classes?.wrapper, 
+          props.selectable && classes?.selectable, 
+          (props.selectable && props.isSelected) && classes?.selected
+        ].filter(e => e).join(" "),
         children: React.createElement("svg", {
           width: props.width,
           height: props.height,
           viewBox: "0 0 22 22",
-          className: [Classes?.icon, props.className].filter(e => e).join(" "),
+          className: [classes?.icon, props.className].filter(e => e).join(" "),
           style: {
             width: `${props.width}px`,
             height: `${props.height}px`,
@@ -108,6 +112,8 @@ export default async (React) => {
       DrApi.commands.commands.add({
         id,
         name,
+        get displayName() { return name || "" },
+        displayDescription: other.description,
         options,
         execute,
         type: 0,
@@ -121,7 +127,7 @@ export default async (React) => {
 
       return () => DrApi.commands.unregister(id)
     },
-    unregister: (id) => DrApi.commands.commands.delete([...DrApi.commands.commands].find(c => c.id === id))
+    unregister: (id) => DrApi.commands.commands.delete([ ...DrApi.commands.commands ].find(c => c.id === id))
   }
 }
 

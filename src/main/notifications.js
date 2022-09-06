@@ -7,17 +7,43 @@ export default async (React) => {
   const Shakeable = await webpack.getModuleByDisplayNameAsync("Shakeable", true)
   logger.log("Notifications", "Patching 'Shakeable' to add notifications")
 
-  const Button = webpack.getModuleByProps("ButtonColors", "ButtonSizes").default
-  const Flex = webpack.getModuleByDisplayName("Flex", true)
-  const { Heading } = webpack.getModuleByProps("Heading")
-  const Close = webpack.getModuleByDisplayName("Close", true)
-  const Clickable = webpack.getModuleByDisplayName("Clickable", true)
-  const renderMessageMarkup = webpack.getModuleByProps("renderMessageMarkupToAST").default
-
-  const { useSpring, animated } = webpack.getModuleByProps("useSpring", "animated")
-
-  const { thin, fade } = webpack.getModuleByProps("thin", "fade")
-  const { scroller } = webpack.getModuleByProps("scroller")
+  const [
+    Button,
+    Flex,
+    { Heading },
+    Close,
+    Clickable,
+    renderMessageMarkup,
+    { useSpring, animated },
+    { thin, fade },
+    { scroller }
+  ] = webpack.getBulk({
+    filter: (m) => m.ButtonColors && m.ButtonSizes, 
+    defaultExport: true
+  }, {
+    filter: (m) => m.displayName === "Flex", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.Heading
+  }, {
+    filter: (m) => m.displayName === "Close", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.displayName === "Clickable", 
+    defaultExport: true,
+    searchInDefault: true
+  }, {
+    filter: (m) => m.renderMessageMarkupToAST, 
+    defaultExport: true
+  }, {
+    filter: (m) => m.useSpring && m.useSpring, 
+  }, {
+    filter: (m) => m.thin && m.fade, 
+  }, {
+    filter: (m) => m.scroller, 
+  })
 
   function toastContent(content) {
     if (!Array.isArray(content)) content = [content]
@@ -141,11 +167,11 @@ export default async (React) => {
   let toastId = 0
 
   function Toasts() {
-    const [location] = storage.useStorage("internal", "notificationLocation", "topRight")
-    const [positionX] = storage.useStorage("internal", "notificationPositionX", 20)
-    const [positionY] = storage.useStorage("internal", "notificationPositionY", 20)
-    const [maxHeight] = storage.useStorage("internal", "notificationMaxHeight", 30)
-    const [toasts, setToasts] = React.useState([])
+    const [ location ] = storage.useStorage("internal", "notificationLocation", "topRight")
+    const [ positionX ] = storage.useStorage("internal", "notificationPositionX", 20)
+    const [ positionY ] = storage.useStorage("internal", "notificationPositionY", 20)
+    const [ maxHeight ] = storage.useStorage("internal", "notificationMaxHeight", 30)
+    const [ toasts, setToasts ] = React.useState([])
     
     React.useEffect(() => {
       DrApi.toast = {
