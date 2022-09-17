@@ -54,6 +54,9 @@ export default new class Webpack {
     if (typeof query === "function") query = { filter: query }
 
     query.defaultExport ??= false
+    query.errors ??= new Set()
+
+    if (query.errors instanceof Array) query.errors = new Set(query.errors)
 
     if (query.filters) {
       query.filters = query.filters.map(filter => this.#ensureQuery(filter))
@@ -63,7 +66,7 @@ export default new class Webpack {
     const old = query.filter
     query.filter = (module, id) => {
       try { return old(query.searchInDefault ? module.default : module, id) }
-      catch (error) {}
+      catch (error) { query.errors.add(error) }
     }
 
     return query
@@ -142,16 +145,13 @@ export default new class Webpack {
       if (cached) return resolve(cached)
 
       function waiter(module, id) {
-        try {
-          if (!module) return
-          
-          if (query.filter(module, id)) {
-            _this.waiting.delete(waiter)
-            resolve(query.defaultExport ? module.default : module)
-            return true
-          }
-          
-        } catch (error) {}
+        if (!module) return
+        
+        if (query.filter(module, id)) {
+          _this.waiting.delete(waiter)
+          resolve(query.defaultExport ? module.default : module)
+          return true
+        }
       }
 
       this.waiting.add(waiter)

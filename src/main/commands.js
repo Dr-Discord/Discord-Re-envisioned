@@ -13,6 +13,32 @@ const section = {
 }
 
 export default async (React) => {
+  const commands = new Map()
+
+  window.DrApi.commands = {
+    commands,
+    register: ({ name, id = name, execute, options = [], ...other }) => {
+      commands.set(id, {
+        id,
+        name,
+        get displayName() { return name || "" },
+        displayDescription: other.description,
+        options,
+        execute,
+        type: 0,
+        target: 1,
+        applicationId: section.id,
+        dmPermission: true,
+        listed: true,
+        ...other,
+        isDrCommand: true
+      })
+
+      return () => DrApi.commands.unregister(id)
+    },
+    unregister: (id) => commands.delete(id)
+  }
+
   logger.log("Commands", "Initializing Command api")
 
   webpack.getModuleByPropsAsync("getBuiltInCommands", "BUILT_IN_SECTIONS").then((CommandsStore) => CommandsStore.BUILT_IN_SECTIONS[section.id] = section)
@@ -26,18 +52,18 @@ export default async (React) => {
       if (!query || query.startsWith("/")) return
       res = [].concat(...(res ?? []))
 
-      for (const command of [...window.DrApi.commands.commands]) {
+      for (const command of [ ...commands.values() ]) {
         if (!command.name.toLowerCase().includes(query.toLowerCase())) continue
         if (res.some(e => e.isDrCommand && e.id === command.id)) continue
         res.unshift(command)
       }
 
-      return res
+      return res.sort()
     })
 
     patcher.after("DrApi", SearchStore, "useSearchManager", (that, [, type], res) => {
-      if (type !== 1 || !DrApi.commands.commands.size) return
-
+      if (type !== 1 || !commands.size) return
+      
       if (!res.sectionDescriptors?.find?.(s => s.id === section.id)) {
         res.sectionDescriptors ??= []
         res.sectionDescriptors.push(section)
@@ -45,11 +71,11 @@ export default async (React) => {
 
       if ((!res.filteredSectionId || res.filteredSectionId === section.id) && !res.activeSections.find(s => s.id === section.id)) res.activeSections.push(section)
 
-      const cmds = [...DrApi.commands.commands]
+      const cmds = [ ...commands.values() ]
       if (cmds.some(c => !res.commands?.find?.(r => c.isDrCommand && r.id === c.id))) {
         res.commands ??= []
-        const collection = [...res.commands, ...cmds]
-        res.commands = [...new Set(collection)]
+        const collection = [ ...res.commands, ...cmds ]
+        res.commands = [ ...new Set(collection) ]
 
         const found = res.commandsByActiveSection.find(r => r.section.id === section.id)
         if (found) found.data = cmds
@@ -68,16 +94,16 @@ export default async (React) => {
     })
   })
 
-  webpack.getModuleAsync(m => m.type.displayName === "ChannelApplicationIcon").then((ChannelApplicationIcon) => patcher.after("DrApi", ChannelApplicationIcon.default, "type", (_, [ props ]) => !props.section && props.command.isDrCommand ? void (props.section = section) : undefined))
+  webpack.getModuleAsync(m => m.default.type.displayName === "ChannelApplicationIcon").then((ChannelApplicationIcon) => patcher.after("DrApi", ChannelApplicationIcon.default, "type", (_, [ props ]) => !props.section && props.command.isDrCommand ? void (props.section = section) : undefined))
   webpack.getModuleByDisplayNameAsync("ApplicationCommandItem").then((ApplicationCommandItem) => patcher.before("DrApi", ApplicationCommandItem, "default", (_, [ props ]) => !props.section && props.command.isDrCommand ? void (props.section = section) : undefined))
 
   void async function() {
     const classes = await webpack.getModuleAsync(m => !m.mask && m.icon && m.selectable && m.wrapper)
     const SectionIcon = await webpack.getModuleByDisplayNameAsync("ApplicationCommandDiscoverySectionIcon")
 
-    patcher.after("DrApi", SectionIcon, "default", (that, [props], res) => {
+    patcher.after("DrApi", SectionIcon, "default", (that, [ props ], res) => {
       if (props.section.id !== section.id) return
-
+      
       const isSmall = props.selectable === undefined
 
       return React.createElement("div", {
@@ -105,29 +131,5 @@ export default async (React) => {
       })
     })
   }()
-
-  window.DrApi.commands = {
-    commands: new Set(),
-    register: ({ name, id = name, execute, options = [], ...other }) => {
-      DrApi.commands.commands.add({
-        id,
-        name,
-        get displayName() { return name || "" },
-        displayDescription: other.description,
-        options,
-        execute,
-        type: 0,
-        target: 1,
-        applicationId: section.id,
-        dmPermission: true,
-        listed: true,
-        ...other,
-        isDrCommand: true
-      })
-
-      return () => DrApi.commands.unregister(id)
-    },
-    unregister: (id) => DrApi.commands.commands.delete([ ...DrApi.commands.commands ].find(c => c.id === id))
-  }
 }
 
