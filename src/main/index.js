@@ -7,6 +7,7 @@ import notifications from "./notifications"
 import styles, { documentReady, plugins as pluginStyleNode, themes as themeStyleNode } from "./styles"
 import modals from "./modals"
 import commands from "./commands"
+import badges from "./badges"
 import update from "./update"
 
 import styling from "styles"
@@ -38,6 +39,8 @@ window.DrApi = {
   webpack,
   Patcher,
   storage: {
+    local: localStorage,
+    session: sessionStorage,
     useStorage: (pluginName, key, defaultValue) => storage.useStorage(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, defaultValue),
     getData: (pluginName, key, defaultValue) => storage.getData(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, defaultValue),
     setData: (pluginName, key, value) => storage.setData(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, value)
@@ -168,6 +171,7 @@ void async function() {
   modals(React).catch((error) => logger.error("Modals", error))
   windowsLoadingIcon(React).catch((error) => logger.error("WindowsLoadingIcon", error))
   commands(React).catch((error) => logger.error("Commands", error))
+  badges(React).catch((error) => logger.error("Badges", error))
 
   const dispatcher = await webpack.getModuleByPropsAsync("subscribe", "dispatch")
   function onOpen() {

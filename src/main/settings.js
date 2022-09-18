@@ -6,7 +6,7 @@ import { getThemes, toggleTheme, parseTheme, isTheme, isSplash } from "./themes"
 import { getPlugins, togglePlugin } from "./plugins"
 import logger from "./logger"
 
-const shell = DrApiNative.runInNative(`require("electron").shell`)
+const shell = DrApiNative.runInNative("require(\"electron\").shell")
 
 export default async (React) => {
   const SettingsView = await webpack.getModuleByDisplayNameAsync("SettingsView", true)
