@@ -8,7 +8,6 @@ export default async (React) => {
   const Tooltip = webpack.getModuleByDisplayName("Tooltip", true)
   const Clickable = webpack.getModuleByDisplayName("Clickable", true)
   const classes = webpack.getModuleByProps("clickable", "profileBadge22", "containerWithContent")
-  const FlowerStar = webpack.getModuleByDisplayName("FlowerStar", true)
 
   function Badge({ text, children, onClick = () => {}, className }) {
     return React.createElement(Tooltip, {
@@ -74,14 +73,14 @@ export default async (React) => {
     id: "InternalDeveloperDoggyBootsyBadge",
     children: DrIcon,
     text: "Discord Re-invisioned Team",
-    onClick: () => shell.openExternal("https://github.com/orgs/Dr-Discord/teams/dev")
+    onClick: () => shell.openExternal("https://github.com/Dr-Discord/")
   })
   DrApi.badges.add({
     userId: "359174224809689089",
     id: "InternalDeveloperUnknown81311Badge",
     children: DrIcon,
     text: "Discord Re-invisioned Team",
-    onClick: () => shell.openExternal("https://github.com/orgs/Dr-Discord/teams/dev")
+    onClick: () => shell.openExternal("https://github.com/Dr-Discord/")
   })
 
   function callback(that, [ props ], res) {

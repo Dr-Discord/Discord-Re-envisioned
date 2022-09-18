@@ -43,7 +43,7 @@ export default async (React) => {
 
   webpack.getModuleByPropsAsync("getBuiltInCommands", "BUILT_IN_SECTIONS").then((CommandsStore) => CommandsStore.BUILT_IN_SECTIONS[section.id] = section)
 
-  webpack.getModuleByPropsAsync("getApplicationIconURL").then((Icons) => patcher.after("DrApi", Icons, "getApplicationIconURL", (that, [props]) => props?.id === section.id ? section.icon : undefined))
+  webpack.getModuleByPropsAsync("getApplicationIconURL").then((Icons) => patcher.after("DrApi", Icons, "getApplicationIconURL", (that, [ props ]) => props?.id === section.id ? section.icon : undefined))
 
   webpack.getModuleByPropsAsync("useSearchManager").then((SearchStore) => {
     patcher.after("DrApi", SearchStore.default, "getApplicationSections", (that, args, res) => !res?.find(r => r.id === section.id) ? void res.push(section) : undefined)
@@ -57,7 +57,7 @@ export default async (React) => {
         if (res.some(e => e.isDrCommand && e.id === command.id)) continue
         res.unshift(command)
       }
-
+      
       return res.sort()
     })
 
@@ -101,7 +101,7 @@ export default async (React) => {
     const classes = await webpack.getModuleAsync(m => !m.mask && m.icon && m.selectable && m.wrapper)
     const SectionIcon = await webpack.getModuleByDisplayNameAsync("ApplicationCommandDiscoverySectionIcon")
 
-    patcher.after("DrApi", SectionIcon, "default", (that, [ props ], res) => {
+    patcher.after("DrApi", SectionIcon, "default", (that, [ props ]) => {
       if (props.section.id !== section.id) return
       
       const isSmall = props.selectable === undefined
@@ -116,7 +116,7 @@ export default async (React) => {
           width: props.width,
           height: props.height,
           viewBox: "0 0 22 22",
-          className: [classes?.icon, props.className].filter(e => e).join(" "),
+          className: [ classes?.icon, props.className].filter(e => e).join(" "),
           style: {
             width: `${props.width}px`,
             height: `${props.height}px`,
