@@ -173,26 +173,29 @@ export default async (React) => {
     const [ maxHeight ] = storage.useStorage("internal", "notificationMaxHeight", 30)
     const [ toasts, setToasts ] = React.useState([])
     
+    const deleteToast = React.useCallback((id) => {
+      const toast = toasts.find(t => t.id === id)
+      const index = toasts.indexOf(toast)
+      if (index === -1) return
+      toasts.splice(index, 1)
+      setToasts([...toasts])
+    }, [ toasts ])
+    const showToast = React.useCallback((toast) => {
+      toast.id ??= `toast-id-${toastId}`
+      toastId++
+      toast.hideToast = (event) => {
+        DrApi.toast.delete(toast.id)
+        if (toast.onClose) toast.onClose(event)
+      }
+      setToasts(toasts.concat(toast))
+      return () => toast.hideToast()
+    }, [ toasts ])
+
     React.useEffect(() => {
       DrApi.toast = {
         toasts,
-        delete(id) {
-          const toast = toasts.find(t => t.id === id)
-          const index = toasts.indexOf(toast)
-          if (index === -1) return
-          toasts.splice(index, 1)
-          setToasts([...toasts])
-        },
-        show(toast) {
-          toast.id ??= `toast-id-${toastId}`
-          toastId++
-          toast.hideToast = (event) => {
-            DrApi.toast.delete(toast.id)
-            if (toast.onClose) toast.onClose(event)
-          }
-          setToasts(toasts.concat(toast))
-          return () => toast.hideToast()
-        }
+        delete: deleteToast,
+        show: showToast
       }
     })
 
