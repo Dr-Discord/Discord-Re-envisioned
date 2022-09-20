@@ -75,6 +75,8 @@ electron.app.name = pkg.name
 const appOld = path.join(process.resourcesPath, "app-old")
 
 if (require("fs").existsSync(appOld)) {
+  console.warn("Discord Re-envisioned can error with other mods!")
+
   const res = require(appOld)
   if (typeof res === "function") res(() => Module._load(path.join(basePath, pkg.main), null, true))
 }

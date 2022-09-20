@@ -9,8 +9,8 @@ Module.globalPaths.push(path.join(process.resourcesPath, "app.asar/node_modules"
 
 // Replace 'electron/renderer' so we can mess with 'DiscordNative'
 delete require.cache.electron.exports
-require.cache.electron.exports = {}
-Object.defineProperty(require.cache.electron.exports, "contextBridge", {
+const electronCache = require.cache.electron.exports = {}
+Object.defineProperty(electronCache, "contextBridge", {
   get: () => ({
     exposeInMainWorld(key, value) {
       if (key === "DiscordNative") {
@@ -23,8 +23,8 @@ Object.defineProperty(require.cache.electron.exports, "contextBridge", {
   })
 })
 Object.entries(electron).map(([key, value]) => {
-  if (key in require.cache.electron.exports) return
-  Object.defineProperty(require.cache.electron.exports, key, { get: () => value })
+  if (key in electronCache) return
+  Object.defineProperty(electronCache, key, { get: () => value })
 })
 
 try {
