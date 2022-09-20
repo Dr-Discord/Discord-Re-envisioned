@@ -21,6 +21,7 @@ export default (id, css) => {
     plugins.append(style)
   }
   style.innerHTML = css
+  
   return () => style.remove()
 }
 

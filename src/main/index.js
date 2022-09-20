@@ -35,18 +35,15 @@ for (const key in originalConsole) {
 }
 
 window.DrApi = {
-  request: (url, then) => fetch(url).then(then),
   webpack,
   Patcher,
   storage: {
-    local: localStorage,
-    session: sessionStorage,
     useStorage: (pluginName, key, defaultValue) => storage.useStorage(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, defaultValue),
     getData: (pluginName, key, defaultValue) => storage.getData(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, defaultValue),
     setData: (pluginName, key, value) => storage.setData(pluginName === "internal" ? pluginName : `${pluginName}.plugin`, key, value)
   },
   plugins: {
-    getAll: () => getPlugins(),
+    getAll: () => Object.values(getPlugins()),
     get: (id) => getPlugins()[id],
     isEnabled: (id) => storage.getData("internal", "enabledPlugins", []).includes(id),
     toggle: (id) => {
@@ -70,7 +67,7 @@ window.DrApi = {
     }
   },
   themes: {
-    getAll: (splash) => getThemes(splash),
+    getAll: (splash) => Object.values(getThemes(splash)),
     get: (id, splash) => getThemes(splash)[id],
     isEnabled: (id, splash) => storage.getData("internal", splash ? "enabledSplashThemes" : "enabledThemes", []).includes(id),
     toggle: (id, splash) => {
@@ -124,7 +121,7 @@ async function windowsLoadingIcon(React) {
   
   const dispatcher = webpack.getModuleByProps("subscribe", "dispatch")
 
-  DrApi.Patcher.after("DrApi", titlebar, "default", (that, args, res) => {
+  DrApi.Patcher.after("DrApi/Loading", titlebar, "default", (that, args, res) => {
     const [ isLoaded, setLoaded ] = React.useState(loaded)
 
     React.useEffect(() => {

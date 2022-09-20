@@ -35,7 +35,6 @@ export default async (React) => {
   const badges = {}
 
   window.DrApi.badges = {
-    badges,
     add: ({ userId, id, children, onClick, text }) => {
       const b = badges[userId] ??= new Map()
 
@@ -97,11 +96,11 @@ export default async (React) => {
     })
   }
 
-  patcher.after("DrApi", UserProfileBadgeList, "default", callback)
+  patcher.after("DrApi/Badges", UserProfileBadgeList, "default", callback)
 
   const UserProfileBadgeList2 = await webpack.getModule({
     filter: (m) => m.displayName === "UserProfileBadgeList" ? m !== UserProfileBadgeList.default : false,
     searchInDefault: true
   })
-  patcher.after("DrApi", UserProfileBadgeList2, "default", callback)
+  patcher.after("DrApi/Badges", UserProfileBadgeList2, "default", callback)
 }

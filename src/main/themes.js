@@ -216,7 +216,7 @@ const watches = {}
 DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(themesFolder), (type, file) => {
   if (watches[file]) return
   watches[file] = true
-  setTimeout(() => watches[file] = false, 200)
+  setTimeout(() => watches[file] = false, 300)
   if (isTheme(file)) return watchTheme(file)
   if (isSplash(file)) return watchSplash(file)
 })

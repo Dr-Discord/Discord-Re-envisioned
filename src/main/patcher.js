@@ -65,6 +65,8 @@ export default new class Patcher {
     return hook
   }
   before(id, mod, fn, callback) {
+    if (id.startsWith("DrApi/")) id = "DrApi"
+
     const hook = this.hook(mod, fn)
     const obj = { callback, id }
     hook.before.add(obj)
@@ -75,6 +77,8 @@ export default new class Patcher {
     return () => hook.before.delete(obj)
   }
   instead(id, mod, fn, callback) {
+    if (id.startsWith("DrApi/")) id = "DrApi"
+
     const hook = this.hook(mod, fn)
     const obj = { callback, id }
     hook.instead.add(obj)
@@ -85,6 +89,8 @@ export default new class Patcher {
     return () => hook.instead.delete(obj)
   }
   after(id, mod, fn, callback) {
+    if (id.startsWith("DrApi/")) id = "DrApi"
+    
     const hook = this.hook(mod, fn)
     const obj = { callback, id }
     hook.after.add(obj)
@@ -95,6 +101,8 @@ export default new class Patcher {
     return () => hook.after.delete(obj)
   }
   unpatchAll(id) {
+    if (id.startsWith("DrApi/")) id = "DrApi"
+    
     this.patches[id] ??= []
     for (const undo of this.patches[id]) undo()
   }

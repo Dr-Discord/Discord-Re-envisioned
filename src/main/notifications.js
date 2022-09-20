@@ -193,7 +193,6 @@ export default async (React) => {
 
     React.useEffect(() => {
       DrApi.toast = {
-        toasts,
         delete: deleteToast,
         show: showToast
       }
@@ -214,7 +213,7 @@ export default async (React) => {
     })
   }
 
-  Patcher.after("DrApi", Shakeable.prototype, "render", (that, args, res) => {
+  Patcher.after("DrApi/Commands", Shakeable.prototype, "render", (that, args, res) => {
     if (res.props.children.find(child => child.type === Toasts)) return
     res.props.children.push(React.createElement(Toasts))
   })

@@ -1491,13 +1491,11 @@ export default async (React) => {
     },
     {
       element: () => React.createElement(Settings),
-      icon: React.createElement(Gear, { width: 20, height: 20 }),
       label: "Settings",
       section: "Discord Re-envisioned"
     },
     {
       element: () => React.createElement(Themes),
-      icon: React.createElement(Creative, { width: 20, height: 20 }),
       label: "Themes",
       section: "Discord Re-envisioned Themes"
     },
@@ -1508,19 +1506,17 @@ export default async (React) => {
         render: () => React.createElement(CustomCSS),
         features: {}
       }) : DrApi.modals.alert("Custom CSS", "The Ace editor didnt load, so custom CSS wont be usable"),
-      icon: React.createElement(Pencil, { width: 20, height: 20 }),
       label: "Custom CSS",
       section: "Discord Re-envisioned Custom CSS"
     },
     {
       element: () => React.createElement(Plugins),
-      icon: React.createElement(InlineCode, { width: 20, height: 20 }),
       label: "Plugins",
       section: "Discord Re-envisioned Plugins"
     }
   ]
 
-  patcher.after("DrApi", SettingsView.prototype, "getPredicateSections", (that, args, res) => {
+  patcher.after("DrApi/Settings", SettingsView.prototype, "getPredicateSections", (that, args, res) => {
     const friendRequests = res.indexOf(res.find(s => s.section === "Friend Requests")) + 1
 
     if (!friendRequests) return
@@ -1531,7 +1527,7 @@ export default async (React) => {
 
   const latestChangelog = DrApiNative.changelog[0]
 
-  patcher.after("DrApi", webpack.getModuleByDisplayName("ClientDebugInfo"), "default", (that, args, res) => {
+  patcher.after("DrApi/DebugInfo", webpack.getModuleByDisplayName("ClientDebugInfo"), "default", (that, args, res) => {
     res.props.children.push(React.createElement(Text, {
       className: line,
       color: "text-muted",

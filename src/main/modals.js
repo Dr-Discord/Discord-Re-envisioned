@@ -34,16 +34,15 @@ export default async (React) => {
     open(content, id) {
       id ??= `DrApi-Modal-${_id++}`
 
-      openModal(typeof content === "function" ? content : () => content, {
-        modalKey: id
-      })
+      openModal(content, { modalKey: id })
 
-      return { close: () => closeModal(id), id }
+      return () => closeModal(id)
     },
     close: (id) => closeModal(id),
-    alert(title, content, opts = {}) {
+    alert: (title, content, opts = {}) => {
       const { confirmText = Messages.OKAY, onConfirm } = opts
-      this.open((props) => React.createElement(Alert, {
+      
+      openModal((props) => React.createElement(Alert, {
         ...props,
         title: title,
         confirmText,
@@ -51,9 +50,10 @@ export default async (React) => {
         body: makeContent(content)
       }))
     },
-    confirmModal(title, content, opts = {}) {
+    confirmModal: (title, content, opts = {}) => {
       const { cancelText = Messages.CANCEL, confirmText = Messages.OKAY, danger = false, onConfirm, onCancel } = opts
-      this.open((props) => React.createElement(ConfirmModal, {
+
+      openModal((props) => React.createElement(ConfirmModal, {
         ...props,
         header: title,
         confirmText,
