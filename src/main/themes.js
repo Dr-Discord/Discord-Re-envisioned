@@ -42,58 +42,48 @@ function int(color) {
 export function parseTheme(contents) {
   const meta = readMeta(contents)
 
-  meta.originalCSS = contents
   meta.css = contents
-
-  const settings = contents.match(/@settings((\s|)+)(.*?)((\s|)+){((\n|)((\s|)+)([A-z]|[0-9])+:((\s|)+)((rgb|hsl|#|)(a|)(([A-z]|[0-9])+|\((([0-9]|\.)+(,|\/|)((\s|)+)){0,4}\))|(["'])(.*?[^\\])\1)(;|)(\n|)((\s|)+)){0,}}/g)
+  const settings = contents.match(/@settings\s+(.*?)(\s+|){[^}]+}/g)
   if (!settings) return meta
-
-  const _settings = {}
-
+  
+  const vars = {}
+  
   for (let setting of settings) {
-    contents = contents.replace(setting, "")
-  
-    setting = setting.replace(/@settings((\s|)+)/g, "")
-  
-    let id = setting.match(/(.*?)((\s|)+){/g)[0]
-    id = id.replace(id.match(/((\s|)+){/g)[0], "")
-  
-    let body = setting.replace(setting.match(/(.*?)((\s|)+){/g)[0], "").replace(/((\s|\n|)+)}/g, "")
-  
-    const properties = []
-    for (let key of body.match(/((\s|)+)([A-z]|[0-9])+:((\s|)+)/g)) {
-      body = body.replace(key, "")
-      for (const iterator of key.match(/((\s|)+)/)) key = key.replace(iterator, "").replace(":", "")
-      properties.push(key)
-    }
-    
-    const _properties = {}
-    const _matches = body.match(/((["'])(.*?[^\\])\2|((rgb|#|)(a|)(([A-z]|[0-9])+|\((([0-9]|\.)+(,|\/|)((\s|)+)){0,4}\))|(["'])(.*?[^\\])\1))/g)
-    for (const id in _matches) {
-      const val = _matches[id]
-      if (val.startsWith("\"") || val.startsWith("'")) _properties[properties[id]] = val.substring(1, val.length - 1)
-      else if (val.startsWith("#") || val.startsWith("rgb")) _properties[properties[id]] = int(val)
-      else _properties[properties[id]] = val
-    }
+    meta.css = meta.css.replace(setting, "")
 
-    if (_properties.regex) {
-      const match = _properties.regex.match(/(^\/)((.*?)+)\/(\w+|)/)
-      if (match) _properties.regex = new RegExp(match[2], match[4])
-      else _properties.regex = new RegExp(_properties.regex)
+    const [, starter, varName ] = setting.match(/(@settings\s+(.*?)(\s+|)){[^}]+}/)
+    vars[varName] = {}
+    const matches = setting.replace(starter, "").match(/(.+):(.+)/g)
+    for (const propAndVal of matches) {
+      const [,, prop,, val] = propAndVal.match(/(\s+|)(.+):(\s+|)(.+[^;])(\s+|)(;|)/)
+      const match = val.match(/^(["'])(.+[^\1])\1$/)
+      if (match) vars[varName][prop] = match[2]
+      else vars[varName][prop] = val
+      if (prop === "regex") {
+        const str = vars[varName][prop]
+        const match = str.match(/\/(.*?)\/(.*?)+/)
+        if (match) vars[varName][prop] = new RegExp(match[1], match[2])
+        else vars[varName][prop] = new RegExp(str)
+      }
     }
-  
-    _settings[id] = _properties
+    if (vars[varName].type === "color") vars[varName].initial = int(vars[varName].initial)
   }
 
-  const data = storage.readJSON(`${meta.name}.theme`)
+  meta.compiledCSS = meta.css
+  meta.settings = vars
 
-  meta.settings = _settings
-  meta.css = `${contents}\n\n/* Generated CSS Settings */\n:root {\n${Object.entries(_settings).map(([key, value]) => {
-    if (value.type.toLowerCase() === "color") return`\t--${key}: #${int(data[key] ?? value.initial)}`
-    if (value.type.toLowerCase() === "text") return`\t--${key}: ${JSON.stringify(data[key] ?? value.initial ?? "")}`
-    if (value.type.toLowerCase() === "switch") return`\t--${key}: ${data[key] ?? JSON.parse(value.initial) ? 1 : 0}`
-    if (value.type.toLowerCase() === "slider") return`\t--${key}: ${data[key] ?? value.initial ? 1 : 0}`
-  }).join(";\n")}\n}`
+  meta.makeCSS = () => {
+    const data = storage.readJSON(`${meta.name}.theme`)
+    
+    return `${meta.compiledCSS}\n\n/* Generated CSS Settings */\n:root {\n${Object.entries(vars).map(([key, value]) => {
+      if (value.type.toLowerCase() === "color") return`\t--${key}: #${int(data[key] ?? value.initial)}`
+      if (value.type.toLowerCase() === "text") return`\t--${key}: ${JSON.stringify(data[key] ?? value.initial ?? "")}`
+      if (value.type.toLowerCase() === "switch") return`\t--${key}: ${data[key] ?? JSON.parse(value.initial) ? 1 : 0}`
+      if (value.type.toLowerCase() === "slider") return`\t--${key}: ${data[key] ?? value.initial ? 1 : 0}`
+    }).join(";\n")}\n}`
+  }
+
+  meta.css = meta.makeCSS()
 
   return meta
 }

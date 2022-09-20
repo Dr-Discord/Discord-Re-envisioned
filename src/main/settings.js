@@ -878,7 +878,11 @@ export default async (React) => {
                 position: "absolute",
                 right: 10
               },
-              onClick: () => document.querySelector(`[dr-theme=${JSON.stringify(addon.name)}]`).innerHTML = parseTheme(addon.originalCSS).css
+              onClick: () => {
+                const css = addon.makeCSS()
+                addon.css = css
+                document.querySelector(`[dr-theme=${JSON.stringify(addon.name)}]`).innerHTML = css
+              }
             }),
             React.createElement(FormDivider, { className: dividerDefault })
           ]
