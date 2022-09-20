@@ -28,7 +28,6 @@
   const esbuild = require("esbuild")
   const asar = require("asar")
   const sass = require("sass")
-  const unzip = require("unzip-crx-3")
 
   const production = process.argv.includes("--production")
   if (production) console.log("Production mode enabled!")
@@ -56,14 +55,6 @@
       req.on("error", reject)
       req.end()
     })
-  }
-
-  if (!fs.existsSync("dist/rdt")) {
-    console.log("Downloading rdt...")
-    await downloadFile("https://clients2.google.com/service/update2/crx?response=redirect&acceptformat=crx2,crx3&x=id%3Dfmkadmapgofadopljbjfkapdkoienihi%26uc&prodversion=32", "rdt.crx")
-    await unzip("rdt.crx", "dist/rdt")
-    changePermissions("dist/rdt", 755)
-    console.log("Downloaded rdt")
   }
 
   const license = fs.readFileSync("license", "utf-8")

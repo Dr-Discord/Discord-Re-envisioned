@@ -1,6 +1,22 @@
 [
   {
     "title": "What's New",
+    "subtitle": "Discord Re-envisioned v1.1.3",
+    "body": [
+      {
+        "title": "INTERNAL ",
+        "type": "improved",
+        "content": [
+          {
+            "title": "Changed Api.",
+            "content": "Removed some stuff"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "title": "What's New",
     "subtitle": "Discord Re-envisioned v1.1.2",
     "body": [
       {
