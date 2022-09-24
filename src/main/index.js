@@ -35,6 +35,7 @@ for (const key in originalConsole) {
 }
 
 window.DrApi = {
+  [Symbol.toStringTag]: "DrApi",
   webpack,
   Patcher,
   storage: {

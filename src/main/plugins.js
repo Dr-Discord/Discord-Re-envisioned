@@ -82,7 +82,7 @@ DrApiNative.require("fs").watch(DrApiNative.fileSystem.join(pluginsFolder), (typ
   
   if (ready) {
     try {
-      const res = window.eval(`(function() {\n${meta.js}\n})()\n//# sourceURL=${encodeURIComponent(meta.name)}`)
+      const res = window.eval(`(function(${meta.apiobject ? meta.apiobject : ""}) {\n${meta.js}\n})(window.DrApi)\n//# sourceURL=${encodeURIComponent(meta.name)}`)
         
       meta.exports = typeof res === "function" ? new res : res
       if (!meta.exports) return meta.didError = true
@@ -103,7 +103,7 @@ export default () => {
   
   for (const plugin of Object.values(_plugins)) {
     try {
-      const res = window.eval(`(function() {\n${plugin.js}\n})()\n//# sourceURL=${encodeURIComponent(plugin.name)}`)
+      const res = window.eval(`(function(${plugin.apiobject ? plugin.apiobject : ""}) {\n${plugin.js}\n})(window.DrApi)\n//# sourceURL=${encodeURIComponent(plugin.name)}`)
       
       plugin.exports = typeof res === "function" ? new res : res
       if (!plugin.exports) return plugin.didError = true
