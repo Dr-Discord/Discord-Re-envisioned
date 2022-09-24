@@ -111,7 +111,7 @@ for (const theme of splashThemes) {
   _splashThemes[meta.name] = meta
 }
 
-let Creative
+let Wrench
 let DoubleStarIcon
 
 function watchTheme(file) {
@@ -147,11 +147,11 @@ function watchTheme(file) {
   _themes[meta.name] = meta
 
   if (DrApi.toast) {
-    if (!Creative) Creative = webpack.getModuleByDisplayName("Creative", true)
+    if (!Wrench) Wrench = webpack.getModuleByDisplayName("Wrench", true)
     DrApi.toast.show({
       title: `'${meta.name}' updated`,
       type: "info",
-      icon: DrApi.React.createElement(Creative),
+      icon: DrApi.React.createElement(Wrench),
       duration: 4000
     })
   }

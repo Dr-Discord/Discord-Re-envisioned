@@ -42,7 +42,7 @@ export default async (React) => {
     WalletIcon,
     Ticket,
     DoubleStarIcon,
-    Creative,
+    Wrench,
     SortIcon,
     OsMac,
     Retry,
@@ -199,7 +199,7 @@ export default async (React) => {
     defaultExport: true,
     searchInDefault: true
   }, {
-    filter: (m) => m.displayName === "Creative", 
+    filter: (m) => m.displayName === "Wrench", 
     defaultExport: true,
     searchInDefault: true
   }, {
@@ -955,7 +955,7 @@ export default async (React) => {
                     children: [
                       React.createElement(Tooltip, {
                         text: isTheme(addon.filePath) ? "Theme" : isSplash(addon.filePath) ? "Splash Theme" : "Plugin",
-                        children: (props) => React.createElement(isTheme(addon.filePath) ? Creative : isSplash(addon.filePath) ? DoubleStarIcon : InlineCode, { 
+                        children: (props) => React.createElement(isTheme(addon.filePath) ? Wrench : isSplash(addon.filePath) ? DoubleStarIcon : InlineCode, { 
                           className: iconToolbar, 
                           style: { marginRight: 8 }, 
                           onMouseEnter: props.onMouseEnter,
@@ -1044,7 +1044,7 @@ export default async (React) => {
                       DrApi.toast.show({
                         title: `${val ? "Enabled" : "Disabled"} '${addon.name}'`,
                         type: "info",
-                        icon: React.createElement(isTheme(addon.filePath) ? Creative : isSplash(addon.filePath) ? DoubleStarIcon : InlineCode),
+                        icon: React.createElement(isTheme(addon.filePath) ? Wrench : isSplash(addon.filePath) ? DoubleStarIcon : InlineCode),
                         duration: 4000
                       })
     
@@ -1208,7 +1208,7 @@ export default async (React) => {
         children: [
           React.createElement(Flex, {
             children: [
-              React.createElement(Creative, { style: { marginRight: 8 } }),
+              React.createElement(Wrench, { style: { marginRight: 8 } }),
               "Themes"
             ]
           }),
